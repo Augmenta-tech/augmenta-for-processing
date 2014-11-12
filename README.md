@@ -1,32 +1,36 @@
 Augmenta for Processing
 =======================
 
-A [Processing][] Augmenta library and examples maintained by [Théoriz][]	
+A [Processing][] Augmenta helper library and examples maintained by [Théoriz][].
 
 Installation
 ------------
 
 We assume that you have [Processing][] installed.
 
-On MAC OSX
+```
+git clone https://github.com/Username/AugmentaP5.git or download library
+```
+
+On Mac OSX
 
 ```
-git clone https://github.com/Username/AugmentaP5.git or copy the files to /Users/Username/Documents/Processing
+/Users/Username/Documents/Processing
 ```
 
 On Windows
 
 ```bash
-git clone https://github.com/Username/AugmentaP5.git or copy the files to C:/My Documents/Processing/
+C:/My Documents/Processing/
 ```
 
-Restart [Processing][].
+Then restart [Processing][].
 
 Importing Augmenta to your sketch
 ---------------------------------
 
 ```
-In processing, go to Sketch -> Import Library... -> AugmentaP5
+Sketch -> Import Library... -> AugmentaP5
 ```
 
 Examples
@@ -43,7 +47,7 @@ OscP5 by Andreas Schlegel
 
 ### 2D and 3D example
 
-Complete example receiving and drawing Augmenta data
+Full example receiving and drawing Augmenta data
 
 * Dependencies :
 
