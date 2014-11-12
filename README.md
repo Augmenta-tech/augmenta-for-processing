@@ -1,7 +1,7 @@
 Augmenta for Processing
 =======================
 
-**A [Processing][] Augmenta library and examples maintained by [Théoriz][]	
+A [Processing][] Augmenta library and examples maintained by [Théoriz][]	
 
 Installation
 ------------
@@ -10,25 +10,23 @@ We assume that you have [Processing][] installed.
 
 On MAC OSX
 
-```bash
-git clone this repo or copy the files in /Users/Username/Documents/Processing
+```
+git clone https://github.com/Username/AugmentaP5.git or copy the files to /Users/Username/Documents/Processing
 ```
 
 On Windows
 
 ```bash
-git clone this repo or copy the files in c:/My Documents/Processing/
+git clone https://github.com/Username/AugmentaP5.git or copy the files to C:/My Documents/Processing/
 ```
 
-Restart [Processing][]
+Restart [Processing][].
 
 Importing Augmenta to your sketch
 ---------------------------------
 
-Launch [Processing][].
-
 ```
-Simply got to Sketch -> Import Library... -> Augmenta
+In processing, go to Sketch -> Import Library... -> AugmentaP5
 ```
 
 Examples
@@ -105,9 +103,9 @@ Protocol
 Thanks
 ------
 
-This library is heavily based on [OpenTSPS][] processing library.
+Thanks to the guys at [OpenTSPS][], this library is heavily inspired from it.
 
 [Processing]: http://www.processing.org/
-[Theoriz]: http://www.theoriz.com/
-[OpenTSPS]: https://github.com/labatrockwell/openTSPS
-[Eclipse]: http://www.eclipse.org
+[Théoriz]: http://www.theoriz.com/
+[OpenTSPS]: https://github.com/labatrockwell/openTSPS/
+[Eclipse]: http://www.eclipse.org/
