@@ -29,6 +29,7 @@ Then restart [Processing][]
 
 Use
 ---
+In [Processing][]
 
 ```
 Sketch -> Import Library... -> AugmentaP5
@@ -48,7 +49,7 @@ Receive and draw Augmenta basic data
 
 Full example receiving and drawing Augmenta data
 
-Install needed libraries :
+Install needed libraries first :
 
 ```
 Sketch -> Import Library... -> Add Library -> Syphon by Andres Colubri
@@ -96,6 +97,7 @@ Data
         5: scene.width (int)                // Scene size
         6: scene.height (int)
 ```
+
 Contribute
 ----------
 
