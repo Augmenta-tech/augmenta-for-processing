@@ -6,16 +6,18 @@ A [Processing][] Augmenta helper library and examples maintained by [Théoriz st
 Install
 -------
 
-We assume that you have [Processing][] installed
+If you have [Processing][] installed, install AugmentaP5 library in the following directory
 
-Install AugmentaP5 library
+- Mac OSX : /Users/Username/Documents/Processing
+- Windows : C:/My Documents/Processing
 
 ```
-git clone https://github.com/Username/AugmentaP5.git or download library to :
+git clone https://github.com/Username/AugmentaP5.git
 ```
+or
 
-Mac OSX : /Users/Username/Documents/Processing
-Windows : C:/My Documents/Processing/
+   [https://github.com/Lyptik/AugmentaP5/archive/master.zip](https://github.com/Lyptik/AugmentaP5/archive/master.zip) (rename to AugmentaP5)
+
 
 Install OscP5 library
 
@@ -23,7 +25,7 @@ Install OscP5 library
 Sketch -> Import Library... -> Add Library -> OscP5 by Andreas Schlegel
 ```
 
-Then restart [Processing][].
+Then restart [Processing][]
 
 Use
 ---
@@ -97,14 +99,15 @@ Data
 Contribute
 ----------
 
-You need [Eclipse][] to modify this library
+You need [Eclipse][] to modify this library.
 
-// TODO : add help to launch eclipse
+Instructions are here : [https://github.com/processing/processing-library-template](https://github.com/processing/processing-library-template)
 
 Thanks
 ------
 
 Thanks to the guys at [OpenTSPS][], this library is heavily inspired from it.
+
 Thanks to the devs and beta testers whose contribution are vitals to the project
  Tom Duchêne / David-Alexandre Chanel / Jonathan Richer / you !
 
