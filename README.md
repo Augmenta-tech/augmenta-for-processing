@@ -9,16 +9,16 @@ Installation
 We assume that you have [Processing][] installed.
 
 ```
-git clone https://github.com/Username/AugmentaP5.git or download library
+git clone https://github.com/Username/AugmentaP5.git or download library to :
 ```
 
-On Mac OSX
+Mac OSX
 
 ```
 /Users/Username/Documents/Processing
 ```
 
-On Windows
+Windows
 
 ```bash
 C:/My Documents/Processing/
