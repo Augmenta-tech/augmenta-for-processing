@@ -1,36 +1,36 @@
 Augmenta for Processing
 =======================
 
-A [Processing][] Augmenta helper library and examples maintained by [Théoriz][].
+A [Processing][] Augmenta helper library and examples maintained by [Théoriz studio][]
 
-Installation
-------------
+Install
+-------
 
-We assume that you have [Processing][] installed.
+We assume that you have [Processing][] installed
+
+Install AugmentaP5 library
 
 ```
 git clone https://github.com/Username/AugmentaP5.git or download library to :
 ```
 
-Mac OSX
+Mac OSX : /Users/Username/Documents/Processing
+Windows : C:/My Documents/Processing/
+
+Install OscP5 library
 
 ```
-/Users/Username/Documents/Processing
-```
-
-Windows
-
-```bash
-C:/My Documents/Processing/
+Sketch -> Import Library... -> Add Library -> OscP5 by Andreas Schlegel
 ```
 
 Then restart [Processing][].
 
-Importing Augmenta to your sketch
----------------------------------
+Use
+---
 
 ```
 Sketch -> Import Library... -> AugmentaP5
+Sketch -> Import Library... -> OscP5 (needed dependency)
 ```
 
 Examples
@@ -42,31 +42,21 @@ Receive and draw Augmenta basic data
 
 // TODO add screenshot (insert basic view)
 
-Dependency
-OscP5 by Andreas Schlegel
-
 ### 2D and 3D example
 
 Full example receiving and drawing Augmenta data
 
-* Dependencies :
+Install needed libraries :
 
-- OscP5 by Andreas Schlegel
-- Syphon by Andres Colubri
-- G4P by Peter Lager
-- PeasyCam by Jonathan Feinberg (needed for the 3D example)
-
+```
+Sketch -> Import Library... -> Add Library -> Syphon by Andres Colubri
+Sketch -> Import Library... -> Add Library -> G4P by Peter Lager
+Sketch -> Import Library... -> Add Library -> PeasyCam by Jonathan Feinberg (for the 3D example only)
+```
 // TODO add screenshot (insert 2D and 3D view)
 
-Developping library
--------------------
-
-You need [Eclipse][] to modify this library
-
-// TODO : add help to launch eclipse
-
-Protocol
---------
+Data
+----
 
 ```
     * Augmenta OSC Protocol :
@@ -77,39 +67,48 @@ Protocol
 
         where args are :
 
-        0: pid (int)
-        1: oid (int)
-        2: age (int)
-        3: centroid.x (float)
-        4: centroid.y (float)
-        5: velocity.x (float)
+        
+        0: pid (int)                        // Personal ID ex : 42th person to enter stage has pid=42
+        1: oid (int)                        // Ordered ID ex : if 3 person on stage, 43th person has oid=2
+        2: age (int)                        // Time on stage (in frame number)
+        3: centroid.x (float)               // Position projected to the ground
+        4: centroid.y (float)               
+        5: velocity.x (float)               // Speed and direction vector
         6: velocity.y (float)
-        7: depth      (float)
-        8: boundingRect.x (float)
+        7: depth (float)                    // Distance to sensor (in m)
+        8: boundingRect.x (float)           // Bounding box on the ground
         9: boundingRect.y (float)
-        10: boundingRect.width  (float)
+        10: boundingRect.width (float)
         11: boundingRect.height (float)
-        12: highest.x (float)
+        12: highest.x (float)               // Highest point placement
         13: highest.y (float)
-        14: highest.z (float)
+        14: highest.z (float)               // Height
 
         /au/scene/   args0 arg1 ... argn
 
-        0: currentTime (int)
-        1: percentCovered (float)
-        2: numPeople (int)
-        3: averageMotion.x (float)
+        0: currentTime (int)                // Time (in frame number)
+        1: percentCovered (float)           // Percent covered
+        2: numPeople (int)                  // Number of person
+        3: averageMotion.x (float)          // Average motion
         4: averageMotion.y (float)
-        5: scene.width (int)
+        5: scene.width (int)                // Scene size
         6: scene.height (int)
 ```
+Contribute
+----------
+
+You need [Eclipse][] to modify this library
+
+// TODO : add help to launch eclipse
 
 Thanks
 ------
 
 Thanks to the guys at [OpenTSPS][], this library is heavily inspired from it.
+Thanks to the devs and beta testers whose contribution are vitals to the project
+ Tom Duchêne / David-Alexandre Chanel / Jonathan Richer / you !
 
 [Processing]: http://www.processing.org/
-[Théoriz]: http://www.theoriz.com/
+[Théoriz studio]: http://www.theoriz.com/
 [OpenTSPS]: https://github.com/labatrockwell/openTSPS/
 [Eclipse]: http://www.eclipse.org/
