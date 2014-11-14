@@ -100,7 +100,7 @@ void draw() {
   }
 
   // Update the UI
-  title.setText("Current scene : 3D example", GAlign.LEFT, GAlign.MIDDLE);
+  title.setText("Current scene : 2D example", GAlign.LEFT, GAlign.MIDDLE);
   sceneSizeInfo.setText("Scene size : "+ sceneSize[0]+"x"+sceneSize[1], GAlign.LEFT, GAlign.MIDDLE);
   inputPort.setText("Osc port : " + oscPort, GAlign.LEFT, GAlign.MIDDLE);
 }
