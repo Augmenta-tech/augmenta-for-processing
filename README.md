@@ -101,7 +101,7 @@ Data
 Contribute
 ----------
 
-You need [Eclipse][] to modify this library.
+Check [TODO](TODO.md) and [TOFIX](TOFIX.md), then get [Eclipse][] to modify this library.
 
 Instructions are here : [https://github.com/processing/processing-library-template](https://github.com/processing/processing-library-template)
 
