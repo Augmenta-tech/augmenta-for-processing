@@ -6,24 +6,29 @@ A [Processing][] Augmenta helper library and examples maintained by [Théoriz st
 Install
 -------
 
-If you have [Processing][] installed, install AugmentaP5 library in the following directory
-
-- Mac OSX : /Users/Username/Documents/Processing
-- Windows : C:/My Documents/Processing
-
-```
-git clone https://github.com/Username/AugmentaP5.git
-```
-or
-
-   [https://github.com/Lyptik/AugmentaP5/archive/master.zip](https://github.com/Lyptik/AugmentaP5/archive/master.zip) (rename to AugmentaP5)
-
-
-Install OscP5 library
+If you have [Processing][], install OscP5 library
 
 ```
 Sketch -> Import Library... -> Add Library -> OscP5 by Andreas Schlegel
 ```
+
+Then get AugmentaP5 library from here
+
+      [https://github.com/Lyptik/AugmentaP5/archive/master.zip](https://github.com/Lyptik/AugmentaP5/archive/master.zip) (rename to AugmentaP5)
+
+or
+
+```
+git clone https://github.com/Lyptik/AugmentaP5.git
+```
+
+in the following directory
+
+- Mac OSX : /Users/Username/Documents/Processing/libraries
+- Windows : C:/My Documents/Processing/libraries
+- Linux   : /home/Username/Processing/libraries
+
+You should now have an *AugmentaP5* named folder in this directory. (If not rename it)
 
 Then restart [Processing][]
 
@@ -32,8 +37,8 @@ Use
 In [Processing][]
 
 ```
-Sketch -> Import Library... -> AugmentaP5
 Sketch -> Import Library... -> OscP5 (needed dependency)
+Sketch -> Import Library... -> AugmentaP5
 ```
 
 Examples
@@ -57,6 +62,11 @@ Sketch -> Import Library... -> Add Library -> G4P by Peter Lager
 Sketch -> Import Library... -> Add Library -> PeasyCam by Jonathan Feinberg (for the 3D example only)
 ```
 // TODO add screenshot (insert 2D and 3D view)
+
+### Mouse sender
+
+Sketch that emulates and send a virtual person that you can control with your mouse.
+This enables you to test the examples
 
 Data
 ----
