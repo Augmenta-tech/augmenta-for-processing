@@ -28,6 +28,7 @@ void setup() {
   size(640,480);
   frameRate(30);
   
+  // Osc network com
   oscP5 = new OscP5(this,13000);
   myRemoteLocation = new NetAddress("127.0.0.1",12000);
   
@@ -42,12 +43,14 @@ void draw() {
   
   if(!mousePressed)
   {
+    // Sin animation
     x = map(sin(t),-1,1,width/10,width*9/10);
   }
-  println("t " + t);
+  // Draw disk
   ellipse(x,y,20,20);
 
-  t= t + sense*TWO_PI/60; // 50 inc
+  // Increment val
+  t= t + sense*TWO_PI/70; // 70 inc
   t = t % TWO_PI;
   age++;
 
