@@ -22,6 +22,7 @@ float x = 0;
 float y = 0;
 float t = 0; // time
 int age = 0;
+int sense = 1;
 
 void setup() {
   size(640,480);
@@ -29,6 +30,8 @@ void setup() {
   
   oscP5 = new OscP5(this,13000);
   myRemoteLocation = new NetAddress("127.0.0.1",12000);
+  
+  y=height/2;
 }
 
 void draw() {
@@ -39,19 +42,19 @@ void draw() {
   
   if(!mousePressed)
   {
-    x = map(sin(t),-1,1,width/4,width*3/4);
-    y = height/2;
+    x = map(sin(t),-1,1,width/10,width*9/10);
   }
-  
+  println("t " + t);
   ellipse(x,y,20,20);
-  
 
-  t+=0.07;
+  t= t + sense*TWO_PI/60; // 50 inc
+  t = t % TWO_PI;
   age++;
 
   // TMP WHILE SENDER LIBRARY IS NOT DONE !
   
   // Forging one augmenta person packet
+  // TODO : replace by correct forging of packet
   OscMessage person = new OscMessage("/au/personUpdated");
   person.add(42); // pid 
   person.add(0);  // oid
@@ -85,7 +88,34 @@ void draw() {
 }
 
 void mouseDragged() {
+ 
+ // Update coords
  x = mouseX;
- y = mouseY; 
+ y = mouseY;
+ 
+ // The following code is here just for pure fun and aesthetic !
+ // It enables the point to go on in its sinus road where
+ // you left it !
+ 
+ // Clamping
+ if(x>width*9/10)
+ {
+   x=width*9/10;
+ }
+ if(x<width/10)
+ {
+   x=width/10;
+ }
+ // Reverse
+ t = asin(map(x,width/10,width*9/10,-1,1));
+ // Don't do it visually
+ x = mouseX;
+ // Change sense by calculating speed vector
+ if(mouseX - pmouseX < 0)
+ {
+   sense = -1;
+ } else {
+   sense = 1;
+ }
 }
 
