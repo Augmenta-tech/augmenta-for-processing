@@ -108,7 +108,7 @@ public class AugmentaP5 {
 			if (person != null){
 				person.lastUpdated--;
 				// haven't gotten an update in ~2 seconds
-				if (person.lastUpdated < -8) {
+				if (person.lastUpdated < 0) {
 					System.out
 							.println("[Augmenta] Person deleted because it has not been updated for 120 frames");
 					callPersonLeft(person);
@@ -178,7 +178,7 @@ public class AugmentaP5 {
 			point.y = theOscMessage.get(i + 1).floatValue();
 			p.contours.add(point);
 		}
-		p.lastUpdated++;
+		p.lastUpdated=120;
 		lock.unlock();
 	}
 
