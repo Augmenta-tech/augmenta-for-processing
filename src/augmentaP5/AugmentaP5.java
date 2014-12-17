@@ -104,17 +104,20 @@ public class AugmentaP5 {
 			int id = (Integer) e.nextElement();
 			AugmentaPerson person = (AugmentaPerson) _currentPeople.get(id);
 
-			person.lastUpdated--;
-			// haven't gotten an update in ~2 seconds
-			if (person.lastUpdated < -120) {
-				System.out
-						.println("[Augmenta] Person deleted because it has not been updated for 120 frames");
-				callPersonLeft(person);
-				_currentPeople.remove(person.id);
-			} else {
-				AugmentaPerson p = new AugmentaPerson(parent);
-				p.copy(person);
-				people.put(p.id, p);
+			// Adding this test to counteract nullPointerExceptions ocurring in rare cases
+			if (person != null){
+				person.lastUpdated--;
+				// haven't gotten an update in ~2 seconds
+				if (person.lastUpdated < -8) {
+					System.out
+							.println("[Augmenta] Person deleted because it has not been updated for 120 frames");
+					callPersonLeft(person);
+					_currentPeople.remove(person.id);
+				} else {
+					AugmentaPerson p = new AugmentaPerson(parent);
+					p.copy(person);
+					people.put(p.id, p);
+				}
 			}
 		}
 
