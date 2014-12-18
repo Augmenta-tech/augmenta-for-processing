@@ -14,7 +14,7 @@ Sketch -> Import Library... -> Add Library -> OscP5 by Andreas Schlegel
 
 Then get AugmentaP5 library from here
 
-      [https://github.com/Lyptik/AugmentaP5/archive/master.zip](https://github.com/Lyptik/AugmentaP5/archive/master.zip) (rename to AugmentaP5)
+      https://github.com/Lyptik/AugmentaP5/archive/master.zip (and rename to AugmentaP5)
 
 or
 
@@ -26,7 +26,7 @@ in the following directory
 
 - Mac OSX : /Users/Username/Documents/Processing/libraries
 - Windows : C:/My Documents/Processing/libraries
-- Linux   : /home/Username/Processing/libraries
+- Linux   : /home/Username/sketchbook/libraries
 
 You should now have an *AugmentaP5* named folder in this directory. (If not rename it)
 
