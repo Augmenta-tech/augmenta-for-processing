@@ -31,32 +31,25 @@ int oscPort = 12000;
 
 // Declare the UI
 boolean guiIsVisible=true;
-//GTextField portInput;
-//GButton portInputButton;
-GLabel title;
-GLabel sceneSizeInfo;
-GLabel inputPort;
+GTextField portInput;
+GButton portInputButton;
+// Declare a debug mode bool
+boolean debug=false;
 
 // Global vars
 int heightFactor=5;
 
 void setup() {
   // Initial frame size
-  size(640, 480, P3D);
-
-  // Set the UI
-  title = new GLabel(this, 10, 10, 200, 20);
-  title.setOpaque(true);
-  title.setTextBold();
-  sceneSizeInfo = new GLabel(this, 10, 40, 200, 20);
-  sceneSizeInfo.setOpaque(true);
-  inputPort = new GLabel(this, 10, 70, 200, 20);
-  inputPort.setOpaque(true);
-  //portInput = new GTextField(this,10,70,100,20);
-  //portInputButton = new GButton(this,110,70,50,20, "Change");
-  //portInput.setText("12000");
+  size(800, 600, P3D);
+  
   G4P.registerSketch(this);
 
+  // Set the UI
+  portInput = new GTextField(this, 10, 10, 100, 20);
+  portInputButton = new GButton(this, 110, 10, 50, 20, "Change");
+  portInput.setText(""+oscPort);
+  
   // 3D camera
   lights();
   cam = new PeasyCam(this, 1000);
@@ -85,12 +78,6 @@ void draw() {
 
   // Global scene code
 
-  // Adjust the scene size
-  int[] sceneSize = auReceiver.getSceneSize();
-  if (width!=sceneSize[0] || height!=sceneSize[1]) {
-    //frame.setSize(sceneSize[0]+frame.getInsets().left+frame.getInsets().right, sceneSize[1]+frame.getInsets().top+frame.getInsets().bottom);
-  }
-
   // Get the person array
   AugmentaPerson[] people = auReceiver.getPeopleArray();
 
@@ -107,6 +94,7 @@ void draw() {
   // Draw a circle for each blob
   for (int i=0; i<people.length; i++) {
     PVector pos = people[i].centroid;
+    
     augmentaP5.Rectangle rect = people[i].boundingRect;
     float rectHeight = 200;
     if (people[i].highest.z != 0 ) {
@@ -119,12 +107,15 @@ void draw() {
     fill(255);
     ellipseMode(CENTER);
     ellipse(0, 0, 5, 5);
-    //box(30);
-    println("People size : "+rect.x+" "+rect.y+" "+rectHeight);
-    pushMatrix();
-    translate(15, 0, 0);
-    text("pid : "+people[i].id+"\n"+"oid : "+people[i].oid+"\n"+"age : "+people[i].age, 0, 0);
-    popMatrix();
+    
+    if (debug){
+      println("People size : "+rect.x+" "+rect.y+" "+rectHeight);
+      pushMatrix();
+      translate(15, 0, 0);
+      text("pid : "+people[i].id+"\n"+"oid : "+people[i].oid+"\n"+"age : "+people[i].age, 0, 0);
+      popMatrix();
+    }
+    
     popMatrix();
 
     // Bounding boxes
@@ -143,43 +134,48 @@ void draw() {
     server.sendScreen();
   }
   
-  // Update the UI
-  title.setText("Current scene : 3D example", GAlign.LEFT, GAlign.MIDDLE);
-  sceneSizeInfo.setText("Scene size : "+ sceneSize[0]+"x"+sceneSize[1], GAlign.LEFT, GAlign.MIDDLE);
-  inputPort.setText("Osc port : " + oscPort, GAlign.LEFT, GAlign.MIDDLE);
 }
 
 public void handleButtonEvents(GButton button, GEvent event) { 
-  //if (button == portInputButton)
-  //  handlePortInputButton();
+  if (button == portInputButton) {
+    handlePortInputButton();
+  }
 }
 
-/*public void handlePortInputButton(){  
- if (Integer.parseInt(portInput.stext.getPlainText()) != oscPort){
- oscPort = Integer.parseInt(portInput.stext.getPlainText());
- tspsReceiver=null;
- tspsReceiver= new TSPS(this, oscPort);
- }
- }*/
+public void handlePortInputButton() {
+
+  if (Integer.parseInt(portInput.stext.getPlainText()) != oscPort) {
+    println("input :"+portInput.stext.getPlainText());
+    oscPort = Integer.parseInt(portInput.stext.getPlainText());
+    auReceiver.unbind();
+    auReceiver=null;
+    auReceiver= new AugmentaP5(this, oscPort);
+  }
+}
 
 void keyPressed() {
 
   // Show/Hide Gui
-  if (key == 'h' || key== 'H') {
+  if (key == 'h') {
     if (guiIsVisible) {
       guiIsVisible = false;
     } else {
       guiIsVisible = true;
     }
     showGUI(guiIsVisible);
+  } else if (key == 'd') {
+    // Show/hide the debug info
+    if (debug) {
+      debug = false;
+    } else {
+      debug = true;
+    }
   }
 }
 
 void showGUI(boolean val) {
-  //portInput.setVisible(val); 
-  //portInputButton.setVisible(val);
-  inputPort.setVisible(val);
-  title.setVisible(val);
-  sceneSizeInfo.setVisible(val);
+  // Show or hide the GUI after the Syphon output
+  portInput.setVisible(val); 
+  portInputButton.setVisible(val);
 }
 

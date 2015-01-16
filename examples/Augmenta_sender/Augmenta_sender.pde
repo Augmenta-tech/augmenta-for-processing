@@ -60,7 +60,7 @@ void draw() {
   // TODO : replace by correct forging of packet
   OscMessage person = new OscMessage("/au/personUpdated");
   person.add(42); // pid 
-  person.add(0);  // oid
+  person.add(1);  // oid
   person.add(age);  // age
   person.add((float)x/width); // centroid.x
   person.add((float)y/height); // centroid.y
