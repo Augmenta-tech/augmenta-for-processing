@@ -14,6 +14,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Augmenta Connection: Connects to Augmenta app and provides your applet with
  * Augmenta People objects as they arrive.
+ * This library is based on the TSPS library for processing. More details at http://www.tsps.cc/
  */
 
 public class AugmentaP5 {
@@ -41,6 +42,8 @@ public class AugmentaP5 {
 	private int defaultPort = 12000;
 	private int width = 0;
 	private int height = 0;
+	
+	private static int timeOut = 120; // After this number of frames, a point that hasn't been updated is destroyed. Do not set under 0.
 
 	private static final Lock lock = new ReentrantLock();
 
@@ -123,10 +126,9 @@ public class AugmentaP5 {
 			// Adding this test to counteract nullPointerExceptions ocurring in rare cases
 			if (person != null){
 				person.lastUpdated--;
-				// haven't gotten an update in ~2 seconds
-				if (person.lastUpdated < 0) {
-					System.out
-							.println("[AugmentaP5] Person deleted because it has not been updated for 120 frames");
+				// haven't gotten an update in a given number of frames
+				if (person.lastUpdated < -1) {
+					//System.out.println("[AugmentaP5] Person deleted because it has not been updated for 120 frames");
 					callPersonLeft(person);
 					_currentPeople.remove(person.id);
 				} else {
@@ -256,7 +258,7 @@ public class AugmentaP5 {
 			point.y = theOscMessage.get(i + 1).floatValue();
 			p.contours.add(point);
 		}
-		p.lastUpdated=120;
+		p.lastUpdated=timeOut;
 		lock.unlock();
 	}
 
@@ -425,6 +427,12 @@ public class AugmentaP5 {
 		}
 		return res;
 
+	}
+	
+	public void setTimeOut(int n) {
+		if (n >= 0){
+			timeOut = n;
+		}
 	}
 
 };

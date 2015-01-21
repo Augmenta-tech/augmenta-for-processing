@@ -46,8 +46,8 @@ void setup() {
   G4P.registerSketch(this);
 
   // Set the UI
-  portInput = new GTextField(this, 10, 10, 100, 20);
-  portInputButton = new GButton(this, 110, 10, 50, 20, "Change");
+  portInput = new GTextField(this, 10, 10, 60, 20);
+  portInputButton = new GButton(this, 70, 10, 110, 20, "Change Osc Port");
   portInput.setText(""+oscPort);
   
   // 3D camera

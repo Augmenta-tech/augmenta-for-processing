@@ -63,8 +63,8 @@ void setup() {
   sceneY = new GTextField(this, 161, 10, 35, 20);
   sceneY.setText(""+height);
   manualSceneButton = new GButton(this, 197, 10, 50, 20, "Change");
-  portInput = new GTextField(this, 10, 40, 100, 20);
-  portInputButton = new GButton(this, 110, 40, 50, 20, "Change");
+  portInput = new GTextField(this, 10, 40, 60, 20);
+  portInputButton = new GButton(this, 70, 40, 110, 20, "Change Osc Port");
   portInput.setText(""+oscPort);
   G4P.registerSketch(this);
 }

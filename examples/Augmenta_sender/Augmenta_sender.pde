@@ -22,15 +22,19 @@ float x = 0;
 float y = 0;
 float t = 0; // time
 int age = 0;
-int sense = 1;
+int direction = 1;
+
+int oscPort = 13000;
+
+Boolean moving = true;
 
 void setup() {
   size(640,480);
   frameRate(30);
   
   // Osc network com
-  oscP5 = new OscP5(this,13000);
-  myRemoteLocation = new NetAddress("127.0.0.1",12000);
+  oscP5 = new OscP5(this,60000);
+  myRemoteLocation = new NetAddress("127.0.0.1",oscPort);
   
   y=height/2;
 }
@@ -39,18 +43,21 @@ void draw() {
 
   background(0);
   
-  text("Drag mouse to send custom data !",10,20);
+  text("Drag mouse to send custom data to 127.0.0.1:"+oscPort,10,20);
   
   if(!mousePressed)
   {
     // Sin animation
-    x = map(sin(t),-1,1,width/10,width*9/10);
+    
+    if (moving){
+      x = map(sin(t),-1,1,width/10,width*9/10);
+    }
   }
   // Draw disk
   ellipse(x,y,20,20);
 
   // Increment val
-  t= t + sense*TWO_PI/70; // 70 inc
+  t= t + direction*TWO_PI/70; // 70 inc
   t = t % TWO_PI;
   age++;
 
@@ -113,12 +120,19 @@ void mouseDragged() {
  t = asin(map(x,width/10,width*9/10,-1,1));
  // Don't do it visually
  x = mouseX;
- // Change sense by calculating speed vector
+ // Change direction by calculating speed vector
  if(mouseX - pmouseX < 0)
  {
-   sense = -1;
+   direction = -1;
  } else {
-   sense = 1;
+   direction = 1;
  }
 }
 
+void keyPressed() {
+
+  // Stop/Start the movement of the point
+  if (key == 'm') {
+    moving=!moving;
+  }
+}
