@@ -29,7 +29,7 @@ import processing.video.*;
 // Declare the Augmenta receiver
 AugmentaP5 auReceiver;
 // Declare the inital OSC port
-int oscPort = 12000;
+int oscPort = 13000;
 // Declare the syphon server
 SyphonServer server;
 // Declare the UI
@@ -61,6 +61,10 @@ float gain;
 
 // [Video]
 Movie bgVideo;
+
+// [Triggers]
+CircleTrigger ct;
+RectangleTrigger rt;
 
 void setup() {
 
@@ -126,6 +130,10 @@ void setup() {
   gain=1;
   // The capped volume is the same as the volume but limited to a max value of 1
   cappedVolume=0;
+  
+  // [Triggers]
+  ct = new CircleTrigger(width/2, height/2, 50, this);
+  rt = new RectangleTrigger(width/2, height/4, width, 0.75f*height, this);
 }
 
 void draw() {
@@ -219,6 +227,15 @@ void draw() {
       rect(width*bounds.x, height*bounds.y, bounds.width*width, bounds.height*height);
     }
   }
+  
+  // [Triggers]
+  ct.update(people);
+  rt.update(people);
+  if (debug){
+    ct.draw(); 
+    rt.draw();
+  }
+  
   // Syphon output
   if (platform == MACOSX) {
     server.sendScreen();
@@ -239,6 +256,20 @@ void personUpdated (AugmentaPerson p) {
 
 void personLeft (AugmentaPerson p) {
   //println("Person left : "+ p.id + " at ("+p.centroid.x+","+p.centroid.y+")");
+}
+
+// DO NOT REMOVE unless you remove the trigger classes
+void personEnteredTrigger(int id, Trigger t){
+  //println("The person with id '"+id+"' entered a trigger"); 
+  // How to test which object has been triggered :
+  if (t == ct){
+    //println("It's the circle trigger");
+  }
+}
+
+// DO NOT REMOVE unless you remove the trigger classes
+void personLeftTrigger(int id, Trigger t){
+  //println("The person with id '"+id+"' left a trigger");
 }
 
 void keyPressed() {
