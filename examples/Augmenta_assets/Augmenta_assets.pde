@@ -65,6 +65,7 @@ Movie bgVideo;
 // [Triggers]
 CircleTrigger ct;
 RectangleTrigger rt;
+PolygonTrigger pt;
 
 void setup() {
 
@@ -134,6 +135,16 @@ void setup() {
   // [Triggers]
   ct = new CircleTrigger(width/2, height/2, 50, this);
   rt = new RectangleTrigger(width/2, height/4, width, 0.75f*height, this);
+  PVector[] points = new PVector[8];
+  points[0]= new PVector(0,0);
+  points[1]= new PVector(300,0);
+  points[2]= new PVector(320,150);
+  points[3]= new PVector(140,160);
+  points[4]= new PVector(200,40);
+  points[5]= new PVector(100,40);
+  points[6]= new PVector(120,150);
+  points[7]= new PVector(0,140);
+  pt = new PolygonTrigger(points, this);
 }
 
 void draw() {
@@ -231,9 +242,11 @@ void draw() {
   // [Triggers]
   ct.update(people);
   rt.update(people);
+  pt.update(people);
   if (debug){
     ct.draw(); 
     rt.draw();
+    pt.draw();
   }
   
   // Syphon output
