@@ -94,6 +94,8 @@ void draw() {
     ellipse(pos.x*width, pos.y*height, 30, 30); // 30 pixels in diameter
 
     if (debug) {
+      // Old version was handmade
+      /*
       // Draw a point
       fill(255);
       noStroke();
@@ -105,6 +107,9 @@ void draw() {
       noFill();
       stroke(150);
       rect(width*bounds.x, height*bounds.y, bounds.width*width, bounds.height*height);
+      */
+      // New version uses the lib
+      people[i].draw();
     }
   }
   // Syphon output

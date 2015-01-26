@@ -2,6 +2,8 @@ package augmentaP5;
 
 import processing.core.PApplet;
 import processing.core.PVector;
+
+//import augmentaP5.Rectangle;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -11,7 +13,7 @@ import java.util.Collections;
 public class AugmentaPerson
 {
 	
-	private final PApplet app;
+	//private final PApplet app;
 
 	/** Unique ID, different for each Person as long as Augmenta is running */
 	public int id;
@@ -30,9 +32,9 @@ public class AugmentaPerson
 	/** Average motion within a Person's area */
 	public PVector opticalFlow; 
 	/** Bounding rectangle that surrounds Person's shape*/
-	public Rectangle boundingRect;
+	public RectangleF boundingRect;
 	/** Rectangle representing a detected HAAR feature (if there is one) */
-	public Rectangle haarRect;
+	public RectangleF haarRect;
 	/** Defines the rough outline of a Person*/
 	public ArrayList<PVector> contours;
 	/** (deprecated) */
@@ -44,10 +46,10 @@ public class AugmentaPerson
 	 * Create a Augmenta Person object
 	 * @param PApplet	Pass in app to enable debug drawing of Augmenta Person object
 	 */
-	public AugmentaPerson( PApplet _app ){
-		app 			= _app;
-		boundingRect 	= new Rectangle();
-		haarRect 		= new Rectangle();
+	public AugmentaPerson(){
+		//app 			= _app;
+		boundingRect 	= new RectangleF();
+		haarRect 		= new RectangleF();
 		centroid 		= new PVector();
 		velocity 		= new PVector();
 		opticalFlow 	= new PVector();
@@ -55,6 +57,30 @@ public class AugmentaPerson
 		dead 			= false;
 		contours 		= new ArrayList<PVector>();
 		lastUpdated		= 0;
+	}
+	public AugmentaPerson(int _id, int _oid, int _age, float _depth, PVector _centroid, PVector _velocity, RectangleF _boundingRect, float _highestX, float _highestY, float _highestZ){
+		id = _id;
+		oid = _oid;
+		age = _age;
+		depth = _depth;
+		centroid = _centroid;
+		velocity = _velocity;
+		boundingRect = _boundingRect;
+		highest = new PVector(_highestX, _highestY);
+		//default :
+		opticalFlow = new PVector();
+		dead = false;
+		contours = new ArrayList<PVector>();
+		lastUpdated	= 0;
+	}
+	public AugmentaPerson(int _id, PVector _centroid, RectangleF _boundingRect){
+		this(_id, 0, 0, 0, _centroid, new PVector(0,0), _boundingRect, 0, 0, 0);
+	}
+	public AugmentaPerson(PVector _centroid, RectangleF _boundingRect){
+		this((int)(Math.random() * 100000), _centroid, _boundingRect);
+	}
+	public AugmentaPerson(PVector _centroid){
+		this(_centroid, new RectangleF(_centroid.x-0.1f, _centroid.y-0.1f, 0.2f, 0.2f));
 	}
 
 	public void copy( AugmentaPerson p){
@@ -88,6 +114,7 @@ public class AugmentaPerson
 	public void draw(){
 		// draw rect based on person's detected size
     	// dimensions from Augmenta are 0-1, so we multiply by window width and height
+		PApplet app = AugmentaP5.parent;
       	app.noFill();
 		app.stroke(255,100);
       	app.rect(boundingRect.x*app.width, boundingRect.y*app.height, boundingRect.width*app.width, boundingRect.height*app.height);		

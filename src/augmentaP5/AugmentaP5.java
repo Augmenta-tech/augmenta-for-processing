@@ -13,13 +13,13 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Augmenta Connection: Connects to Augmenta app and provides your applet with
- * Augmenta People objects as they arrive.
- * This library is based on the TSPS library for processing. More details at http://www.tsps.cc/
+ * Augmenta People objects as they arrive. This library is based on the TSPS
+ * library for processing. More details at http://www.tsps.cc/
  */
 
 public class AugmentaP5 {
 
-	private final PApplet parent;
+	public static PApplet parent;
 	private OscP5 receiver;
 
 	/**
@@ -42,8 +42,10 @@ public class AugmentaP5 {
 	private int defaultPort = 12000;
 	private int width = 0;
 	private int height = 0;
-	
-	private static int timeOut = 120; // After this number of frames, a point that hasn't been updated is destroyed. Do not set under 0.
+
+	private static int timeOut = 120; // After this number of frames, a point
+										// that hasn't been updated is
+										// destroyed. Do not set under 0.
 
 	private static final Lock lock = new ReentrantLock();
 
@@ -58,7 +60,8 @@ public class AugmentaP5 {
 	 */
 	public AugmentaP5(PApplet _parent) {
 		System.out
-				.println("[AugmentaP5] Starting the receiver with default port ("+defaultPort+")");
+				.println("[AugmentaP5] Starting the receiver with default port ("
+						+ defaultPort + ")");
 		parent = _parent;
 		receiver = new OscP5(this, defaultPort);
 		people = new Hashtable<Integer, AugmentaPerson>();
@@ -87,26 +90,63 @@ public class AugmentaP5 {
 		receiver = new OscP5(this, port);
 		people = new Hashtable<Integer, AugmentaPerson>();
 		_currentPeople = new Hashtable<Integer, AugmentaPerson>();
-
 		registerEvents();
 		parent.registerPre(this);
 	}
-	
-	public void unbind(){
-		System.out.println("[AugmentaP5] AugmentaP5 object unbinding...");  
+
+	public void send(AugmentaPerson p, NetAddress address) {
+		// Create the message
+		OscMessage person = new OscMessage("/au/personUpdated");
+		person.add(p.id); // pid
+		person.add(p.oid); // oid
+		person.add(p.age); // age
+		person.add(p.centroid.x); // centroid.x
+		person.add(p.centroid.y); // centroid.y
+		person.add(p.velocity.x); // velocity.x
+		person.add(p.velocity.y); // velocity.y
+		person.add(p.depth); // depth
+		person.add(p.boundingRect.x); // boundingRect.x
+		person.add(p.boundingRect.y); // boudingRect.y
+		person.add(p.boundingRect.width); // boundingRect.width
+		person.add(p.boundingRect.height); // boundingRect.height
+		person.add(p.highest.x); // highest.x
+		person.add(p.highest.y); // highest.y
+		person.add(p.highest.z); // highest.z
+		// Send the packet
+		receiver.send(person, address);
+	}
+	public void sendScene(int width, int height, int age, int numPeople, NetAddress address) {
+		// Create the message
+		OscMessage msg = new OscMessage("/au/scene");
+		msg.add(age); // age
+		msg.add(0); // percentage covered
+		msg.add(numPeople); // number of people
+		msg.add(0); // average motion X
+		msg.add(0); // average motion Y
+		msg.add(width); // width in pixels
+		msg.add(height); // height in pixels
+		
+		// Send the packet
+		receiver.send(msg, address);
+	}
+	public void sendScene(int width, int height, NetAddress address) {
+		sendScene(width, height, 0, 0, address);
+	}
+
+	public void unbind() {
+		System.out.println("[AugmentaP5] AugmentaP5 object unbinding...");
 		receiver.stop();
 		receiver = null;
 	}
-	
-	public void finalize()
-    {
-		System.out.println("[AugmentaP5] AugmentaP5 object terminating...");  
+
+	public void finalize() {
+		System.out.println("[AugmentaP5] AugmentaP5 object terminating...");
 		receiver.stop();
 		receiver = null;
 		people = null;
 		_currentPeople = null;
-         
-    }
+
+	}
 
 	public void pre() {
 
@@ -123,16 +163,17 @@ public class AugmentaP5 {
 			int id = (Integer) e.nextElement();
 			AugmentaPerson person = (AugmentaPerson) _currentPeople.get(id);
 
-			// Adding this test to counteract nullPointerExceptions ocurring in rare cases
-			if (person != null){
+			// Adding this test to counteract nullPointerExceptions ocurring in
+			// rare cases
+			if (person != null) {
 				person.lastUpdated--;
 				// haven't gotten an update in a given number of frames
 				if (person.lastUpdated < -1) {
-					//System.out.println("[AugmentaP5] Person deleted because it has not been updated for 120 frames");
+					// System.out.println("[AugmentaP5] Person deleted because it has not been updated for 120 frames");
 					callPersonLeft(person);
 					_currentPeople.remove(person.id);
 				} else {
-					AugmentaPerson p = new AugmentaPerson(parent);
+					AugmentaPerson p = new AugmentaPerson();
 					p.copy(person);
 					people.put(p.id, p);
 				}
@@ -165,80 +206,93 @@ public class AugmentaP5 {
 		try {
 			p.id = theOscMessage.get(0).intValue();
 		} catch (Exception e) {
-			System.out.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [0] should be an int (id)");
+			System.out
+					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [0] should be an int (id)");
 		}
 		try {
 			p.oid = theOscMessage.get(1).intValue();
 		} catch (Exception e) {
-			System.out.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [1] should be an int (oid)");
+			System.out
+					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [1] should be an int (oid)");
 		}
 		try {
 			p.age = theOscMessage.get(2).intValue();
 		} catch (Exception e) {
-			System.out.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [2] should be an int (age)");
+			System.out
+					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [2] should be an int (age)");
 		}
 		try {
 			p.centroid.x = theOscMessage.get(3).floatValue();
 		} catch (Exception e) {
-			System.out.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [3] should be a float (centroid.x)");
+			System.out
+					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [3] should be a float (centroid.x)");
 		}
 		try {
 			p.centroid.y = theOscMessage.get(4).floatValue();
 		} catch (Exception e) {
-			System.out.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [4] should be a float (centroid.y)");
+			System.out
+					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [4] should be a float (centroid.y)");
 		}
 		try {
 			p.velocity.x = theOscMessage.get(5).floatValue();
 		} catch (Exception e) {
-			System.out.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [5] should be a float (velocity.x)");
+			System.out
+					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [5] should be a float (velocity.x)");
 		}
 		try {
 			p.velocity.y = theOscMessage.get(6).floatValue();
 		} catch (Exception e) {
-			System.out.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [6] should be a float (velocity.y)");
+			System.out
+					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [6] should be a float (velocity.y)");
 		}
 		try {
 			p.depth = theOscMessage.get(7).floatValue();
 		} catch (Exception e) {
-			System.out.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [7] should be a float (depth)");
+			System.out
+					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [7] should be a float (depth)");
 		}
 		try {
 			p.boundingRect.x = theOscMessage.get(8).floatValue();
 		} catch (Exception e) {
-			System.out.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [8] should be a float (boundignRect.x)");
+			System.out
+					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [8] should be a float (boundignRect.x)");
 		}
 		try {
 			p.boundingRect.y = theOscMessage.get(9).floatValue();
 		} catch (Exception e) {
-			System.out.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [9] should be a float (boundignRect.y)");
+			System.out
+					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [9] should be a float (boundignRect.y)");
 		}
 		try {
 			p.boundingRect.width = theOscMessage.get(10).floatValue();
 		} catch (Exception e) {
-			System.out.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [10] should be a float (boundignRect.width)");
+			System.out
+					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [10] should be a float (boundignRect.width)");
 		}
 		try {
 			p.boundingRect.height = theOscMessage.get(11).floatValue();
 		} catch (Exception e) {
-			System.out.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [11] should be a float (boundignRect.height)");
+			System.out
+					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [11] should be a float (boundignRect.height)");
 		}
 		try {
 			p.highest.x = theOscMessage.get(12).floatValue();
 		} catch (Exception e) {
-			System.out.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [12] should be a float (highest.x)");
+			System.out
+					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [12] should be a float (highest.x)");
 		}
 		try {
 			p.highest.y = theOscMessage.get(13).floatValue();
 		} catch (Exception e) {
-			System.out.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [13] should be a float (highest.y)");
+			System.out
+					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [13] should be a float (highest.y)");
 		}
 		try {
 			p.highest.z = theOscMessage.get(14).floatValue();
 		} catch (Exception e) {
-			System.out.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [14] should be a float (highest.z)");
+			System.out
+					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [14] should be a float (highest.z)");
 		}
-		
-		
 
 		/*
 		 * Old protocol p.haarRect.x = theOscMessage.get(14).floatValue();
@@ -258,7 +312,7 @@ public class AugmentaP5 {
 			point.y = theOscMessage.get(i + 1).floatValue();
 			p.contours.add(point);
 		}
-		p.lastUpdated=timeOut;
+		p.lastUpdated = timeOut;
 		lock.unlock();
 	}
 
@@ -288,7 +342,7 @@ public class AugmentaP5 {
 		// adding a person
 		if (theOscMessage.checkAddrPattern("/au/personEntered")
 				|| theOscMessage.checkAddrPattern("/au/personEntered/")) {
-			AugmentaPerson p = new AugmentaPerson(parent);
+			AugmentaPerson p = new AugmentaPerson();
 			updatePerson(p, theOscMessage);
 			callPersonEntered(p);
 
@@ -299,15 +353,15 @@ public class AugmentaP5 {
 
 			AugmentaPerson p = null;
 			try {
-				p = _currentPeople.get(theOscMessage.get(0)
-						.intValue());
+				p = _currentPeople.get(theOscMessage.get(0).intValue());
 			} catch (Exception e) {
-				System.out.println("[AugmentaP5] The OSC message with address  'personUpdated' could not be parsed : the value [0] should be an int (id)");
+				System.out
+						.println("[AugmentaP5] The OSC message with address  'personUpdated' could not be parsed : the value [0] should be an int (id)");
 			}
-			
+
 			boolean personExists = (p != null);
 			if (!personExists) {
-				p = new AugmentaPerson(parent);
+				p = new AugmentaPerson();
 			}
 
 			updatePerson(p, theOscMessage);
@@ -321,13 +375,13 @@ public class AugmentaP5 {
 		// person is about to leave
 		else if (theOscMessage.checkAddrPattern("/au/personWillLeave")
 				|| theOscMessage.checkAddrPattern("/au/personWillLeave/")) {
-			
+
 			AugmentaPerson p = null;
 			try {
-				p = _currentPeople.get(theOscMessage.get(0)
-						.intValue());
+				p = _currentPeople.get(theOscMessage.get(0).intValue());
 			} catch (Exception e) {
-				System.out.println("[AugmentaP5] The OSC message with address 'personWillLeave' could not be parsed : the value [0] should be an int (id)");
+				System.out
+						.println("[AugmentaP5] The OSC message with address 'personWillLeave' could not be parsed : the value [0] should be an int (id)");
 			}
 			if (p == null) {
 				return;
@@ -343,14 +397,16 @@ public class AugmentaP5 {
 			try {
 				width = theOscMessage.get(5).intValue();
 			} catch (Exception e) {
-				System.out.println("[AugmentaP5] The OSC message with address 'scene' could not be parsed : the value [5] should be an int (width)");
+				System.out
+						.println("[AugmentaP5] The OSC message with address 'scene' could not be parsed : the value [5] should be an int (width)");
 			}
 			try {
 				height = theOscMessage.get(6).intValue();
 			} catch (Exception e) {
-				System.out.println("[AugmentaP5] The OSC message with address 'scene' could not be parsed : the value [6] should be an int (height)");
+				System.out
+						.println("[AugmentaP5] The OSC message with address 'scene' could not be parsed : the value [6] should be an int (height)");
 			}
-			
+
 			// System.out.println("[Augmenta] Received OSC OK : width "+width+" height "+height);
 		}
 
@@ -423,14 +479,14 @@ public class AugmentaP5 {
 		res[0] = width;
 		res[1] = height;
 		if (width == 0 || height == 0) {
-			//System.out.println("[AugmentaP5 Warning : at least one of the dimensions is null or equal to 0");
+			// System.out.println("[AugmentaP5 Warning : at least one of the dimensions is null or equal to 0");
 		}
 		return res;
 
 	}
-	
+
 	public void setTimeOut(int n) {
-		if (n >= 0){
+		if (n >= 0) {
 			timeOut = n;
 		}
 	}
