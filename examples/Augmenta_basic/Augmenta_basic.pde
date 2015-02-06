@@ -43,7 +43,7 @@ void draw() {
       // Add debug info
       text("pid : "+people[i].id+"\n"+"oid : "+people[i].oid+"\n"+"age : "+people[i].age, pos.x*width+10, pos.y*height);
       // Draw the bounding rectangle
-      augmentaP5.Rectangle bounds = people[i].boundingRect;
+      augmentaP5.RectangleF bounds = people[i].boundingRect;
       noFill();
       stroke(150);
       rect(width*bounds.x, height*bounds.y, bounds.width*width, bounds.height*height);
