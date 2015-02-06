@@ -27,15 +27,22 @@ public class Trigger{
            newPeopleInside.append(people[i].id);
         }
      }
+     
      // Check if people have left the circle
      for (int i=0; i<peopleInside.size(); i++) {
-       if (!newPeopleInside.hasValue(people[i].id)){
-         // Send message to the app : someone left
-         app.personLeftTrigger(people[i].id, this);
+       // Check if the point still exists
+       if (people.length <i && people[i]!= null){
+         // Test if the point is not in the trigger anymore
+         if (!newPeopleInside.hasValue(people[i].id)){
+           // Send message to the app : someone left
+           app.personLeftTrigger(people[i].id, this);
+         }
        }
      }
+     
      // Replace the old list by the new one
      peopleInside = newPeopleInside;
+     
   }
   
   public void draw(){

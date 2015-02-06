@@ -29,7 +29,7 @@ import processing.video.*;
 // Declare the Augmenta receiver
 AugmentaP5 auReceiver;
 // Declare the inital OSC port
-int oscPort = 13000;
+int oscPort = 12000;
 // Declare the syphon server
 SyphonServer server;
 // Declare the UI
