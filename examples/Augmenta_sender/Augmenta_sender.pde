@@ -47,11 +47,11 @@ void draw() {
   background(0);
   
   text("Drag mouse to send custom data to 127.0.0.1:"+oscPort,10,20);
+  text("Press M to toggle the automatic movement",10,35);
   
   if(!mousePressed)
   {
     // Sin animation
-    
     if (moving){
       x = map(sin(t),-1,1,width/10,width*9/10);
     }

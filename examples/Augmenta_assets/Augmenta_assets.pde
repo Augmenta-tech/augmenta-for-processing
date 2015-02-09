@@ -8,6 +8,7 @@
  *    - [Sprites] Add an image under people's feet
  *    - [Video] Play a video in the background
  *    - [Sound] Play a sound when a person enters the scene
+ *    - [Triggers] Sends a message when a person enters/leaves the trigger area and allows to get a list of the people inside it at any time (shapes available : circles, rectangles, complex polygons)
  *
  *    Authors : David-Alexandre Chanel
  *              Tom Duchêne
@@ -17,11 +18,10 @@
  */
 
 import oscP5.*;
-import netP5.*;
 import augmentaP5.*;
 import g4p_controls.*;
 import codeanticode.syphon.*;
-// [Sound]
+// [Sound] and [Audioreaction]
 import ddf.minim.*;
 // [Video]
 import processing.video.*;

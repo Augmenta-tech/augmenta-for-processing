@@ -6,7 +6,7 @@ A [Processing][] Augmenta helper library and examples maintained by [Théoriz st
 Install
 -------
 
-If you have [Processing][], install OscP5 library
+Open [Processing][] and install the OscP5 library
 
 ```
 Sketch -> Import Library... -> Add Library -> OscP5 by Andreas Schlegel
@@ -28,7 +28,7 @@ in the following directory
 - Windows : C:/My Documents/Processing/libraries
 - Linux   : /home/Username/sketchbook/libraries
 
-You should now have an *AugmentaP5* named folder in this directory. (If not rename it)
+You should now have a folder named *AugmentaP5* in this directory.
 
 Then restart [Processing][]
 
@@ -46,27 +46,46 @@ Examples
 
 ### Basic example
 
-Receive and draw Augmenta basic data
+Receive and draw Augmenta data without any other library
 
 // TODO add screenshot (insert basic view)
 
-### 2D and 3D example
+### 2D and 3D examples
 
-Full example receiving and drawing Augmenta data
+Examples for receiving and drawing Augmenta data including a Syphon output (Mac only) and a basic UI
 
-Install needed libraries first :
+Install the needed libraries first :
 
 ```
 Sketch -> Import Library... -> Add Library -> Syphon by Andres Colubri
 Sketch -> Import Library... -> Add Library -> G4P by Peter Lager
 Sketch -> Import Library... -> Add Library -> PeasyCam by Jonathan Feinberg (for the 3D example only)
 ```
-// TODO add screenshot (insert 2D and 3D view)
+
+### Assets
+
+Full 2D example including various features you may find useful :
+- Display points representing people and lines between them
+- [Audioreaction] Change the radius of the circle depending on a sound input
+- [Sprites] Add an image under people's feet
+- [Video] Play a video in the background
+- [Sound] Play a sound when a person enters the scene
+- [Triggers] Sends a message when a person enters/leaves the trigger area and allows to get a list of the people inside it at any time (shapes available : circles, rectangles, complex polygons)
+
+Install the needed libraries first :
+
+```
+Sketch -> Import Library... -> Add Library -> Syphon by Andres Colubri
+Sketch -> Import Library... -> Add Library -> G4P by Peter Lager
+Sketch -> Import Library... -> Minim
+Sketch -> Import Library... -> Video
+```
+
 
 ### Mouse sender
 
-Sketch that emulates and send a virtual person that you can control with your mouse.
-This enables you to test the examples
+Sketch that emulates and sends a virtual person that you can control with your mouse.
+This allows you to test the examples
 
 Data
 ----
