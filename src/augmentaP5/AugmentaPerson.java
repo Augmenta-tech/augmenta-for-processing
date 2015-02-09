@@ -134,6 +134,6 @@ public class AugmentaPerson
 		app.endShape(PApplet.CLOSE);
 
     	// text shows more info available
-    	app.text("id: "+id+" age: "+age, boundingRect.x*app.width, (boundingRect.y*app.height + boundingRect.height*app.height) + 2);
+    	app.text("id: "+id+" age: "+age, centroid.x*app.width+12, centroid.y*app.height + 2);
 	}
 };

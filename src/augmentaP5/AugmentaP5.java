@@ -33,13 +33,14 @@ public class AugmentaP5 {
 	 * draw()
 	 */
 	private Hashtable<Integer, AugmentaPerson> _currentPeople;
+	
+	public InteractiveArea interactiveArea;
 
 	private Method personEntered;
 	private Method personUpdated;
 	private Method personLeft;
 	private Method customEvent;
 
-	private int defaultPort = 12000;
 	private int width = 0;
 	private int height = 0;
 
@@ -59,16 +60,7 @@ public class AugmentaP5 {
 	 *            _parent Your app (pass in as "this")
 	 */
 	public AugmentaP5(PApplet _parent) {
-		System.out
-				.println("[AugmentaP5] Starting the receiver with default port ("
-						+ defaultPort + ")");
-		parent = _parent;
-		receiver = new OscP5(this, defaultPort);
-		people = new Hashtable<Integer, AugmentaPerson>();
-		_currentPeople = new Hashtable<Integer, AugmentaPerson>();
-		registerEvents();
-
-		parent.registerPre(this);
+		this(_parent, 12000);
 	}
 
 	/**
@@ -84,11 +76,12 @@ public class AugmentaP5 {
 	 */
 	public AugmentaP5(PApplet _parent, int port) {
 		System.out
-				.println("[AugmentaP5] Starting the receiver with custom port ("
+				.println("[AugmentaP5] Starting the receiver with port ("
 						+ port + ")");
 		parent = _parent;
 		receiver = new OscP5(this, port);
 		people = new Hashtable<Integer, AugmentaPerson>();
+		interactiveArea = new InteractiveArea();
 		_currentPeople = new Hashtable<Integer, AugmentaPerson>();
 		registerEvents();
 		parent.registerPre(this);
@@ -125,7 +118,6 @@ public class AugmentaP5 {
 		msg.add(0); // average motion Y
 		msg.add(width); // width in pixels
 		msg.add(height); // height in pixels
-		
 		// Send the packet
 		receiver.send(msg, address);
 	}
@@ -343,8 +335,27 @@ public class AugmentaP5 {
 		if (theOscMessage.checkAddrPattern("/au/personEntered")
 				|| theOscMessage.checkAddrPattern("/au/personEntered/")) {
 			AugmentaPerson p = new AugmentaPerson();
-			updatePerson(p, theOscMessage);
-			callPersonEntered(p);
+			
+			// Get the point's coordinates
+			PVector point = new PVector(-1f, -1f);
+			try {
+				point.x = theOscMessage.get(3).floatValue();
+			} catch (Exception e) {
+				System.out
+						.println("[AugmentaP5] The OSC message with address  'personEntered' could not be parsed : the value [3] should be a float (centroid.x)");
+			}
+			try {
+				point.y = theOscMessage.get(4).floatValue();
+			} catch (Exception e) {
+				System.out
+						.println("[AugmentaP5] The OSC message with address  'personEntered' could not be parsed : the value [4] should be a float (centroid.y)");
+			}
+			
+			// Check if the point is inside the interactive area first
+			if(interactiveArea.contains(point)){
+				updatePerson(p, theOscMessage);
+				callPersonEntered(p);
+			}
 
 			// updating a person (or adding them if they don't exist in the
 			// system yet)
@@ -358,18 +369,44 @@ public class AugmentaP5 {
 				System.out
 						.println("[AugmentaP5] The OSC message with address  'personUpdated' could not be parsed : the value [0] should be an int (id)");
 			}
-
+			
+			// Get the point's coordinates
+			PVector point = new PVector(-1f, -1f);
+			try {
+				point.x = theOscMessage.get(3).floatValue();
+			} catch (Exception e) {
+				System.out
+						.println("[AugmentaP5] The OSC message with address  'personEntered' could not be parsed : the value [3] should be a float (centroid.x)");
+			}
+			try {
+				point.y = theOscMessage.get(4).floatValue();
+			} catch (Exception e) {
+				System.out
+						.println("[AugmentaP5] The OSC message with address  'personEntered' could not be parsed : the value [4] should be a float (centroid.y)");
+			}
+			
+			// Check if the person exists in the scene
 			boolean personExists = (p != null);
-			if (!personExists) {
-				p = new AugmentaPerson();
-			}
-
-			updatePerson(p, theOscMessage);
-			if (!personExists) {
-				callPersonEntered(p);
+			
+			// Check if the point is inside the interactive area
+			if(interactiveArea.contains(point)){
+				if (!personExists) {
+					p = new AugmentaPerson();
+					updatePerson(p, theOscMessage);
+					callPersonEntered(p);
+				} else {
+					updatePerson(p, theOscMessage);
+					callPersonUpdated(p);
+				}
 			} else {
-				callPersonUpdated(p);
+				// Else we have to act like that the person left
+				if (personExists) {
+					updatePerson(p, theOscMessage);
+					callPersonLeft(p);
+					_currentPeople.remove(p.id);
+				} // if the person does not exist in the scene no need to do this again
 			}
+			
 		}
 
 		// person is about to leave

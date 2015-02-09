@@ -19,6 +19,8 @@ void setup() {
 
   // Create the Augmenta receiver
   auReceiver = new AugmentaP5(this, oscPort);
+  // You can hardcode the interactive area if you need to
+  //auReceiver.interactiveArea.set(0.25f, 0.25f, 0.5f, 0.5f);
 }
 
 void draw() {
@@ -36,28 +38,52 @@ void draw() {
     PVector pos = people[i].centroid; 
 
     if (debug) {
-      // Draw a point
-      fill(255);
-      noStroke();
-      ellipse(pos.x*width, pos.y*height, 10, 10);
-      // Add debug info
-      text("pid : "+people[i].id+"\n"+"oid : "+people[i].oid+"\n"+"age : "+people[i].age, pos.x*width+10, pos.y*height);
-      // Draw the bounding rectangle
-      augmentaP5.RectangleF bounds = people[i].boundingRect;
-      noFill();
-      stroke(150);
-      rect(width*bounds.x, height*bounds.y, bounds.width*width, bounds.height*height);
+      people[i].draw();
     }
+  }
+  
+  if (debug){
+    // Draw the interactive area
+    auReceiver.interactiveArea.draw();
   }
 }
 
 void keyPressed() {
   if (key == 'd') {
     // Press 'D' to show/hide the debug info
-    if (debug) {
-      debug = false;
+    debug = !debug;
+  }
+}
+
+// Used to set the interactive area
+// click and drag to set a custom area, right click to set it to default (full scene)
+float originX;
+float originY;
+void mousePressed(){
+  if (debug){
+    if (mouseButton == LEFT){
+      originX = (float)mouseX/(float)width;
+      originY = (float)mouseY/(float)height;
     } else {
-      debug = true;
+      auReceiver.interactiveArea.set(0f, 0f, 1f, 1f);
+    }
+  }
+}
+void mouseDragged(){
+  if (debug){
+    if (mouseButton == LEFT){
+      float w = (float)mouseX/(float)width-originX;
+      float h = (float)mouseY/(float)height-originY;
+      if (w > 0 && h > 0){
+        auReceiver.interactiveArea.set(originX, originY, w, h); 
+      } else if (w < 0 && h > 0){
+        auReceiver.interactiveArea.set((float)mouseX/(float)width, originY, -w, h);
+      } else if (h < 0 && w > 0){
+        auReceiver.interactiveArea.set(originX, (float)mouseY/(float)height, w, -h);
+      } else {
+        auReceiver.interactiveArea.set((float)mouseX/(float)width, (float)mouseY/(float)height, -w, -h);
+        println("Rect : "+(float)mouseX/(float)width+" "+ (float)mouseY/(float)height+" "+ -w+" "+ -h);
+      }
     }
   }
 }
