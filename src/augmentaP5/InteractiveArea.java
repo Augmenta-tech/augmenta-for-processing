@@ -37,6 +37,8 @@ public class InteractiveArea
       	app.noFill();
 		app.stroke(255, 0, 0, 100);
 		app.strokeWeight(2);
+		app.rectMode(app.CORNER);
+		app.textAlign(app.CORNER);
       	app.rect(area.x*app.width, area.y*app.height, area.width*app.width, area.height*app.height);		
 	}
 };

@@ -44,6 +44,8 @@ void setup() {
     frame.setResizable(true);
   }
 
+  background(0);
+  
   // Create the Augmenta receiver
   auReceiver= new AugmentaP5(this, oscPort);
   auReceiver.setTimeOut(5);
@@ -75,7 +77,7 @@ void setup() {
 
 void draw() {
 
-  background(0);
+  //background(0);
 
   // Adjust the scene size
   int[] sceneSize = auReceiver.getSceneSize();
@@ -90,18 +92,12 @@ void draw() {
 
   // For each person...
   for (int i=0; i<people.length; i++) {
-    PVector pos = people[i].centroid;
-    PVector velocity = people[i].velocity; 
+    PVector pos = people[i].centroid; 
 
     // Draw a circle
-    fill(0, 128, 255); // Filled in blue
+    fill(255); // Filled in white
     noStroke(); // Without stroke
-    ellipse(pos.x*width, pos.y*height, 30, 30); // 30 pixels in diameter
-    if (debug){
-      stroke(255);
-      line(pos.x*width, pos.y*height, (pos.x+velocity.x*2)*width, (pos.y+velocity.y*2)*height);
-      people[i].draw();
-    }
+    ellipse(pos.x*width, pos.y*height, 50, 50); // 30 pixels in diameter
   }
   
   if (debug){
@@ -136,6 +132,8 @@ void keyPressed() {
   } else if (key == 'd') {
     // Show/hide the debug info
     debug = !debug;
+  } else if (key == 'r') {
+   background(0); 
   }
 }
 // Used to set the interactive area

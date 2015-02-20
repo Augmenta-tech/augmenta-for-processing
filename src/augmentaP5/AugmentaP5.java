@@ -89,7 +89,12 @@ public class AugmentaP5 {
 
 	public void send(AugmentaPerson p, NetAddress address) {
 		// Create the message
-		OscMessage person = new OscMessage("/au/personUpdated");
+		send(p, address, "personUpdated");
+	}
+	
+	public void send(AugmentaPerson p, NetAddress address, String message) {
+		// Create the message
+		OscMessage person = new OscMessage("/au/"+message);
 		person.add(p.id); // pid
 		person.add(p.oid); // oid
 		person.add(p.age); // age
@@ -108,6 +113,7 @@ public class AugmentaP5 {
 		// Send the packet
 		receiver.send(person, address);
 	}
+	
 	public void sendScene(int width, int height, int age, int numPeople, NetAddress address) {
 		// Create the message
 		OscMessage msg = new OscMessage("/au/scene");

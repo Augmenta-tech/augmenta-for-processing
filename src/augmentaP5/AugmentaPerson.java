@@ -112,11 +112,15 @@ public class AugmentaPerson
 	 * Draw an debug view
 	 */
 	public void draw(){
+		
+		
 		// draw rect based on person's detected size
     	// dimensions from Augmenta are 0-1, so we multiply by window width and height
 		PApplet app = AugmentaP5.parent;
       	app.noFill();
 		app.stroke(255,100);
+		app.rectMode(app.CORNER);
+		app.textAlign(app.CORNER);
       	app.rect(boundingRect.x*app.width, boundingRect.y*app.height, boundingRect.width*app.width, boundingRect.height*app.height);		
       
     	// draw circle based on person's centroid (also from 0-1)
@@ -134,6 +138,8 @@ public class AugmentaPerson
 		app.endShape(PApplet.CLOSE);
 
     	// text shows more info available
+		app.textSize(10);
+		app.fill(255);
     	app.text("id: "+id+" age: "+age, centroid.x*app.width+12, centroid.y*app.height + 2);
 	}
 };
