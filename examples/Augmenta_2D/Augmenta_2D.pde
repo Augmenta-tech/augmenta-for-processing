@@ -116,7 +116,7 @@ void draw() {
 }
 
 void personEntered (AugmentaPerson p) {
-  //println("Person entered : "+ p.id + "at ("+p.centroid.x+","+p.centroid.y+")");
+  println("Person entered : "+ p.id + "at ("+p.centroid.x+","+p.centroid.y+")");
 }
 
 void personUpdated (AugmentaPerson p) {
@@ -124,7 +124,7 @@ void personUpdated (AugmentaPerson p) {
 }
 
 void personLeft (AugmentaPerson p) {
-  //println("Person left : "+ p.id + " at ("+p.centroid.x+","+p.centroid.y+")");
+  println("Person left : "+ p.id + " at ("+p.centroid.x+","+p.centroid.y+")");
 }
 
 void keyPressed() {

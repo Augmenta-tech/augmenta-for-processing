@@ -95,7 +95,7 @@ void draw() {
   for (int i=0; i<people.length; i++) {
     PVector pos = people[i].centroid;
     
-    augmentaP5.Rectangle rect = people[i].boundingRect;
+    augmentaP5.RectangleF rect = people[i].boundingRect;
     float rectHeight = 200;
     if (people[i].highest.z != 0 ) {
       rectHeight = people[i].highest.z;

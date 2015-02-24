@@ -25,7 +25,7 @@ int age = 0;
 int direction = 1;
 int pid = int(random(1000));
 //int pid = 43;
-int oscPort = 7000;
+int oscPort = 7001;
 
 Boolean send = true;
 Boolean moving = true;
@@ -50,6 +50,7 @@ void draw() {
   textSize(14);
   text("Drag mouse to send custom data to 127.0.0.1:"+oscPort,10,20);
   text("Press M to toggle the automatic movement",10,35);
+  text("Press S to send the point or not (and the point is reset)",10,50);
   
   if(!mousePressed)
   {
@@ -129,10 +130,10 @@ void keyPressed() {
     send=!send;
     if (send){
       augmenta.send(testPerson, sendingAddress, "personEntered");
+      pid = int(random(1000));
+      age = 0;
     } else {
       augmenta.send(testPerson, sendingAddress, "personWillLeave");
     }
-    pid = int(random(1000));
-    age = 0;
   }
 }
