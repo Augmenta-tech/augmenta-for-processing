@@ -2,6 +2,7 @@ package augmentaP5;
 
 import processing.core.PApplet;
 import processing.core.PVector;
+import processing.core.PGraphics;
 
 //import augmentaP5.Rectangle;
 import java.util.ArrayList;
@@ -34,11 +35,15 @@ public class InteractiveArea
 		// draw rect based on person's detected size
     	// dimensions are between 0 and 1, so we multiply by window width and height
 		PApplet app = AugmentaP5.parent;
-      	app.noFill();
-		app.stroke(255, 0, 0, 100);
-		app.strokeWeight(2);
-		app.rectMode(app.CORNER);
-		app.textAlign(app.CORNER);
-      	app.rect(area.x*app.width, area.y*app.height, area.width*app.width, area.height*app.height);		
+		PGraphics g = AugmentaP5.canvas;
+		
+		g.pushStyle();
+			g.noFill();
+			g.stroke(255, 0, 0, 100);
+			g.strokeWeight(2);
+			g.rectMode(g.CORNER);
+			g.textAlign(g.CORNER);
+			g.rect(area.x*g.width, area.y*g.height, area.width*g.width, area.height*g.height);	
+		g.popStyle();
 	}
 };

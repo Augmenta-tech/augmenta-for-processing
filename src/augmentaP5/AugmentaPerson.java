@@ -2,6 +2,7 @@ package augmentaP5;
 
 import processing.core.PApplet;
 import processing.core.PVector;
+import processing.core.PGraphics;
 
 //import augmentaP5.Rectangle;
 import java.util.ArrayList;
@@ -105,7 +106,7 @@ public class AugmentaPerson
 				contours.add(co);
 			}
 		}
-		dead 			= p.dead;
+		dead = p.dead;
 	}
 
 	/**
@@ -117,29 +118,34 @@ public class AugmentaPerson
 		// draw rect based on person's detected size
     	// dimensions from Augmenta are 0-1, so we multiply by window width and height
 		PApplet app = AugmentaP5.parent;
-      	app.noFill();
-		app.stroke(255,100);
-		app.rectMode(app.CORNER);
-		app.textAlign(app.CORNER);
-      	app.rect(boundingRect.x*app.width, boundingRect.y*app.height, boundingRect.width*app.width, boundingRect.height*app.height);		
-      
-    	// draw circle based on person's centroid (also from 0-1)
-    	app.fill(255,255,255);
-    	app.ellipse(centroid.x*app.width, centroid.y*app.height, 10, 10);
-    	
-    	// draw contours
-    	app.noFill();
-		app.stroke(255,100);
-		app.beginShape();
-		for (int i=0; i<contours.size(); i++){
-			PVector pt = (PVector) contours.get(i);
-			app.vertex(pt.x*app.width, pt.y*app.height);
+      	PGraphics g = AugmentaP5.canvas;
+		
+		if(g != null)
+		{
+			g.noFill();
+			g.stroke(255,100);
+			g.rectMode(g.CORNER);
+			g.textAlign(g.CORNER);
+			g.rect(boundingRect.x*g.width, boundingRect.y*g.height, boundingRect.width*g.width, boundingRect.height*g.height);		
+			
+			// draw circle based on person's centroid (also from 0-1)
+			g.fill(255,255,255);
+			g.ellipse(centroid.x*g.width, centroid.y*g.height, 10, 10);
+			
+			// draw contours
+			g.noFill();
+			g.stroke(255,100);
+			g.beginShape();
+			for (int i=0; i<contours.size(); i++){
+				PVector pt = (PVector) contours.get(i);
+				g.vertex(pt.x*g.width, pt.y*g.height);
+			}
+			g.endShape(PApplet.CLOSE);
+			
+			// text shows more info available
+			g.textSize(10);
+			g.fill(255);
+			g.text("id: "+id+" age: "+age, centroid.x*g.width+12, centroid.y*g.height + 2);
 		}
-		app.endShape(PApplet.CLOSE);
-
-    	// text shows more info available
-		app.textSize(10);
-		app.fill(255);
-    	app.text("id: "+id+" age: "+age, centroid.x*app.width+12, centroid.y*app.height + 2);
 	}
 };

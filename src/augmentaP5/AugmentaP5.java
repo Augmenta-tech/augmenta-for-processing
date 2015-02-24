@@ -4,6 +4,7 @@ import netP5.*;
 import oscP5.*;
 import processing.core.PApplet;
 import processing.core.PVector;
+import processing.core.PGraphics;
 
 import java.util.*;
 import java.lang.reflect.Method;
@@ -85,6 +86,13 @@ public class AugmentaP5 {
 		_currentPeople = new Hashtable<Integer, AugmentaPerson>();
 		registerEvents();
 		parent.registerPre(this);
+		
+		canvas = (PGraphics)(_parent.g);
+	}
+
+	public void setGraphicsTarget(PGraphics target)
+	{
+		canvas = target;
 	}
 
 	public void send(AugmentaPerson p, NetAddress address) {
