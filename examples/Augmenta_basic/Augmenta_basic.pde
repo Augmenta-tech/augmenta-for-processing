@@ -1,4 +1,5 @@
 import augmentaP5.*;
+import oscP5.*;
 
 // Declare the Augmenta Receiver
 AugmentaP5 auReceiver;
