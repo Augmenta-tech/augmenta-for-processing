@@ -93,9 +93,9 @@ Data
 ```
     * Augmenta OSC Protocol :
 
-        /au/personWillLeave/ args0 arg1 ... argn
-        /au/personUpdated/   args0 arg1 ... argn
-        /au/personEntered/   args0 arg1 ... argn
+        /au/personWillLeave args0 arg1 ... argn
+        /au/personUpdated   args0 arg1 ... argn
+        /au/personEntered   args0 arg1 ... argn
 
         where args are :
 
