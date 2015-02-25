@@ -212,8 +212,8 @@ public void handlePortInputButton() {
 }
 public void handleManualSceneButton() {
   try {
-    String xs = sceneX.stext.getPlainText();
-    String ys = sceneY.stext.getPlainText();
+    String xs = sceneX.getText();
+    String ys = sceneY.getText();
     xs.trim();
     ys.trim();
     int x = Integer.parseInt(xs);
