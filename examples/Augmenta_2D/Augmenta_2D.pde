@@ -178,6 +178,7 @@ public void handleButtonEvents(GButton button, GEvent event) {
     handleManualSceneButton();
   }
 }
+
 public void handleToggleControlEvents(GToggleControl box, GEvent event) {
   if (box == autoSceneSize) {
     handleAutoSceneSizeCheckbox();
@@ -210,6 +211,7 @@ public void handlePortInputButton() {
     auReceiver= new AugmentaP5(this, oscPort);
   }
 }
+
 public void handleManualSceneButton() {
   try {
     String xs = sceneX.getText();
