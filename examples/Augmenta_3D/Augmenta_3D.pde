@@ -144,9 +144,9 @@ public void handleButtonEvents(GButton button, GEvent event) {
 
 public void handlePortInputButton() {
 
-  if (Integer.parseInt(portInput.stext.getPlainText()) != oscPort) {
-    println("input :"+portInput.stext.getPlainText());
-    oscPort = Integer.parseInt(portInput.stext.getPlainText());
+  if (Integer.parseInt(portInput.getText()) != oscPort) {
+    println("input :"+portInput.getText());
+    oscPort = Integer.parseInt(portInput.getText());
     auReceiver.unbind();
     auReceiver=null;
     auReceiver= new AugmentaP5(this, oscPort);

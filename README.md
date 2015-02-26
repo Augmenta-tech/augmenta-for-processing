@@ -93,9 +93,9 @@ Data
 ```
     * Augmenta OSC Protocol :
 
-        /au/personWillLeave/ args0 arg1 ... argn
-        /au/personUpdated/   args0 arg1 ... argn
-        /au/personEntered/   args0 arg1 ... argn
+        /au/personWillLeave args0 arg1 ... argn
+        /au/personUpdated   args0 arg1 ... argn
+        /au/personEntered   args0 arg1 ... argn
 
         where args are :
 
@@ -116,7 +116,7 @@ Data
         13: highest.y (float)
         14: highest.z (float)               // Height
 
-        /au/scene/   args0 arg1 ... argn
+        /au/scene   args0 arg1 ... argn
 
         0: currentTime (int)                // Time (in frame number)
         1: percentCovered (float)           // Percent covered
@@ -126,6 +126,15 @@ Data
         5: scene.width (int)                // Scene size
         6: scene.height (int)
 ```
+
+Documentation
+-------------
+
+Documentation can be found in the reference folder
+
+Here is a presentation explaining how to use the API
+
+http://fr.slideshare.net/theoriz/augmentap5-api
 
 Contribute
 ----------
