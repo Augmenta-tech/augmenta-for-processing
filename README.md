@@ -83,8 +83,6 @@ Install the needed libraries first :
 ```
 Sketch -> Import Library... -> Add Library -> Syphon by Andres Colubri
 Sketch -> Import Library... -> Add Library -> G4P by Peter Lager
-Sketch -> Import Library... -> Minim
-Sketch -> Import Library... -> Video
 ```
 
 Data
