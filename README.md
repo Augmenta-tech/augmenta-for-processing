@@ -14,7 +14,7 @@ Sketch -> Import Library... -> Add Library -> OscP5 by Andreas Schlegel
 
 Then get AugmentaP5 library from here
 
-      https://github.com/Lyptik/AugmentaP5/archive/master.zip (and rename to AugmentaP5)
+https://github.com/Lyptik/AugmentaP5/archive/master.zip (and rename to AugmentaP5)
 
 or
 
