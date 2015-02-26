@@ -44,6 +44,12 @@ Sketch -> Import Library... -> AugmentaP5
 Examples
 --------
 
+In [Processing][], start your example
+
+```
+File -> Examples... -> Contributed Libraries -> AugmentaP5
+```
+
 ### Basic example
 
 Receive and draw Augmenta data without any other library
@@ -80,12 +86,6 @@ Sketch -> Import Library... -> Add Library -> G4P by Peter Lager
 Sketch -> Import Library... -> Minim
 Sketch -> Import Library... -> Video
 ```
-
-
-### Mouse sender
-
-Sketch that emulates and sends a virtual person that you can control with your mouse.
-This allows you to test the examples
 
 Data
 ----
