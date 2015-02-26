@@ -46,7 +46,7 @@ void setup() {
 
   // Create the Augmenta receiver
   auReceiver= new AugmentaP5(this, oscPort);
-  auReceiver.setTimeOut(5);
+  auReceiver.setTimeOut(500);
   
   // You can hardcode the interactive area if you need to
   //auReceiver.interactiveArea.set(0.25f, 0.25f, 0.5f, 0.5f);

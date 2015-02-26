@@ -87,14 +87,17 @@ public class AugmentaP5 {
 		parent.registerPre(this);
 	}
 
-	public void send(AugmentaPerson p, NetAddress address) {
+	public void sendSimulation(AugmentaPerson p, NetAddress address) {
 		// Create the message
-		send(p, address, "personUpdated");
+		sendSimulation(p, address, "personUpdated");
 	}
 	
-	public void send(AugmentaPerson p, NetAddress address, String message) {
+	public void sendSimulation(AugmentaPerson p, NetAddress address, String message) {
 		// Create the message
+		
+		
 		OscMessage person = new OscMessage("/au/"+message);
+		
 		person.add(p.id); // pid
 		person.add(p.oid); // oid
 		person.add(p.age); // age
@@ -110,8 +113,10 @@ public class AugmentaP5 {
 		person.add(p.highest.x); // highest.x
 		person.add(p.highest.y); // highest.y
 		person.add(p.highest.z); // highest.z
+		
 		// Send the packet
 		receiver.send(person, address);
+		
 	}
 	
 	public void sendScene(int width, int height, int age, int numPeople, NetAddress address) {
@@ -532,6 +537,25 @@ public class AugmentaP5 {
 		if (n >= 0) {
 			timeOut = n;
 		}
+	}
+	
+	public AugmentaPerson getOldestPerson(){
+		int bestAge = 0;
+		int bestPerson = -1;
+		// For each person...
+		for (int key : people.keySet()) {
+			System.out.println("Lib : people id = "+people.get(key).id);
+		    PVector pos = people.get(key).centroid;
+		    if (people.get(key).age > bestAge) {
+		      bestAge = people.get(key).age;
+		      bestPerson = key;
+		    }
+		}
+		AugmentaPerson p = null;
+		if (bestPerson != -1){
+			p = people.get(bestPerson);
+		}	
+		return p;
 	}
 
 };
