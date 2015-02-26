@@ -82,10 +82,17 @@ void draw() {
   testPerson.age = age;
   // Send point
   if (send){
-    augmenta.send(testPerson, sendingAddress);
+    try
+    {
+    augmenta.sendSimulation(testPerson, sendingAddress);
+    }catch(Error e)
+    {
+      println("error :"+e.getMessage());
+      //e.printStackTrace();
+    }
   }
   // Send scene
-  augmenta.sendScene(320, 240, sendingAddress);
+  //augmenta.sendScene(320, 240, sendingAddress);
 
 }
 
@@ -129,11 +136,11 @@ void keyPressed() {
   } else if (key == 's'){
     send=!send;
     if (send){
-      augmenta.send(testPerson, sendingAddress, "personEntered");
+      augmenta.sendSimulation(testPerson, sendingAddress, "personEntered");
       pid = int(random(1000));
       age = 0;
     } else {
-      augmenta.send(testPerson, sendingAddress, "personWillLeave");
+      augmenta.sendSimulation(testPerson, sendingAddress, "personWillLeave");
     }
   }
 }
