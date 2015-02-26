@@ -1,6 +1,6 @@
 /**
 *
-*    * Augmenta sender example
+*    * Augmenta simulator
 *    Send some generated Augmenta Packet
 *    Use your mouse to send custom packets
 *
@@ -12,11 +12,13 @@
 */
 
 import netP5.*;
-import augmentaP5.*;
+import g4p_controls.*;
 
 AugmentaP5 augmenta;
 NetAddress sendingAddress;
 AugmentaPerson testPerson;
+GTextField portInput;
+GButton portInputButton;
 
 float x = 0;
 float y = 0;
@@ -25,10 +27,10 @@ int age = 0;
 int direction = 1;
 int pid = int(random(1000));
 //int pid = 43;
-int oscPort = 7000;
+int oscPort = 12000;
 
 Boolean send = true;
-Boolean moving = true;
+Boolean moving = false;
 
 void setup() {
   size(640,480);
@@ -41,7 +43,15 @@ void setup() {
   PVector pos = new PVector(0.5f, 0.5f);
   testPerson = new AugmentaPerson(pid, pos, rect);
   
+  // Set the UI
+  portInput = new GTextField(this, 10, 55, 60, 20);
+  portInputButton = new GButton(this, 70, 55, 110, 20, "Change Osc Port");
+  portInput.setText(""+oscPort);
+  G4P.registerSketch(this);
+
+  // Init
   y=height/2;
+  x= width/2;
 }
 
 void draw() {
@@ -49,7 +59,8 @@ void draw() {
   background(0);
   textSize(14);
   text("Drag mouse to send custom data to 127.0.0.1:"+oscPort,10,20);
-  text("Press M to toggle the automatic movement",10,35);
+  text("Press S to toggle data sending",10,35);
+  text("Press M to toggle automatic movement",10,50);
   
   if(!mousePressed)
   {
@@ -65,6 +76,7 @@ void draw() {
     fill(128);
   }
   ellipse(x,y,20,20);
+  //rect(
   textSize(16);
   text(""+pid, x+20,y-10, 50, 20);
 
@@ -78,13 +90,15 @@ void draw() {
   testPerson.centroid.y = (float)y/height;
   testPerson.boundingRect.x = (float)x/width-0.1;
   testPerson.boundingRect.y = (float)y/height-0.1;
+  // Other values 
   testPerson.age = age;
+  
   // Send point
   if (send){
     augmenta.send(testPerson, sendingAddress);
   }
   // Send scene
-  augmenta.sendScene(320, 240, sendingAddress);
+  augmenta.sendScene(0, 0, sendingAddress);
 
 }
 
@@ -134,5 +148,28 @@ void keyPressed() {
     }
     pid = int(random(1000));
     age = 0;
+  } else if (key == ENTER || key == RETURN){
+    if(portInput.hasFocus() == true) {
+      handlePortInputButton();
+    }
   }
 }
+
+public void handleButtonEvents(GButton button, GEvent event) { 
+  if (button == portInputButton) {
+    handlePortInputButton();
+  }
+}
+
+public void handlePortInputButton() {
+
+  if (Integer.parseInt(portInput.getText()) != oscPort) {
+    println("input :"+portInput.getText());
+    oscPort = Integer.parseInt(portInput.getText());
+    augmenta.unbind();
+    augmenta=null;
+    augmenta= new AugmentaP5(this, 50000);
+    sendingAddress = new NetAddress("127.0.0.1",oscPort);
+  }
+}
+
