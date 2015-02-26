@@ -127,6 +127,15 @@ Data
         6: scene.height (int)
 ```
 
+Documentation
+-------------
+
+Documentation can be found in the reference folder
+
+Here is a presentation explaining how to use the API
+
+http://fr.slideshare.net/theoriz/augmentap5-api
+
 Contribute
 ----------
 
