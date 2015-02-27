@@ -14,7 +14,7 @@ Sketch -> Import Library... -> Add Library -> OscP5 by Andreas Schlegel
 
 Then get AugmentaP5 library from here
 
-      https://github.com/Lyptik/AugmentaP5/archive/master.zip (and rename to AugmentaP5)
+https://github.com/Lyptik/AugmentaP5/archive/master.zip (and rename to AugmentaP5)
 
 or
 
@@ -43,6 +43,12 @@ Sketch -> Import Library... -> AugmentaP5
 
 Examples
 --------
+
+In [Processing][], start your example
+
+```
+File -> Examples... -> Contributed Libraries -> AugmentaP5
+```
 
 ### Basic example
 
@@ -77,15 +83,7 @@ Install the needed libraries first :
 ```
 Sketch -> Import Library... -> Add Library -> Syphon by Andres Colubri
 Sketch -> Import Library... -> Add Library -> G4P by Peter Lager
-Sketch -> Import Library... -> Minim
-Sketch -> Import Library... -> Video
 ```
-
-
-### Mouse sender
-
-Sketch that emulates and sends a virtual person that you can control with your mouse.
-This allows you to test the examples
 
 Data
 ----
@@ -93,9 +91,9 @@ Data
 ```
     * Augmenta OSC Protocol :
 
-        /au/personWillLeave/ args0 arg1 ... argn
-        /au/personUpdated/   args0 arg1 ... argn
-        /au/personEntered/   args0 arg1 ... argn
+        /au/personWillLeave args0 arg1 ... argn
+        /au/personUpdated   args0 arg1 ... argn
+        /au/personEntered   args0 arg1 ... argn
 
         where args are :
 
@@ -116,7 +114,7 @@ Data
         13: highest.y (float)
         14: highest.z (float)               // Height
 
-        /au/scene/   args0 arg1 ... argn
+        /au/scene   args0 arg1 ... argn
 
         0: currentTime (int)                // Time (in frame number)
         1: percentCovered (float)           // Percent covered
@@ -126,6 +124,15 @@ Data
         5: scene.width (int)                // Scene size
         6: scene.height (int)
 ```
+
+Documentation
+-------------
+
+Documentation can be found in the reference folder
+
+Here is a presentation explaining how to use the API
+
+http://fr.slideshare.net/theoriz/augmentap5-api
 
 Contribute
 ----------

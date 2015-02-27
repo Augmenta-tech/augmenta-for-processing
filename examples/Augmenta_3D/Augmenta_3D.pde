@@ -95,7 +95,7 @@ void draw() {
   for (int i=0; i<people.length; i++) {
     PVector pos = people[i].centroid;
     
-    augmentaP5.Rectangle rect = people[i].boundingRect;
+    augmentaP5.RectangleF rect = people[i].boundingRect;
     float rectHeight = 200;
     if (people[i].highest.z != 0 ) {
       rectHeight = people[i].highest.z;
@@ -144,9 +144,9 @@ public void handleButtonEvents(GButton button, GEvent event) {
 
 public void handlePortInputButton() {
 
-  if (Integer.parseInt(portInput.stext.getPlainText()) != oscPort) {
-    println("input :"+portInput.stext.getPlainText());
-    oscPort = Integer.parseInt(portInput.stext.getPlainText());
+  if (Integer.parseInt(portInput.getText()) != oscPort) {
+    println("input :"+portInput.getText());
+    oscPort = Integer.parseInt(portInput.getText());
     auReceiver.unbind();
     auReceiver=null;
     auReceiver= new AugmentaP5(this, oscPort);
@@ -170,6 +170,14 @@ void keyPressed() {
     } else {
       debug = true;
     }
+  }   else if (key == ENTER || key == RETURN){
+    if(portInput.hasFocus() == true) {
+      handlePortInputButton();
+    } /*else if(sceneX.hasFocus() == true) {
+      handleManualSceneButton();
+    } else if(sceneY.hasFocus() == true) {
+      handleManualSceneButton();
+    }*/
   }
 }
 

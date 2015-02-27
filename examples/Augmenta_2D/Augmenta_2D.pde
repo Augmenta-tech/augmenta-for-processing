@@ -46,7 +46,7 @@ void setup() {
 
   // Create the Augmenta receiver
   auReceiver= new AugmentaP5(this, oscPort);
-  auReceiver.setTimeOut(5);
+  auReceiver.setTimeOut(500);
   
   // You can hardcode the interactive area if you need to
   //auReceiver.interactiveArea.set(0.25f, 0.25f, 0.5f, 0.5f);
@@ -83,7 +83,10 @@ void draw() {
     frame.setSize(sceneSize[0]+frame.getInsets().left+frame.getInsets().right, sceneSize[1]+frame.getInsets().top+frame.getInsets().bottom);
   }
   // Update the UI
-  sceneSizeInfo.setText(sceneSize[0]+"x"+sceneSize[1], GAlign.MIDDLE, GAlign.MIDDLE);
+  if(sceneSize[0] >= 50 && sceneSize[1] >=50)
+  {
+    sceneSizeInfo.setText(sceneSize[0]+"x"+sceneSize[1], GAlign.MIDDLE, GAlign.MIDDLE);
+  }
 
   // Get the person data
   AugmentaPerson[] people = auReceiver.getPeopleArray();
@@ -116,7 +119,7 @@ void draw() {
 }
 
 void personEntered (AugmentaPerson p) {
-  //println("Person entered : "+ p.id + "at ("+p.centroid.x+","+p.centroid.y+")");
+  println("Person entered : "+ p.id + "at ("+p.centroid.x+","+p.centroid.y+")");
 }
 
 void personUpdated (AugmentaPerson p) {
@@ -124,7 +127,7 @@ void personUpdated (AugmentaPerson p) {
 }
 
 void personLeft (AugmentaPerson p) {
-  //println("Person left : "+ p.id + " at ("+p.centroid.x+","+p.centroid.y+")");
+  println("Person left : "+ p.id + " at ("+p.centroid.x+","+p.centroid.y+")");
 }
 
 void keyPressed() {
@@ -136,8 +139,17 @@ void keyPressed() {
   } else if (key == 'd') {
     // Show/hide the debug info
     debug = !debug;
+  }  else if (key == ENTER || key == RETURN){
+    if(portInput.hasFocus() == true) {
+      handlePortInputButton();
+    } else if(sceneX.hasFocus() == true) {
+      handleManualSceneButton();
+    } else if(sceneY.hasFocus() == true) {
+      handleManualSceneButton();
+    }
   }
 }
+
 // Used to set the interactive area
 // click and drag to set a custom area, right click to set it to default (full scene)
 float originX;
@@ -178,6 +190,7 @@ public void handleButtonEvents(GButton button, GEvent event) {
     handleManualSceneButton();
   }
 }
+
 public void handleToggleControlEvents(GToggleControl box, GEvent event) {
   if (box == autoSceneSize) {
     handleAutoSceneSizeCheckbox();
@@ -202,18 +215,19 @@ public void handleAutoSceneSizeCheckbox() {
 
 public void handlePortInputButton() {
 
-  if (Integer.parseInt(portInput.stext.getPlainText()) != oscPort) {
-    println("input :"+portInput.stext.getPlainText());
-    oscPort = Integer.parseInt(portInput.stext.getPlainText());
+  if (Integer.parseInt(portInput.getText()) != oscPort) {
+    println("input :"+portInput.getText());
+    oscPort = Integer.parseInt(portInput.getText());
     auReceiver.unbind();
     auReceiver=null;
     auReceiver= new AugmentaP5(this, oscPort);
   }
 }
+
 public void handleManualSceneButton() {
   try {
-    String xs = sceneX.stext.getPlainText();
-    String ys = sceneY.stext.getPlainText();
+    String xs = sceneX.getText();
+    String ys = sceneY.getText();
     xs.trim();
     ys.trim();
     int x = Integer.parseInt(xs);

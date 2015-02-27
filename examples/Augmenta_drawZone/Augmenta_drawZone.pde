@@ -85,7 +85,10 @@ void draw() {
     frame.setSize(sceneSize[0]+frame.getInsets().left+frame.getInsets().right, sceneSize[1]+frame.getInsets().top+frame.getInsets().bottom);
   }
   // Update the UI
-  sceneSizeInfo.setText(sceneSize[0]+"x"+sceneSize[1], GAlign.MIDDLE, GAlign.MIDDLE);
+  if(sceneSize[0] >= 50 && sceneSize[1] >=50)
+  {
+    sceneSizeInfo.setText(sceneSize[0]+"x"+sceneSize[1], GAlign.MIDDLE, GAlign.MIDDLE);
+  }
 
   // Get the person data
   AugmentaPerson[] people = auReceiver.getPeopleArray();
@@ -134,6 +137,14 @@ void keyPressed() {
     debug = !debug;
   } else if (key == 'r') {
    background(0); 
+  } else if (key == ENTER || key == RETURN){
+    if(portInput.hasFocus() == true) {
+      handlePortInputButton();
+    } else if(sceneX.hasFocus() == true) {
+      handleManualSceneButton();
+    } else if(sceneY.hasFocus() == true) {
+      handleManualSceneButton();
+    }
   }
 }
 // Used to set the interactive area
@@ -200,9 +211,9 @@ public void handleAutoSceneSizeCheckbox() {
 
 public void handlePortInputButton() {
 
-  if (Integer.parseInt(portInput.stext.getPlainText()) != oscPort) {
-    println("input :"+portInput.stext.getPlainText());
-    oscPort = Integer.parseInt(portInput.stext.getPlainText());
+  if (Integer.parseInt(portInput.getText()) != oscPort) {
+    println("input :"+portInput.getText());
+    oscPort = Integer.parseInt(portInput.getText());
     auReceiver.unbind();
     auReceiver=null;
     auReceiver= new AugmentaP5(this, oscPort);
@@ -210,8 +221,8 @@ public void handlePortInputButton() {
 }
 public void handleManualSceneButton() {
   try {
-    String xs = sceneX.stext.getPlainText();
-    String ys = sceneY.stext.getPlainText();
+    String xs = sceneX.getText();
+    String ys = sceneY.getText();
     xs.trim();
     ys.trim();
     int x = Integer.parseInt(xs);
