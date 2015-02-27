@@ -160,7 +160,10 @@ void draw() {
     frame.setSize(sceneSize[0]+frame.getInsets().left+frame.getInsets().right, sceneSize[1]+frame.getInsets().top+frame.getInsets().bottom);
   }
   // Update the UI
-  sceneSizeInfo.setText(sceneSize[0]+"x"+sceneSize[1], GAlign.MIDDLE, GAlign.MIDDLE);
+  if(sceneSize[0] >= 50 && sceneSize[1] >=50)
+  {
+    sceneSizeInfo.setText(sceneSize[0]+"x"+sceneSize[1], GAlign.MIDDLE, GAlign.MIDDLE);
+  }
 
   // Get the person data
   AugmentaPerson[] people = auReceiver.getPeopleArray();
