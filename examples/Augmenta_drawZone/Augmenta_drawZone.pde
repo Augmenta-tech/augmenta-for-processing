@@ -134,6 +134,14 @@ void keyPressed() {
     debug = !debug;
   } else if (key == 'r') {
    background(0); 
+  } else if (key == ENTER || key == RETURN){
+    if(portInput.hasFocus() == true) {
+      handlePortInputButton();
+    } else if(sceneX.hasFocus() == true) {
+      handleManualSceneButton();
+    } else if(sceneY.hasFocus() == true) {
+      handleManualSceneButton();
+    }
   }
 }
 // Used to set the interactive area

@@ -292,6 +292,14 @@ void keyPressed() {
   } else if (key == 'd') {
     // Show/hide the debug info
     debug = !debug;
+  }   else if (key == ENTER || key == RETURN){
+    if(portInput.hasFocus() == true) {
+      handlePortInputButton();
+    } else if(sceneX.hasFocus() == true) {
+      handleManualSceneButton();
+    } else if(sceneY.hasFocus() == true) {
+      handleManualSceneButton();
+    }
   }
 }
 

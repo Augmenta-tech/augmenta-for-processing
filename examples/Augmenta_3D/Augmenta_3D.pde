@@ -170,6 +170,14 @@ void keyPressed() {
     } else {
       debug = true;
     }
+  }   else if (key == ENTER || key == RETURN){
+    if(portInput.hasFocus() == true) {
+      handlePortInputButton();
+    } /*else if(sceneX.hasFocus() == true) {
+      handleManualSceneButton();
+    } else if(sceneY.hasFocus() == true) {
+      handleManualSceneButton();
+    }*/
   }
 }
 
