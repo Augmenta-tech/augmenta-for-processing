@@ -226,7 +226,7 @@ void adjustSceneSize() {
       println("The values entered for the screen size are not ints ! "+e);
     }
   }
-  if ( (width!=sw || height!=sh) && sw>100 && sh>100) {
+  if ( (canvas.width!=sw || canvas.height!=sh) && sw>100 && sh>100) {
     // Create the output canvas with the correct size
     canvas = createGraphics(sw, sh);
     float ratio = (float)sw/(float)sh;

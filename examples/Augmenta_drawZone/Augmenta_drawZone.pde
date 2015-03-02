@@ -275,7 +275,6 @@ void adjustSceneSize() {
   }
   if ( (canvas.width!=sw || canvas.height!=sh) && sw>100 && sh>100) {
     // Create the output canvas with the correct size
-    println("Update size");
     canvas = createGraphics(sw, sh);
     float ratio = (float)sw/(float)sh;
     if (sw >= displayWidth*0.9f || sh >= displayHeight*0.9f) {
