@@ -32,6 +32,9 @@ AugmentaP5 auReceiver;
 int oscPort = 12000;
 // Declare the syphon server
 SyphonServer server;
+// Graphics that will hold the syphon/spout texture to send
+PGraphics canvas;
+
 // Declare the UI
 boolean guiIsVisible=true;
 GTextField portInput;
@@ -40,7 +43,6 @@ GCheckbox autoSceneSize;
 GLabel sceneSizeInfo;
 GTextField sceneX;
 GTextField sceneY;
-GButton manualSceneButton;
 // [Audioreaction]
 GCustomSlider gainSlider;
 
@@ -71,6 +73,8 @@ void setup() {
 
   // Set the initial frame size
   size(640, 480, P2D);
+  // Create the canvas that will be used to send the syphon output
+  canvas = createGraphics(width, height, P2D);
 
   // Allow the frame to be resized
   if (frame != null) {
@@ -88,22 +92,9 @@ void setup() {
   if (platform == MACOSX) {
     server = new SyphonServer(this, "Processing Syphon");
   }
-
+  
   // Set the UI
-  autoSceneSize = new GCheckbox(this, 10, 10, 110, 20, "Auto scene size");
-  autoSceneSize.setOpaque(true);
-  sceneSizeInfo = new GLabel(this, 125, 10, 70, 20);
-  sceneSizeInfo.setOpaque(true);
-  sceneSizeInfo.setVisible(false);
-  sceneX = new GTextField(this, 125, 10, 35, 20);
-  sceneX.setText(""+width);
-  sceneY = new GTextField(this, 161, 10, 35, 20);
-  sceneY.setText(""+height);
-  manualSceneButton = new GButton(this, 197, 10, 50, 20, "Change");
-  portInput = new GTextField(this, 10, 40, 60, 20);
-  portInputButton = new GButton(this, 70, 40, 110, 20, "Change Osc Port");
-  portInput.setText(""+oscPort);
-  G4P.registerSketch(this);
+  setUI();
   
   // [Sprites]
   // Load an image (.png/.jpg/.tga/.gif)
@@ -152,25 +143,20 @@ void setup() {
 
 void draw() {
 
-  background(0);
-
   // Adjust the scene size
-  int[] sceneSize = auReceiver.getSceneSize();
-  if ( (width!=sceneSize[0] || height!=sceneSize[1]) && autoSceneSize.isSelected() && sceneSize[0]>100 && sceneSize[1]>100) {
-    frame.setSize(sceneSize[0]+frame.getInsets().left+frame.getInsets().right, sceneSize[1]+frame.getInsets().top+frame.getInsets().bottom);
-  }
-  // Update the UI
-  if(sceneSize[0] >= 50 && sceneSize[1] >=50)
-  {
-    sceneSizeInfo.setText(sceneSize[0]+"x"+sceneSize[1], GAlign.MIDDLE, GAlign.MIDDLE);
-  }
+  adjustSceneSize();
+  // Draw a background for the window
+  background(0);
+  // Begin drawing the canvas
+  canvas.beginDraw();
+  canvas.background(0);
 
   // Get the person data
   AugmentaPerson[] people = auReceiver.getPeopleArray();
   
   // [Video]
-  imageMode(CORNER);
-  image(bgVideo, 0, 0, width, height);
+  canvas.imageMode(CORNER);
+  canvas.image(bgVideo, 0, 0, canvas.width, canvas.height);
   
   // [Audioreaction]
   // Compute the current audio volume
@@ -183,7 +169,7 @@ void draw() {
   }
   // Display the VUmeter
   if (guiIsVisible){
-    noStroke();
+    canvas.noStroke();
     // Draw the debug rectangle symbolizing the volume
     if (volume > 1){
       fill(255,0,0);
@@ -198,13 +184,13 @@ void draw() {
   }
 
   // Draw a line between all the blobs
-  stroke(255);
-  strokeWeight(2);
+  canvas.stroke(255);
+  canvas.strokeWeight(2);
   for (int k=0; k<people.length; k++) {
     PVector pos1 = people[k].centroid; 
     for (int l=k+1; l<people.length; l++) {
       PVector pos2 = people[l].centroid; 
-      line(pos1.x*width, pos1.y*height, pos2.x*width, pos2.y*height);
+      canvas.line(pos1.x*canvas.width, pos1.y*canvas.height, pos2.x*canvas.width, pos2.y*canvas.height);
     }
   }
 
@@ -214,20 +200,20 @@ void draw() {
     
     // [Sprites]
     // Draw the sprite at the position of the person, with a small endless rotation
-    pushMatrix();
-    imageMode(CENTER);
-    translate(pos.x*width, pos.y*height);
-    rotate(radians(frameCount * 0.5f  % 360));
-    image(img, 0, 0, 150, 150);
-    popMatrix();
+    canvas.pushMatrix();
+    canvas.imageMode(CENTER);
+    canvas.translate(pos.x*canvas.width, pos.y*canvas.height);
+    canvas.rotate(radians(frameCount * 0.5f  % 360));
+    canvas.image(img, 0, 0, 150, 150);
+    canvas.popMatrix();
     
     // Draw a circle
-    fill(255); // Filled in white
-    noStroke(); // Without stroke
+    canvas.fill(255); // Filled in white
+    canvas.noStroke(); // Without stroke
     // Normal version (commented)
     // ellipse(pos.x*width, pos.y*height, 20, 20); // 20 pixels in diameter
     // [Audioreaction] version
-    ellipse(pos.x*width, pos.y*height, 15+cappedVolume*50, 15+cappedVolume*50);
+    canvas.ellipse(pos.x*canvas.width, pos.y*canvas.height, 15+cappedVolume*50, 15+cappedVolume*50);
 
     // Draw debug informations
     if (debug) {
@@ -252,8 +238,12 @@ void draw() {
   
   // Syphon output
   if (platform == MACOSX) {
-    server.sendScreen();
+    server.sendImage(canvas);
   }
+  
+  //draw augmenta canvas
+  image(canvas, 0, 0, width, height);
+  canvas.endDraw();
 }
 
 void personEntered (AugmentaPerson p) {
@@ -298,10 +288,6 @@ void keyPressed() {
   }   else if (key == ENTER || key == RETURN){
     if(portInput.hasFocus() == true) {
       handlePortInputButton();
-    } else if(sceneX.hasFocus() == true) {
-      handleManualSceneButton();
-    } else if(sceneY.hasFocus() == true) {
-      handleManualSceneButton();
     }
   }
 }
@@ -342,8 +328,6 @@ void mouseDragged(){
 public void handleButtonEvents(GButton button, GEvent event) { 
   if (button == portInputButton) {
     handlePortInputButton();
-  } else if (button == manualSceneButton) {
-    handleManualSceneButton();
   }
 }
 public void handleToggleControlEvents(GToggleControl box, GEvent event) {
@@ -357,14 +341,12 @@ public void handleAutoSceneSizeCheckbox() {
     sceneSizeInfo.setVisible(true);
     sceneX.setVisible(false);
     sceneY.setVisible(false);
-    manualSceneButton.setVisible(false);
   } else {
     sceneSizeInfo.setVisible(false);
     sceneX.setVisible(true);
     sceneY.setVisible(true);
     sceneX.setText(""+width);
     sceneY.setText(""+height);
-    manualSceneButton.setVisible(true);
   }
 }
 
@@ -376,22 +358,6 @@ public void handlePortInputButton() {
     auReceiver.unbind();
     auReceiver=null;
     auReceiver= new AugmentaP5(this, oscPort);
-  }
-}
-public void handleManualSceneButton() {
-  try {
-    String xs = sceneX.getText();
-    String ys = sceneY.getText();
-    xs.trim();
-    ys.trim();
-    int x = Integer.parseInt(xs);
-    int y = Integer.parseInt(ys);
-    if (width!=x || height!=y && !autoSceneSize.isSelected()) {
-      frame.setSize(x+frame.getInsets().left+frame.getInsets().right, y+frame.getInsets().top+frame.getInsets().bottom);
-    }
-  }
-  catch(NumberFormatException e) {
-    println("The values entered for the screen size are not ints ! "+e);
   }
 }
 
@@ -407,7 +373,6 @@ void showGUI(boolean val) {
   } else {
     sceneX.setVisible(val);
     sceneY.setVisible(val);
-    manualSceneButton.setVisible(val);
   }
 }
 
@@ -417,3 +382,57 @@ void movieEvent(Movie m) {
   m.read();
 }
 
+void setUI(){
+  // Set the UI
+  autoSceneSize = new GCheckbox(this, 10, 10, 110, 20, "Auto scene size");
+  autoSceneSize.setOpaque(true);
+  sceneSizeInfo = new GLabel(this, 125, 10, 70, 20);
+  sceneSizeInfo.setOpaque(true);
+  sceneSizeInfo.setVisible(false);
+  sceneX = new GTextField(this, 125, 10, 35, 20);
+  sceneX.setText(""+width);
+  sceneY = new GTextField(this, 161, 10, 35, 20);
+  sceneY.setText(""+height);
+  portInput = new GTextField(this, 10, 40, 60, 20);
+  portInputButton = new GButton(this, 70, 40, 110, 20, "Change Osc Port");
+  portInput.setText(""+oscPort);
+  G4P.registerSketch(this);
+}
+
+void adjustSceneSize() {
+  int sh = 0;
+  int sw = 0;
+  if (autoSceneSize.isSelected()) {
+    int[] sceneSize = auReceiver.getSceneSize();
+    sw = sceneSize[0];
+    sh = sceneSize[1];
+  } else {
+    try {
+      sw = Integer.parseInt(sceneX.getText());
+      sh = Integer.parseInt(sceneY.getText());
+    }
+    catch(NumberFormatException e) {
+      println("The values entered for the screen size are not ints ! "+e);
+    }
+  }
+  if ( (width!=sw || height!=sh) && sw>100 && sh>100) {
+    // Create the output canvas with the correct size
+    println("adjust");
+    canvas = createGraphics(sw, sh);
+    float ratio = (float)sw/(float)sh;
+    if (sw >= displayWidth*0.9f || sh >= displayHeight*0.9f) {
+      // Resize the window to fit in the screen with the correct ratio
+      if ( ratio > displayWidth/displayHeight ) {
+        sw = (int)(displayWidth*0.8f);
+        sh = (int)(sw/ratio);
+      } else {
+        sh = (int)(displayHeight*0.8f);
+        sw = (int)(sh*ratio);
+      }
+    }
+    frame.setSize(sw+frame.getInsets().left+frame.getInsets().right, sh+frame.getInsets().top+frame.getInsets().bottom);
+  }
+  
+  // Update the UI text field
+  sceneSizeInfo.setText(canvas.width+"x"+canvas.height, GAlign.MIDDLE, GAlign.MIDDLE);
+}

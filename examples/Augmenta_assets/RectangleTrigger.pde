@@ -19,14 +19,14 @@ public class RectangleTrigger extends Trigger{
 
   @Override
   public void draw(){
-    strokeWeight(2); 
-    stroke(255);
+    canvas.strokeWeight(2); 
+    canvas.stroke(255);
     if ( peopleInside.size() > 0){
-      fill(255,0,0,70);
+      canvas.fill(255,0,0,70);
     } else {
-      fill(255,255,255,70);
+      canvas.fill(255,255,255,70);
     }
-    rect(tl.x, tl.y, br.x-tl.x, br.y-tl.y);
+    canvas.rect(tl.x, tl.y, br.x-tl.x, br.y-tl.y);
   }
   
   @Override

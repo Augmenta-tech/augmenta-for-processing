@@ -16,18 +16,18 @@ public class PolygonTrigger extends Trigger{
 
   @Override
   public void draw(){
-    strokeWeight(2); 
-    stroke(255);
+    canvas.strokeWeight(2); 
+    canvas.stroke(255);
     if ( peopleInside.size() > 0){
-      fill(255,0,0,70);
+      canvas.fill(255,0,0,70);
     } else {
-      fill(255,255,255,70);
+      canvas.fill(255,255,255,70);
     }
-    beginShape();
+    canvas.beginShape();
     for (int i=0; i<points.length; i++){
-      vertex(points[i].x,points[i].y);
+      canvas.vertex(points[i].x,points[i].y);
     }
-    endShape();
+    canvas.endShape();
   }
   
   @Override
