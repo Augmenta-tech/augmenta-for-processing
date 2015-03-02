@@ -27,7 +27,7 @@ int age = 0;
 int direction = 1;
 int pid = int(random(1000));
 //int pid = 43;
-int oscPort = 12000;
+int oscPort = 7000;
 
 Boolean send = true;
 Boolean moving = false;

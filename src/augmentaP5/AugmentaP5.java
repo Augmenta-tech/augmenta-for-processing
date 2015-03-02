@@ -36,6 +36,8 @@ public class AugmentaP5 {
 	private Hashtable<Integer, AugmentaPerson> _currentPeople;
 	
 	public InteractiveArea interactiveArea;
+	
+	public static PGraphics canvas;
 
 	private Method personEntered;
 	private Method personUpdated;

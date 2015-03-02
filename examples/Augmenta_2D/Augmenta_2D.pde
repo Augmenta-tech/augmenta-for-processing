@@ -92,7 +92,7 @@ void draw() {
     canvas.ellipse(pos.x*canvas.width, pos.y*canvas.height, 30, 30); // 30 pixels in diameter
     if (debug) {
       canvas.stroke(255);
-      canvas.line(pos.x*canvas.width, pos.y*canvas.height, (pos.x+velocity.x*2)*canvas.width, (pos.y+velocity.y*2)*canvas.height);
+      //canvas.line(pos.x*canvas.width, pos.y*canvas.height, (pos.x+velocity.x*2)*canvas.width, (pos.y+velocity.y*2)*canvas.height);
       people[i].draw();
     }
   }

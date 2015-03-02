@@ -25,7 +25,8 @@ public class AugmentaPerson
 	/** Normalized (0.0-1.0) distance from camera. For Kinect camera, highest value (1) is approx. 10 meters*/
 	public float depth; 
 	/** Center of mass of person */
-	public PVector centroid;  
+	public PVector centroid;
+	public PVector lastcentroid;  
 	/** Speed since last update */
 	public PVector velocity;
 	/** Closest point to the camera (with Kinect). If using non-depth camera, represents brightest point on person. */
@@ -114,7 +115,6 @@ public class AugmentaPerson
 	 */
 	public void draw(){
 		
-		
 		// draw rect based on person's detected size
     	// dimensions from Augmenta are 0-1, so we multiply by window width and height
 		PApplet app = AugmentaP5.parent;
@@ -122,18 +122,51 @@ public class AugmentaPerson
 		
 		if(g != null)
 		{
+			
+			// Compute a color for the points
+			int rc,gc,bc;
+			if (id%5 == 0){
+				rc = 255;
+				gc = 255;
+				bc = 0;
+			} else if (id%5 == 1){
+				rc = 255;
+				gc = 0;
+				bc = 255;
+			} else if (id%5 == 2){
+				rc = 0;
+				gc = 255;
+				bc = 255;
+			} else if (id%5 == 3){
+				rc = 0;
+				gc = 255;
+				bc = 50;
+			} else {
+				rc = 50;
+				gc = 255;
+				bc = 0;
+			}
+			
+			// Bounding rect
 			g.noFill();
-			g.stroke(255,100);
+			g.stroke(rc,gc,bc,255);
+			g.strokeWeight(2);
+
 			g.rectMode(g.CORNER);
 			g.textAlign(g.CORNER);
 			g.rect(boundingRect.x*g.width, boundingRect.y*g.height, boundingRect.width*g.width, boundingRect.height*g.height);		
 			
 			// draw circle based on person's centroid (also from 0-1)
-			g.fill(255,255,255);
+			g.fill(rc,gc,bc);
+			g.stroke(255);
 			g.ellipse(centroid.x*g.width, centroid.y*g.height, 10, 10);
 			
+			int factor = 4;
+			g.stroke(255);
+			g.line(centroid.x*g.width, centroid.y*g.height, (centroid.x+velocity.x*factor)*g.width, (centroid.y+velocity.y*factor)*g.height);
+			
 			// draw contours
-			g.noFill();
+			//g.noFill();
 			g.stroke(255,100);
 			g.beginShape();
 			for (int i=0; i<contours.size(); i++){
