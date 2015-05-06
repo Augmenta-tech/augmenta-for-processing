@@ -19,7 +19,7 @@ https://github.com/Lyptik/AugmentaP5/archive/master.zip (and rename to AugmentaP
 or
 
 ```
-git clone https://github.com/Lyptik/AugmentaP5.git
+git clone https://github.com/Theoriz/AugmentaP5.git
 ```
 
 in the following directory
