@@ -161,7 +161,7 @@ public class AugmentaPerson
 			g.stroke(255);
 			g.ellipse(centroid.x*g.width, centroid.y*g.height, 10, 10);
 			
-			int factor = 4;
+			int factor = 1;
 			g.stroke(255);
 			g.line(centroid.x*g.width, centroid.y*g.height, (centroid.x+velocity.x*factor)*g.width, (centroid.y+velocity.y*factor)*g.height);
 			

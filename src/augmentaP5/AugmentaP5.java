@@ -11,6 +11,7 @@ import java.lang.reflect.Method;
 import java.lang.Integer;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.awt.geom.Point2D;
 
 /**
  * Augmenta Connection: Connects to Augmenta app and provides your applet with
@@ -129,21 +130,23 @@ public class AugmentaP5 {
 		
 	}
 	
-	public void sendScene(int width, int height, int age, int numPeople, NetAddress address) {
+	public void sendScene(int width, int height, int depth, int age, float percentCovered, int numPeople, Point2D.Float averageMotion, NetAddress address) {
 		// Create the message
 		OscMessage msg = new OscMessage("/au/scene");
 		msg.add(age); // age
-		msg.add(0); // percentage covered
+		msg.add(percentCovered); // percentage covered
 		msg.add(numPeople); // number of people
-		msg.add(0); // average motion X
-		msg.add(0); // average motion Y
+		msg.add(averageMotion.x); // average motion X
+		msg.add(averageMotion.y); // average motion Y
 		msg.add(width); // width in pixels
 		msg.add(height); // height in pixels
+		msg.add(depth); // depth in pixels
 		// Send the packet
 		receiver.send(msg, address);
 	}
 	public void sendScene(int width, int height, NetAddress address) {
-		sendScene(width, height, 0, 0, address);
+		Point2D.Float zero = new Point2D.Float(0f,0f);
+		sendScene(width, height, 0, 0, 0f, 0, zero, address);
 	}
 
 	public void unbind() {
