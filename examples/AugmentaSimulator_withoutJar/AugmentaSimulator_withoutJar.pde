@@ -137,9 +137,9 @@ void mouseDragged() {
 void keyPressed() {
 
   // Stop/Start the movement of the point
-  if (key == 'm') {
+  if (key == 'm' || key == 'M') {
     moving=!moving;
-  } else if (key == 's'){
+  } else if (key == 's' || key == 'S'){
     send=!send;
     if (send){
       augmenta.send(testPerson, sendingAddress, "personEntered");
