@@ -82,15 +82,21 @@ void draw() {
   background(0);
   textSize(14);
   text("Drag mouse to send custom data to 127.0.0.1:"+oscPort,10,20);
-  text("Press S to toggle data sending",10,35);
-  text("Press M to toggle automatic movement",10,50);
-  text("Press G to toggle a grid of random points",10,65);
+  text("Press [s] to toggle data sending",10,35);
+  text("Press [m] to toggle automatic movement",10,50);
+  text("Press [g] to toggle a grid of random persons",10,65);
   
   if (grid){
     // Update and draw the TestPersons
     for(int i = 0; i < persons.length ; i++){
       persons[i].update();
       //persons[i].send(augmenta, sendingAddress);
+      if(send){
+        fill(255);
+      }
+      else{
+        fill(128);
+      }
       persons[i].draw();
     }
   }
@@ -178,9 +184,9 @@ void mouseDragged() {
 void keyPressed() {
 
   // Stop/Start the movement of the point
-  if (key == 'm') {
+  if (key == 'm' || key == 'M') {
     moving=!moving;
-  } else if (key == 's'){
+  } else if (key == 's' || key == 'S'){
     send=!send;
     if (send){
       augmenta.sendSimulation(testPerson, sendingAddress, "personEntered");
@@ -193,7 +199,7 @@ void keyPressed() {
     if(portInput.hasFocus() == true) {
       handlePortInputButton();
     }
-  } else if (key == 'g'){
+  } else if (key == 'g' || key == 'G'){
     grid=!grid;
   }
 }
