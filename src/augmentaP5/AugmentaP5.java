@@ -98,15 +98,9 @@ public class AugmentaP5 {
 		canvas = target;
 	}
 
-	public void sendSimulation(AugmentaPerson p, NetAddress address) {
-		// Create the message
-		sendSimulation(p, address, "personUpdated");
-	}
-	
 	public void sendSimulation(AugmentaPerson p, NetAddress address, String message) {
+		
 		// Create the message
-		
-		
 		OscMessage person = new OscMessage("/au/"+message);
 		
 		person.add(p.id); // pid
@@ -118,7 +112,7 @@ public class AugmentaP5 {
 		person.add(p.velocity.y); // velocity.y
 		person.add(p.depth); // depth
 		person.add(p.boundingRect.x); // boundingRect.x
-		person.add(p.boundingRect.y); // boudingRect.y
+		person.add(p.boundingRect.y); // boundingRect.y
 		person.add(p.boundingRect.width); // boundingRect.width
 		person.add(p.boundingRect.height); // boundingRect.height
 		person.add(p.highest.x); // highest.x
@@ -129,6 +123,12 @@ public class AugmentaP5 {
 		receiver.send(person, address);
 		
 	}
+	
+	public void sendSimulation(AugmentaPerson p, NetAddress address) {
+		// Create the message
+		sendSimulation(p, address, "personUpdated");
+	}
+	
 	
 	public void sendScene(int width, int height, int depth, int age, float percentCovered, int numPeople, Point2D.Float averageMotion, NetAddress address) {
 		// Create the message
