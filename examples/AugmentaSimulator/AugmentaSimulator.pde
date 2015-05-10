@@ -16,7 +16,6 @@ import java.awt.geom.Point2D;
 import g4p_controls.*;
 import augmentaP5.*;
 
-
 AugmentaP5 augmenta;
 NetAddress sendingAddress;
 AugmentaPerson testPerson;
@@ -52,10 +51,14 @@ void setup() {
   count = wideCount * highCount;
   persons = new TestPerson[count];
   
+  // Create grid
   int index = 0;
   for (int y = 0; y < highCount; y++) {
     for (int x = 0; x < wideCount; x++) {
-      persons[index++] = new TestPerson(x*unit, y*unit, unit/2, unit/2, random(0.05, 0.8), unit);
+      persons[index] = new TestPerson(x*unit, y*unit, unit/2, unit/2, random(0.05, 0.8), unit);
+      persons[index].p.oid = index; // set oid
+      
+      index++;
     }
   }
   

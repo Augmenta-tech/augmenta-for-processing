@@ -25,6 +25,9 @@ class TestPerson {
     PVector pos = new PVector(0.5f, 0.5f);
     p = new AugmentaPerson(pid, pos, rect);
     
+    p.highest.x = random(0.1, 0.9);
+    p.highest.y = random(0.1, 0.9);
+    p.highest.z = random(0.4, 0.8);
   }
   
   // Custom method for updating the variables
@@ -44,6 +47,7 @@ class TestPerson {
     p.centroid.y = (y+yOffset)/height;
     p.boundingRect.x = p.centroid.x - p.boundingRect.width/2;
     p.boundingRect.y = p.centroid.y - p.boundingRect.height/2;
+    p.age++;    
   }
   
   void send(AugmentaP5 augmenta, NetAddress a){
