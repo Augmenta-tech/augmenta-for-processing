@@ -89,7 +89,7 @@ void draw() {
     // Draw a circle
     canvas.fill(0, 128, 255); // Filled in blue
     canvas.noStroke(); // Without stroke
-    canvas.ellipse(pos.x*canvas.width, pos.y*canvas.height, 30, 30); // 30 pixels in diameter
+    canvas.ellipse(pos.x*canvas.width, pos.y*canvas.height, 15, 15); // 30 pixels in diameter
     if (debug) {
       canvas.stroke(255);
       //canvas.line(pos.x*canvas.width, pos.y*canvas.height, (pos.x+velocity.x*2)*canvas.width, (pos.y+velocity.y*2)*canvas.height);

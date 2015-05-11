@@ -21,7 +21,7 @@ class TestPerson {
     unit = tempUnit;
     
     // Setup the augmenta person
-    int pid = int(random(100000));
+    int pid = int(random(10000000));
     RectangleF rect = new RectangleF(0.4f,0.4f,0.2f,0.2f);
     PVector pos = new PVector(0.5f, 0.5f);
     p = new AugmentaPerson(pid, pos, rect);

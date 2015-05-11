@@ -21,6 +21,7 @@ NetAddress sendingAddress;
 AugmentaPerson testPerson;
 GTextField portInput;
 GButton portInputButton;
+GSlider slider;
 
 float x, oldX = 0;
 float y, oldY = 0;
@@ -71,9 +72,10 @@ void setup() {
   testPerson.highest.z = random(0.4, 0.6);
   
   // Set the UI
-  portInput = new GTextField(this, 10, 70, 60, 20);
-  portInputButton = new GButton(this, 70, 70, 110, 20, "Change Osc Port");
+  portInput = new GTextField(this, 10, 75, 60, 20);
+  portInputButton = new GButton(this, 70, 75, 110, 20, "Change Osc Port");
   portInput.setText(""+oscPort);
+  slider = new GSlider(this, 10, 140, 170, 15, 15);
   G4P.registerSketch(this);
 
   // Init
@@ -84,11 +86,6 @@ void setup() {
 void draw() {
 
   background(0);
-  textSize(14);
-  text("Drag mouse to send custom data to 127.0.0.1:"+oscPort,10,20);
-  text("Press [s] to toggle data sending",10,35);
-  text("Press [m] to toggle automatic movement",10,50);
-  text("Press [g] to toggle a grid of random persons",10,65);
   
   if (grid){
     // Update and draw the TestPersons
@@ -159,6 +156,14 @@ void draw() {
   Point2D.Float p = new Point2D.Float(2f+random(0.1),-2f+random(0.1));
   augmenta.sendScene(width, height, 100, sceneAge, percentCovered, persons.length, p, sendingAddress);
 
+  
+  // Text
+  textSize(14);
+  text("Drag mouse to send custom data to 127.0.0.1:"+oscPort,10,20);
+  text("Press [s] to toggle data sending",10,35);
+  text("Press [m] to toggle automatic movement",10,50);
+  text("Press [g] to toggle a grid of random persons",10,65);
+  text("Number of points of the grid : "+persons.length,10,130);
 }
 
 void mouseDragged() {
@@ -233,5 +238,24 @@ public void handlePortInputButton() {
     augmenta= new AugmentaP5(this, 50000);
     sendingAddress = new NetAddress("127.0.0.1",oscPort);
   }
+}
+
+public void handleSliderEvents(GValueControl slider, GEvent event) { 
+  unit = (int)((1-slider.getValueF())*120)+12;
+  // Setup the array of TestPerson
+  int wideCount = width / unit;
+  int highCount = height / unit;
+  count = wideCount * highCount;
+  persons = new TestPerson[count];
+  
+  // Create grid
+  int index = 0;
+  for (int y = 0; y < highCount; y++) {
+    for (int x = 0; x < wideCount; x++) {
+      persons[index] = new TestPerson(x*unit, y*unit, unit/2, unit/2, random(0.05, 0.8), unit);
+      persons[index].p.oid = index; // set oid
+      index++;
+    }
+  }  
 }
 
