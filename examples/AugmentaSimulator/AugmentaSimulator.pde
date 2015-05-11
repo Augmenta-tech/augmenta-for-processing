@@ -22,8 +22,8 @@ AugmentaPerson testPerson;
 GTextField portInput;
 GButton portInputButton;
 
-float x = 0;
-float y = 0;
+float x, oldX = 0;
+float y, oldY = 0;
 float t = 0; // time
 int age = 0;
 int sceneAge = 0;
@@ -102,10 +102,13 @@ void draw() {
       }
       persons[i].draw();
     }
-  }
+  } 
   
   if(!mousePressed)
   {
+    // Save the old positions for the main point
+    oldX = x;
+    oldY = y;
     // Sin animation
     if (moving){
       x = map(sin(t),-1,1,width/10,width*9/10);
@@ -130,6 +133,8 @@ void draw() {
   // Update point
   testPerson.centroid.x = (float)x/width;
   testPerson.centroid.y = (float)y/height;
+  testPerson.velocity.x = (x - oldX)/width;
+  testPerson.velocity.y = (y - oldY)/height;
   testPerson.boundingRect.x = (float)x/width-0.1;
   testPerson.boundingRect.y = (float)y/height-0.1;
   // Other values 
@@ -153,7 +158,8 @@ void draw() {
 }
 
 void mouseDragged() {
- 
+ oldX = x;
+ oldY = y;
  // Update coords
  x = mouseX;
  y = mouseY;

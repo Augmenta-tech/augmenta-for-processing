@@ -5,6 +5,7 @@ class TestPerson {
   int xOffset;
   int yOffset;
   float x, y;
+  float oldX, oldY;
   int unit;
   int xDirection = 1;
   int yDirection = 1;
@@ -27,11 +28,17 @@ class TestPerson {
     
     p.highest.x = random(0.1, 0.9);
     p.highest.y = random(0.1, 0.9);
-    p.highest.z = random(0.4, 0.8);
+    p.highest.z = random(0.4, 0.6);
   }
   
   // Custom method for updating the variables
   void update() {
+    
+    // Store the oldX oldY values
+   oldX = x;
+   oldY = y;
+    
+    // Compute the new values
     x = x + (speed * xDirection);
     if (x >= unit || x <= 0) {
       xDirection *= -1;
@@ -42,12 +49,18 @@ class TestPerson {
       yDirection *= -1;
       y = y + (1 * yDirection);
     }
+    // Compute the velocity
+    p.velocity.x = (x - oldX)/width;
+    p.velocity.y = (y - oldY)/height;
     // Update augmenta
+    p.depth = 0.5f;
     p.centroid.x = (x+xOffset)/width;
     p.centroid.y = (y+yOffset)/height;
     p.boundingRect.x = p.centroid.x - p.boundingRect.width/2;
     p.boundingRect.y = p.centroid.y - p.boundingRect.height/2;
-    p.age++;    
+    p.age++; 
+ 
+     
   }
   
   void send(AugmentaP5 augmenta, NetAddress a){
