@@ -124,8 +124,6 @@ void draw() {
     fill(255, 255, 255, 30);
     stroke(255);
     box(rect.width*width, rect.height*height, rectHeight);
-    //box(30);
-    println("People size : "+rect.x+" "+rect.y+" "+rect.width+" "+rect.height);
     popMatrix();
   }
 
