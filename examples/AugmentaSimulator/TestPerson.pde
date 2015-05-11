@@ -59,8 +59,6 @@ class TestPerson {
     p.highest.x = p.centroid.x;
     p.highest.y = p.centroid.y;
     p.age++; 
- 
-     
   }
   
   void send(AugmentaP5 augmenta, NetAddress a){

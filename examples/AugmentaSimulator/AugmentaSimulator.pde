@@ -1,15 +1,15 @@
 /**
-*
-*    * Augmenta simulator
-*    Send some generated Augmenta Packet
-*    Use your mouse to send custom packets
-*
-*    Author : David-Alexandre Chanel
-*             Tom Duchêne
-*
-*    Website : http://www.theoriz.com
-*
-*/
+ *
+ *    * Augmenta simulator
+ *    Send some generated Augmenta Packet
+ *    Use your mouse to send custom packets
+ *
+ *    Author : David-Alexandre Chanel
+ *             Tom Duchêne
+ *
+ *    Website : http://www.theoriz.com
+ *
+ */
 
 import netP5.*;
 import java.awt.geom.Point2D;
@@ -30,7 +30,6 @@ int age = 0;
 int sceneAge = 0;
 int direction = 1;
 int pid = int(random(1000));
-//int pid = 43;
 int oscPort = 12000;
 
 Boolean send = true;
@@ -43,39 +42,39 @@ int count;
 TestPerson[] persons;
 
 void setup() {
-  size(640,480);
+  size(640, 480);
   frameRate(30);
-  
+
   // Setup the array of TestPerson
   int wideCount = width / unit;
   int highCount = height / unit;
   count = wideCount * highCount;
   persons = new TestPerson[count];
-  
+
   // Create grid
   int index = 0;
   for (int y = 0; y < highCount; y++) {
     for (int x = 0; x < wideCount; x++) {
       persons[index] = new TestPerson(x*unit, y*unit, unit/2, unit/2, random(0.05, 0.8), unit);
       persons[index].p.oid = index; // set oid
-      
+
       index++;
     }
   }
-  
+
   // Osc network com
   augmenta = new AugmentaP5(this, 50000);
-  sendingAddress = new NetAddress("127.0.0.1",oscPort);
-  RectangleF rect = new RectangleF(0.4f,0.4f,0.2f,0.2f);
+  sendingAddress = new NetAddress("127.0.0.1", oscPort);
+  RectangleF rect = new RectangleF(0.4f, 0.4f, 0.2f, 0.2f);
   PVector pos = new PVector(0.5f, 0.5f);
   testPerson = new AugmentaPerson(pid, pos, rect);
   testPerson.highest.z = random(0.4, 0.6);
-  
+
   // Set the UI
-  portInput = new GTextField(this, 10, 75, 60, 20);
-  portInputButton = new GButton(this, 70, 75, 110, 20, "Change Osc Port");
+  portInput = new GTextField(this, 10, 22, 60, 20);
+  portInputButton = new GButton(this, 70, 22, 110, 20, "Change Osc Port");
   portInput.setText(""+oscPort);
-  slider = new GSlider(this, 10, 140, 170, 15, 15);
+  slider = new GSlider(this, 8, 100, 270, 15, 15);
   G4P.registerSketch(this);
 
   // Init
@@ -86,42 +85,41 @@ void setup() {
 void draw() {
 
   background(0);
-  
-  if (grid){
+
+  if (grid) {
     // Update and draw the TestPersons
-    for(int i = 0; i < persons.length ; i++){
+    for (int i = 0; i < persons.length; i++) {
       persons[i].update();
       //persons[i].send(augmenta, sendingAddress);
-      if(send){
+      if (send) {
         fill(255);
-      }
-      else{
+      } else {
         fill(128);
       }
       persons[i].draw();
     }
   } 
-  
-  if(!mousePressed)
+
+  if (!mousePressed)
   {
     // Save the old positions for the main point
     oldX = x;
     oldY = y;
     // Sin animation
-    if (moving){
-      x = map(sin(t),-1,1,width/10,width*9/10);
+    if (moving) {
+      x = map(sin(t), -1, 1, width/10, width*9/10);
     }
   }
   // Draw disk
-  if (send){
+  if (send) {
     fill(255);
-  }else{
+  } else {
     fill(128);
   }
-  ellipse(x,y,20,20);
+  ellipse(x, y, 20, 20);
   //rect(
   textSize(16);
-  text(""+pid, x+20,y-10, 50, 20);
+  text(""+pid, x+20, y-10, 50, 20);
 
   // Increment val
   t= t + direction*TWO_PI/70; // 70 inc
@@ -140,12 +138,12 @@ void draw() {
   // Other values 
   testPerson.age = age;
   testPerson.depth = 0.5f;
-  
+
   // Send point
-  if (send){
+  if (send) {
     augmenta.sendSimulation(testPerson, sendingAddress);
-    if (grid){
-      for(int i = 0; i < persons.length ; i++){
+    if (grid) {
+      for (int i = 0; i < persons.length; i++) {
         persons[i].send(augmenta, sendingAddress);
       }
     }
@@ -153,50 +151,48 @@ void draw() {
   // Send scene
   sceneAge++;
   float percentCovered = random(0.1)+0.2f;
-  Point2D.Float p = new Point2D.Float(2f+random(0.1),-2f+random(0.1));
+  Point2D.Float p = new Point2D.Float(2f+random(0.1), -2f+random(0.1));
   augmenta.sendScene(width, height, 100, sceneAge, percentCovered, persons.length, p, sendingAddress);
 
-  
   // Text
   textSize(14);
-  text("Drag mouse to send custom data to 127.0.0.1:"+oscPort,10,20);
-  text("Press [s] to toggle data sending",10,35);
-  text("Press [m] to toggle automatic movement",10,50);
-  text("Press [g] to toggle a grid of random persons",10,65);
-  text("Number of points of the grid : "+persons.length,10,130);
+  text("Drag mouse to send custom data to 127.0.0.1:"+oscPort, 10, 16);
+  text("Press [s] to toggle data sending", 10, 60);
+  text("Press [m] to toggle automatic movement", 10, 75);
+  text("Press [g] to toggle a grid of "+persons.length+" persons", 10, 90);
 }
 
 void mouseDragged() {
- oldX = x;
- oldY = y;
- // Update coords
- x = mouseX;
- y = mouseY;
- 
- // The following code is here just for pure fun and aesthetic !
- // It enables the point to go on in its sinus road where
- // you left it !
- 
- // Clamping
- if(x>width*9/10)
- {
-   x=width*9/10;
- }
- if(x<width/10)
- {
-   x=width/10;
- }
- // Reverse
- t = asin(map(x,width/10,width*9/10,-1,1));
- // Don't do it visually
- x = mouseX;
- // Change direction by calculating speed vector
- if(mouseX - pmouseX < 0)
- {
-   direction = -1;
- } else {
-   direction = 1;
- }
+  oldX = x;
+  oldY = y;
+  // Update coords
+  x = mouseX;
+  y = mouseY;
+
+  // The following code is here just for pure fun and aesthetic !
+  // It enables the point to go on in its sinus road where
+  // you left it !
+
+  // Clamping
+  if (x>width*9/10)
+  {
+    x=width*9/10;
+  }
+  if (x<width/10)
+  {
+    x=width/10;
+  }
+  // Reverse
+  t = asin(map(x, width/10, width*9/10, -1, 1));
+  // Don't do it visually
+  x = mouseX;
+  // Change direction by calculating speed vector
+  if (mouseX - pmouseX < 0)
+  {
+    direction = -1;
+  } else {
+    direction = 1;
+  }
 }
 
 void keyPressed() {
@@ -204,20 +200,20 @@ void keyPressed() {
   // Stop/Start the movement of the point
   if (key == 'm' || key == 'M') {
     moving=!moving;
-  } else if (key == 's' || key == 'S'){
+  } else if (key == 's' || key == 'S') {
     send=!send;
-    if (send){
+    if (send) {
       augmenta.sendSimulation(testPerson, sendingAddress, "personEntered");
     } else {
       augmenta.sendSimulation(testPerson, sendingAddress, "personWillLeave");
     }
     pid = int(random(1000));
     age = 0;
-  } else if (key == ENTER || key == RETURN){
-    if(portInput.hasFocus() == true) {
+  } else if (key == ENTER || key == RETURN) {
+    if (portInput.hasFocus() == true) {
       handlePortInputButton();
     }
-  } else if (key == 'g' || key == 'G'){
+  } else if (key == 'g' || key == 'G') {
     grid=!grid;
   }
 }
@@ -236,7 +232,7 @@ public void handlePortInputButton() {
     augmenta.unbind();
     augmenta=null;
     augmenta= new AugmentaP5(this, 50000);
-    sendingAddress = new NetAddress("127.0.0.1",oscPort);
+    sendingAddress = new NetAddress("127.0.0.1", oscPort);
   }
 }
 
@@ -247,7 +243,7 @@ public void handleSliderEvents(GValueControl slider, GEvent event) {
   int highCount = height / unit;
   count = wideCount * highCount;
   persons = new TestPerson[count];
-  
+
   // Create grid
   int index = 0;
   for (int y = 0; y < highCount; y++) {
@@ -256,6 +252,6 @@ public void handleSliderEvents(GValueControl slider, GEvent event) {
       persons[index].p.oid = index; // set oid
       index++;
     }
-  }  
+  }
 }
 
