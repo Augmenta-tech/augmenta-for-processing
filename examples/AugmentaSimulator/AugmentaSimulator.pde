@@ -68,6 +68,7 @@ void setup() {
   RectangleF rect = new RectangleF(0.4f,0.4f,0.2f,0.2f);
   PVector pos = new PVector(0.5f, 0.5f);
   testPerson = new AugmentaPerson(pid, pos, rect);
+  testPerson.highest.z = random(0.4, 0.6);
   
   // Set the UI
   portInput = new GTextField(this, 10, 70, 60, 20);
@@ -137,8 +138,11 @@ void draw() {
   testPerson.velocity.y = (y - oldY)/height;
   testPerson.boundingRect.x = (float)x/width-0.1;
   testPerson.boundingRect.y = (float)y/height-0.1;
+  testPerson.highest.x = testPerson.centroid.x;
+  testPerson.highest.y = testPerson.centroid.y;
   // Other values 
   testPerson.age = age;
+  testPerson.depth = 0.5f;
   
   // Send point
   if (send){
