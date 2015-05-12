@@ -35,6 +35,8 @@ int oscPort = 12000;
 Boolean send = true;
 Boolean moving = false;
 Boolean grid = false;
+Boolean draw = true;
+Boolean gridHasChanged = false;
 
 // Array of TestPerson points
 int unit = 65;
@@ -74,7 +76,7 @@ void setup() {
   portInput = new GTextField(this, 10, 22, 60, 20);
   portInputButton = new GButton(this, 70, 22, 110, 20, "Change Osc Port");
   portInput.setText(""+oscPort);
-  slider = new GSlider(this, 8, 100, 270, 15, 15);
+  slider = new GSlider(this, 8, 120, 270, 15, 15);
   G4P.registerSketch(this);
 
   // Init
@@ -86,6 +88,11 @@ void draw() {
 
   background(0);
 
+  if (gridHasChanged && !mousePressed){
+     updateGrid();
+     gridHasChanged = false;
+  }
+
   if (grid) {
     // Update and draw the TestPersons
     for (int i = 0; i < persons.length; i++) {
@@ -96,7 +103,9 @@ void draw() {
       } else {
         fill(128);
       }
-      persons[i].draw();
+      if(draw){
+        persons[i].draw();
+      }
     }
   } 
 
@@ -116,10 +125,13 @@ void draw() {
   } else {
     fill(128);
   }
-  ellipse(x, y, 20, 20);
-  //rect(
-  textSize(16);
-  text(""+pid, x+20, y-10, 50, 20);
+  if (draw){
+    ellipse(x, y, 20, 20);
+    //rect(
+    textSize(16);
+    text(""+pid, x+20, y-10, 50, 20);
+  }
+  
 
   // Increment val
   t= t + direction*TWO_PI/70; // 70 inc
@@ -159,7 +171,8 @@ void draw() {
   text("Drag mouse to send custom data to 127.0.0.1:"+oscPort, 10, 16);
   text("Press [s] to toggle data sending", 10, 60);
   text("Press [m] to toggle automatic movement", 10, 75);
-  text("Press [g] to toggle a grid of "+persons.length+" persons", 10, 90);
+  text("Press [d] to toggle the draw on this window", 10, 90);
+  text("Press [g] to toggle a grid of "+count+" persons", 10, 105);
 }
 
 void mouseDragged() {
@@ -204,8 +217,16 @@ void keyPressed() {
     send=!send;
     if (send) {
       augmenta.sendSimulation(testPerson, sendingAddress, "personEntered");
+      // Send personWillLeave for the old grid
+      for (int i = 0; i < persons.length; i++) {
+        persons[i].send(augmenta, sendingAddress, "personEntered");
+      }
     } else {
       augmenta.sendSimulation(testPerson, sendingAddress, "personWillLeave");
+      // Send personWillLeave for the old grid
+      for (int i = 0; i < persons.length; i++) {
+        persons[i].send(augmenta, sendingAddress, "personWillLeave");
+      }
     }
     pid = int(random(1000));
     age = 0;
@@ -215,6 +236,14 @@ void keyPressed() {
     }
   } else if (key == 'g' || key == 'G') {
     grid=!grid;
+    if (!grid && send) {
+      // Send personWillLeave for the old grid
+      for (int i = 0; i < persons.length; i++) {
+        persons[i].send(augmenta, sendingAddress, "personWillLeave");
+      }
+    }
+  } else if (key == 'd' || key == 'D') {
+    draw=!draw;
   }
 }
 
@@ -236,12 +265,26 @@ public void handlePortInputButton() {
   }
 }
 
-public void handleSliderEvents(GValueControl slider, GEvent event) { 
+public void handleSliderEvents(GValueControl slider, GEvent event) {
   unit = (int)((1-slider.getValueF())*120)+12;
-  // Setup the array of TestPerson
+   // Setup the array of TestPerson
   int wideCount = width / unit;
   int highCount = height / unit;
   count = wideCount * highCount;
+  println("count : "+count);
+  gridHasChanged = true;
+}
+
+public void updateGrid(){
+  
+  // Send personWillLeave for the old grid
+  for (int i = 0; i < persons.length; i++) {
+    persons[i].send(augmenta, sendingAddress, "personWillLeave");
+  }
+  
+  int wideCount = width / unit;
+  int highCount = height / unit;
+  
   persons = new TestPerson[count];
 
   // Create grid
@@ -252,6 +295,6 @@ public void handleSliderEvents(GValueControl slider, GEvent event) {
       persons[index].p.oid = index; // set oid
       index++;
     }
-  }
+  } 
 }
 

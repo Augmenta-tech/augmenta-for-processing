@@ -64,7 +64,10 @@ class TestPerson {
   void send(AugmentaP5 augmenta, NetAddress a){
      augmenta.sendSimulation(p, a);
   }
-  
+  void send(AugmentaP5 augmenta, NetAddress a, String s){
+     augmenta.sendSimulation(p, a, s);
+  }
+    
   // Custom method for drawing the object
   void draw() {
     ellipse(xOffset + x, yOffset + y, 6, 6);

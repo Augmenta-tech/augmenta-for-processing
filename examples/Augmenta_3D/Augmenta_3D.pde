@@ -98,7 +98,7 @@ void draw() {
     augmentaP5.RectangleF rect = people[i].boundingRect;
     float rectHeight = 200;
     if (people[i].highest.z != 0 ) {
-      rectHeight = people[i].highest.z;
+      rectHeight = people[i].highest.z*400;
     }
 
     // Centroids
