@@ -161,7 +161,17 @@ public class AugmentaPerson
 			g.stroke(255);
 			g.ellipse(centroid.x*g.width, centroid.y*g.height, 10, 10);
 			
-			int factor = 1;
+			// Draw the highest point
+			g.noFill();
+			g.stroke(rc,gc,bc);
+			int crossSize=10;
+			// Horizontal line
+			g.line(highest.x*g.width-crossSize, highest.y*g.height, highest.x*g.width+crossSize, highest.y*g.height);
+			// Vertical line
+			g.line(highest.x*g.width, highest.y*g.height-crossSize, highest.x*g.width, highest.y*g.height+crossSize);
+			
+			// Draw the velocity vector
+			int factor = 2;
 			g.stroke(255);
 			g.line(centroid.x*g.width, centroid.y*g.height, (centroid.x+velocity.x*factor)*g.width, (centroid.y+velocity.y*factor)*g.height);
 			
