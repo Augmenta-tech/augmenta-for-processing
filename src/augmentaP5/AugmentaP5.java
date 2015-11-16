@@ -88,7 +88,7 @@ public class AugmentaP5 {
 		interactiveArea = new InteractiveArea();
 		_currentPeople = new Hashtable<Integer, AugmentaPerson>();
 		registerEvents();
-		parent.registerPre(this);
+		parent. registerMethod("pre", this);
 		
 		canvas = (PGraphics)(_parent.g);
 	}
