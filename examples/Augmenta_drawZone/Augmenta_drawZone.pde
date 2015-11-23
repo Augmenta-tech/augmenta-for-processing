@@ -37,17 +37,20 @@ GTextField sceneY;
 // Declare a debug mode bool
 boolean debug=false;
 
-void setup() {
-
+void settings(){
   // Set the initial frame size
-  size(640, 480, P2D);
+  size(640, 480, P3D);
+  PJOGL.profile=1;
+}
+
+void setup() {
   
   // Create the canvas that will be used to send the syphon output
   canvas = createGraphics(width, height, P2D);
 
   // Allow the frame to be resized
-  if (frame != null) {
-    frame.setResizable(true);
+  if (surface != null) {
+    surface.setResizable(true);
   }
   background(0);
   
@@ -74,12 +77,6 @@ void draw() {
   // Adjust the scene size
   adjustSceneSize();
   // Draw a background for the window
-  // Begin drawing the canvas
-  canvas.beginDraw();
-  
-  if (canvas.backgroundColor != 0){
-    canvas.background(0);
-  }
 
   // Get the person data
   AugmentaPerson[] people = auReceiver.getPeopleArray();
@@ -89,9 +86,9 @@ void draw() {
     PVector pos = people[i].centroid; 
 
     // Draw a circle
-    canvas.fill(255); // Filled in white
-    canvas.noStroke(); // Without stroke
-    canvas.ellipse(pos.x*canvas.width, pos.y*canvas.height, 50, 50); // 30 pixels in diameter
+    fill(255); // Filled in white
+    noStroke(); // Without stroke
+    ellipse(pos.x*canvas.width, pos.y*canvas.height, 50, 50); // 30 pixels in diameter
   }
   
   if (debug){
@@ -101,12 +98,12 @@ void draw() {
   
   // Syphon output
   if (platform == MACOSX) {
-    server.sendImage(canvas);
+    server.sendScreen();
   }
 
   //draw augmenta canvas
   image(canvas, 0, 0, width, height);
-  canvas.endDraw();
+  
 }
 
 void personEntered (AugmentaPerson p) {
@@ -293,4 +290,3 @@ void adjustSceneSize() {
   // Update the UI text field
   sceneSizeInfo.setText(canvas.width+"x"+canvas.height, GAlign.MIDDLE, GAlign.MIDDLE);
 }
-

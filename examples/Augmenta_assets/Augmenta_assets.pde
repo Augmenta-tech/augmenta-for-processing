@@ -69,10 +69,14 @@ CircleTrigger ct;
 RectangleTrigger rt;
 PolygonTrigger pt;
 
-void setup() {
-
+void settings(){
   // Set the initial frame size
   size(640, 480, P2D);
+  PJOGL.profile=1;
+}
+
+void setup() {
+
   // Create the canvas that will be used to send the syphon output
   canvas = createGraphics(width, height, P2D);
 

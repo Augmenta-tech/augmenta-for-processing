@@ -39,9 +39,13 @@ boolean debug=false;
 // Global vars
 int heightFactor=5;
 
+void settings(){
+  // Set the initial frame size
+  size(640, 480, P3D);
+  PJOGL.profile=1;
+}
+
 void setup() {
-  // Initial frame size
-  size(800, 600, P3D);
   
   G4P.registerSketch(this);
 
@@ -57,8 +61,8 @@ void setup() {
   cam.setMaximumDistance(800);
 
   // Allow the frame to be resized
-  if (frame != null) {
-    frame.setResizable(true);
+  if (surface != null) {
+    surface.setResizable(true);
   }
 
   // Create the Augmenta receiver
@@ -184,4 +188,3 @@ void showGUI(boolean val) {
   portInput.setVisible(val); 
   portInputButton.setVisible(val);
 }
-

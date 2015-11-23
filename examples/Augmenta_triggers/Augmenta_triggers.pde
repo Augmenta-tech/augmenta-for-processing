@@ -43,16 +43,20 @@ CircleTrigger ct;
 RectangleTrigger rt;
 PolygonTrigger pt;
 
+void settings(){
+  // Set the initial frame size
+  size(640, 480, P3D);
+  PJOGL.profile=1;
+}
+
 void setup() {
 
-  // Set the initial frame size
-  size(640, 480, P2D);
   // Create the canvas that will be used to send the syphon output
   canvas = createGraphics(width, height, P2D);
 
   // Allow the frame to be resized
-  if (frame != null) {
-    frame.setResizable(true);
+  if (surface != null) {
+    surface.setResizable(true);
   }
 
   // Create the Augmenta receiver
@@ -139,6 +143,8 @@ void draw() {
     pt.draw();
   }
   
+  canvas.endDraw();
+  
   // Syphon output
   if (platform == MACOSX) {
     server.sendImage(canvas);
@@ -146,7 +152,6 @@ void draw() {
   
   //draw augmenta canvas
   image(canvas, 0, 0, width, height);
-  canvas.endDraw();
 }
 
 void personEntered (AugmentaPerson p) {

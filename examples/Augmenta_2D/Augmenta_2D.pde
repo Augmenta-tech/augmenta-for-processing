@@ -38,17 +38,20 @@ GTextField sceneY;
 // Declare a debug mode bool
 boolean debug=false;
 
-void setup() {
-
+void settings(){
   // Set the initial frame size
   size(640, 480, P2D);
+  PJOGL.profile=1;
+}
+
+void setup() {
 
   // Create the canvas that will be used to send the syphon output
   canvas = createGraphics(width, height, P2D);
 
   // Allow the frame to be resized
-  if (frame != null) {
-    frame.setResizable(true);
+  if (surface != null) {
+    surface.setResizable(true);
   }
 
   // Create the Augmenta receiver
@@ -102,14 +105,16 @@ void draw() {
     auReceiver.interactiveArea.draw();
   }
 
+  canvas.endDraw();
+  
+  //draw augmenta canvas
+  image(canvas, 0, 0, width, height);
+  
   // Syphon output
   if (platform == MACOSX) {
     server.sendImage(canvas);
   }
 
-  //draw augmenta canvas
-  image(canvas, 0, 0, width, height);
-  canvas.endDraw();
 }
 
 void personEntered (AugmentaPerson p) {
@@ -195,6 +200,7 @@ void showGUI(boolean val) {
 }
 
 void setUI() {
+  
   autoSceneSize = new GCheckbox(this, 10, 10, 110, 20, "Auto scene size");
   autoSceneSize.setOpaque(true);
   sceneSizeInfo = new GLabel(this, 125, 10, 70, 20);
@@ -208,6 +214,7 @@ void setUI() {
   portInputButton = new GButton(this, 70, 40, 110, 20, "Change Osc Port");
   portInput.setText(""+oscPort);
   G4P.registerSketch(this);
+  
 }
 
 void adjustSceneSize() {

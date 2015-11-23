@@ -14,8 +14,8 @@ void setup() {
   size(640, 480, P2D);
 
   // Allow the frame to be resized
-  if (frame != null) {
-    frame.setResizable(true);
+  if (surface != null) {
+    surface.setResizable(true);
   }
 
   // Create the Augmenta receiver
@@ -100,4 +100,3 @@ void personLeft (AugmentaPerson p) {
 void personUpdated (AugmentaPerson p) {
   //println(" Person updated : "+ p.id + " / Position : "+p.centroid.x+"x"+p.centroid.y);
 }
-
