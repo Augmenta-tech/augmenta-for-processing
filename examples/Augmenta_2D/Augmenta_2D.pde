@@ -69,10 +69,14 @@ void setup() {
     server = new SyphonServer(this, "Processing Syphon");
   }
   
+  // New GUI instance
   cp5 = new ControlP5(this);
+  // Set the properties format : needed to save/load correctly
+  cp5.getProperties().setFormat(ControlP5.SERIALIZED);
 
   // Set the UI
   setUI();
+  loadSettings("settings");
 }
 
 void draw() {
@@ -155,6 +159,8 @@ void keyPressed() {
        sceneX.setFocus(false);
        sceneY.setFocus(true);
     }
+  } else if(key == 's'){
+   saveSettings("settings"); 
   }
 }
 
@@ -272,9 +278,23 @@ void adjustSceneSize() {
         sw = (int)(sh*ratio);
       }
     }
-    frame.setSize(sw+frame.getInsets().left+frame.getInsets().right, sh+frame.getInsets().top+frame.getInsets().bottom);
+    surface.setSize(sw+frame.getInsets().left+frame.getInsets().right, sh+frame.getInsets().top+frame.getInsets().bottom);
   }
   
   // Update the UI text field
   sceneSizeInfo.setText(canvas.width+"x"+canvas.height);
+}
+
+void saveSettings(String file){
+  println("Saving to : "+file);
+  cp5.saveProperties(file);
+}
+
+void loadSettings(String file){
+  println("Loading from : "+file);
+  cp5.loadProperties(file);
+}
+
+void stop(){
+ saveSettings("settings"); 
 }

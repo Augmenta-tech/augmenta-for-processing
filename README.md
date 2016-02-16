@@ -64,7 +64,7 @@ Install the needed libraries first :
 
 ```
 Sketch -> Import Library... -> Add Library -> Syphon by Andres Colubri
-Sketch -> Import Library... -> Add Library -> G4P by Peter Lager
+Sketch -> Import Library... -> Add Library -> ControlP5
 Sketch -> Import Library... -> Add Library -> PeasyCam by Jonathan Feinberg (for the 3D example only)
 ```
 
@@ -82,7 +82,7 @@ Install the needed libraries first :
 
 ```
 Sketch -> Import Library... -> Add Library -> Syphon by Andres Colubri
-Sketch -> Import Library... -> Add Library -> G4P by Peter Lager
+Sketch -> Import Library... -> Add Library -> ControlP5
 ```
 
 Documentation
