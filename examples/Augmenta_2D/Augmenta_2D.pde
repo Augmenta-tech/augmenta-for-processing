@@ -15,6 +15,7 @@ import netP5.*;
 import augmentaP5.*;
 import g4p_controls.*;
 import codeanticode.syphon.*;
+import controlP5.*;
 
 // Declare the Augmenta receiver
 AugmentaP5 auReceiver;
@@ -28,12 +29,13 @@ PGraphics canvas;
 
 // Declare the UI
 boolean guiIsVisible=true;
-GTextField portInput;
-GButton portInputButton;
-GCheckbox autoSceneSize;
-GLabel sceneSizeInfo;
-GTextField sceneX;
-GTextField sceneY;
+// ControlP5
+ControlP5 cp5;
+CheckBox autoSceneSize;
+Textfield sceneX;
+Textfield sceneY;
+Textlabel sceneSizeInfo;
+Textfield portInput;
 
 // Declare a debug mode bool
 boolean debug=false;
@@ -66,6 +68,8 @@ void setup() {
   if (platform == MACOSX) {
     server = new SyphonServer(this, "Processing Syphon");
   }
+  
+  cp5 = new ControlP5(this);
 
   // Set the UI
   setUI();
@@ -146,22 +150,86 @@ void keyPressed() {
     } else {
       debug = true;
     }
+  } else if (keyCode == TAB){
+    if (sceneX.isFocus()){
+       sceneX.setFocus(false);
+       sceneY.setFocus(true);
+    }
   }
 }
 
-public void handleButtonEvents(GButton button, GEvent event) { 
-  if (button == portInputButton) {
-    handlePortInputButton();
+public void changeInputPort(String s) {
+
+  if (Integer.parseInt(s) != oscPort) {
+    println("input :"+portInput.getText());
+    oscPort = Integer.parseInt(portInput.getText());
+    auReceiver.unbind();
+    auReceiver=null;
+    auReceiver= new AugmentaP5(this, oscPort);
   }
 }
-public void handleToggleControlEvents(GToggleControl box, GEvent event) {
-  if (box == autoSceneSize) {
-    handleAutoSceneSizeCheckbox();
-  }
-} 
 
-public void handleAutoSceneSizeCheckbox() {  
-  if (autoSceneSize.isSelected()) {
+void showGUI(boolean val) {
+  // Show or hide the GUI after the Syphon output
+  portInput.setVisible(val);
+
+  autoSceneSize.setVisible(val);
+  if (autoSceneSize.getArrayValue()[0] == 1) {
+    sceneSizeInfo.setVisible(val);
+  } else {
+    sceneX.setVisible(val);
+    sceneY.setVisible(val);
+  }
+}
+
+void setUI() {
+  
+  //Auto scene size + manual scene size
+  autoSceneSize = cp5.addCheckBox("changeAutoSceneSize")
+                .setPosition(10, 10)
+                .setSize(20, 20)
+                .addItem("Auto Scene Size", 0)
+                ;
+  sceneX = cp5.addTextfield("changeSceneWidth")
+     .setPosition(110,10)
+     .setSize(30,20)
+     .setAutoClear(false)
+     .setCaptionLabel("")
+     .setInputFilter(ControlP5.INTEGER);
+     ;
+  sceneX.setText(""+width);
+  sceneY = cp5.addTextfield("changeSceneHeight")
+     .setPosition(140,10)
+     .setSize(30,20)
+     .setAutoClear(false)
+     .setCaptionLabel("")
+     .setInputFilter(ControlP5.INTEGER);
+     ;
+  sceneY.setText(""+height);
+  sceneSizeInfo = cp5.addTextlabel("label")
+                    .setText("500x500")
+                    .setPosition(110,16)
+                    ;
+  sceneSizeInfo.setVisible(false);
+  
+  // Port input OSC
+  portInput = cp5.addTextfield("changeInputPort")
+     .setPosition(10,40)
+     .setSize(40,20)
+     .setAutoClear(false)
+     .setCaptionLabel("")
+     .setInputFilter(ControlP5.INTEGER);
+     ;
+  portInput.setText(""+oscPort);
+  // corresponding label
+  cp5.addTextlabel("labeloscport")
+      .setText("OSC input port")
+      .setPosition(55, 46)
+      ;
+}
+
+void changeAutoSceneSize(float[] a) {
+  if (autoSceneSize.getArrayValue()[0] == 1) {
     sceneSizeInfo.setVisible(true);
     sceneX.setVisible(false);
     sceneY.setVisible(false);
@@ -174,53 +242,10 @@ public void handleAutoSceneSizeCheckbox() {
   }
 }
 
-public void handlePortInputButton() {
-
-  if (Integer.parseInt(portInput.getText()) != oscPort) {
-    println("input :"+portInput.getText());
-    oscPort = Integer.parseInt(portInput.getText());
-    auReceiver.unbind();
-    auReceiver=null;
-    auReceiver= new AugmentaP5(this, oscPort);
-  }
-}
-
-void showGUI(boolean val) {
-  // Show or hide the GUI after the Syphon output
-  portInput.setVisible(val); 
-  portInputButton.setVisible(val);
-
-  autoSceneSize.setVisible(val);
-  if (autoSceneSize.isSelected()) {
-    sceneSizeInfo.setVisible(val);
-  } else {
-    sceneX.setVisible(val);
-    sceneY.setVisible(val);
-  }
-}
-
-void setUI() {
-  
-  autoSceneSize = new GCheckbox(this, 10, 10, 110, 20, "Auto scene size");
-  autoSceneSize.setOpaque(true);
-  sceneSizeInfo = new GLabel(this, 125, 10, 70, 20);
-  sceneSizeInfo.setOpaque(true);
-  sceneSizeInfo.setVisible(false);
-  sceneX = new GTextField(this, 125, 10, 35, 20);
-  sceneX.setText(""+width);
-  sceneY = new GTextField(this, 161, 10, 35, 20);
-  sceneY.setText(""+height);
-  portInput = new GTextField(this, 10, 40, 60, 20);
-  portInputButton = new GButton(this, 70, 40, 110, 20, "Change Osc Port");
-  portInput.setText(""+oscPort);
-  G4P.registerSketch(this);
-  
-}
-
 void adjustSceneSize() {
   int sh = 0;
   int sw = 0;
-  if (autoSceneSize.isSelected()) {
+  if (autoSceneSize.getArrayValue()[0] == 1) {
     int[] sceneSize = auReceiver.getSceneSize();
     sw = sceneSize[0];
     sh = sceneSize[1];
@@ -233,7 +258,7 @@ void adjustSceneSize() {
       println("The values entered for the screen size are not ints ! "+e);
     }
   }
-  if ( (canvas.width!=sw || canvas.height!=sh) && sw>100 && sh>100) {
+  if ( (canvas.width!=sw || canvas.height!=sh) && sw>100 && sh>100 && sw<=16000 && sh <=16000 ) {
     // Create the output canvas with the correct size
     canvas = createGraphics(sw, sh);
     float ratio = (float)sw/(float)sh;
@@ -251,5 +276,5 @@ void adjustSceneSize() {
   }
   
   // Update the UI text field
-  sceneSizeInfo.setText(canvas.width+"x"+canvas.height, GAlign.MIDDLE, GAlign.MIDDLE);
+  sceneSizeInfo.setText(canvas.width+"x"+canvas.height);
 }
