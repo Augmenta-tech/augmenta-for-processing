@@ -6,7 +6,7 @@ public class RectangleTrigger extends Trigger{
   // Bottom right corner
   PVector br;
   
-  public RectangleTrigger(float _tlx, float _tly, float _brx, float _bry, PApplet _app){
+  public RectangleTrigger(float _tlx, float _tly, float _brx, float _bry, Augmenta_triggers _app){
     super(_app);
     tl = new PVector(_tlx, _tly);
     br = new PVector(_brx, _bry);

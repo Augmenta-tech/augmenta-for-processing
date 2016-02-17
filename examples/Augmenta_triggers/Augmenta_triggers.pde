@@ -36,7 +36,7 @@ GTextField sceneX;
 GTextField sceneY;
 
 // Declare a debug mode bool
-boolean debug=false;
+boolean debug=true;
 
 // [Triggers]
 CircleTrigger ct;
@@ -102,17 +102,6 @@ void draw() {
   // Get the person data
   AugmentaPerson[] people = auReceiver.getPeopleArray();
 
-  // Draw a line between all the blobs
-  canvas.stroke(255);
-  canvas.strokeWeight(2);
-  for (int k=0; k<people.length; k++) {
-    PVector pos1 = people[k].centroid; 
-    for (int l=k+1; l<people.length; l++) {
-      PVector pos2 = people[l].centroid; 
-      canvas.line(pos1.x*canvas.width, pos1.y*canvas.height, pos2.x*canvas.width, pos2.y*canvas.height);
-    }
-  }
-
   // For each person...
   for (int i=0; i<people.length; i++) {
     PVector pos = people[i].centroid; 
@@ -168,16 +157,16 @@ void personLeft (AugmentaPerson p) {
 
 // DO NOT REMOVE unless you remove the trigger classes
 void personEnteredTrigger(int id, Trigger t){
-  //println("The person with id '"+id+"' entered a trigger"); 
+  println("The person with id '"+id+"' entered a trigger"); 
   // How to test which object has been triggered :
   if (t == ct){
-    //println("It's the circle trigger");
+    println("It's the circle trigger");
   }
 }
 
 // DO NOT REMOVE unless you remove the trigger classes
 void personLeftTrigger(int id, Trigger t){
-  //println("The person with id '"+id+"' left a trigger");
+  println("The person with id '"+id+"' left a trigger");
 }
 
 void keyPressed() {

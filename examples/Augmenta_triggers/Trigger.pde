@@ -1,70 +1,59 @@
 import augmentaP5.*;
 
-public class Trigger {
+public class Trigger{
 
   AugmentaPerson[] people;
   IntList peopleInside;
-  PApplet app;
+  Augmenta_triggers app;
+  PGraphics canvas;
   
-  private Method personEnteredTrigger;
-  private Method personLeftTrigger;
-
-  public Trigger(PApplet _app) {
+  public Trigger(Augmenta_triggers _app){
     peopleInside = new IntList();
     app = _app;
-
-    try {
-      personEnteredTrigger = app.getClass().getMethod("personEnteredTrigger", new Class[] { Augmenta_triggers.class });
-    } 
-    catch (Exception e) {
-      System.out.println("You are missing the personEnteredTrigger() method. " + e);
-    }
+    canvas = _app.canvas;
   }
-
-  public void update(AugmentaPerson[] _people) {
-
+  
+  public void update(AugmentaPerson[] _people){
+    
     // Update the people in the scene
     people = _people;
-
+    
     IntList newPeopleInside = new IntList();
     for (int i=0; i<people.length; i++) {
-      PVector p = people[i].centroid;
-      if (pointIsInside(p)) {
-        if (!peopleInside.hasValue(people[i].id)) {
-          // Send message to the app : someone entered
-          app.personEnteredTrigger(people[i].id, this);
+        PVector p = people[i].centroid;
+        if (pointIsInside(p)){
+           if (!peopleInside.hasValue(people[i].id)){
+             // Send message to the app : someone entered
+             app.personEnteredTrigger(people[i].id, this);
+           }
+           newPeopleInside.append(people[i].id);
         }
-        newPeopleInside.append(people[i].id);
-      }
-    }
-
-    // Check if people have left the circle
-    for (int i=0; i<peopleInside.size (); i++) {
-      // Check if the point still exists
-      if (people.length <i && people[i]!= null) {
-        // Test if the point is not in the trigger anymore
-        if (!newPeopleInside.hasValue(people[i].id)) {
-          // Send message to the app : someone left
-          app.personLeftTrigger(people[i].id, this);
-        }
-      }
-    }
-
-    // Replace the old list by the new one
-    peopleInside = newPeopleInside;
+     }
+     
+     // Check if people have left the trigger
+     for (int i=0; i<peopleInside.size(); i++) {
+         // Test if the point is not in the trigger anymore
+         if (!newPeopleInside.hasValue(peopleInside.get(i))){
+           app.personLeftTrigger(peopleInside.get(i), this);
+         }
+     }
+     
+     // Replace the old list by the new one
+     peopleInside = newPeopleInside;
+     
   }
-
-  public void draw() {
+  
+  public void draw(){
     // Override in the child classes
   }
-
-  public IntList getPeopleInside() {
-    return peopleInside;
+  
+  public IntList getPeopleInside(){
+     return peopleInside;
   }
-
-  public Boolean pointIsInside(PVector p) {
+  
+  public Boolean pointIsInside(PVector p){
     // Override in the child classes
     return false;
   }
+  
 }
-

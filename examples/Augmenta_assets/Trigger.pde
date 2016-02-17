@@ -30,16 +30,12 @@ public class Trigger{
         }
      }
      
-     // Check if people have left the circle
+     // Check if people have left the trigger
      for (int i=0; i<peopleInside.size(); i++) {
-       // Check if the point still exists
-       if (people.length <i && people[i]!= null){
          // Test if the point is not in the trigger anymore
-         if (!newPeopleInside.hasValue(people[i].id)){
-           // Send message to the app : someone left
-           app.personLeftTrigger(people[i].id, this);
+         if (!newPeopleInside.hasValue(peopleInside.get(i))){
+           app.personLeftTrigger(peopleInside.get(i), this);
          }
-       }
      }
      
      // Replace the old list by the new one

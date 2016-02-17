@@ -5,7 +5,7 @@ public class PolygonTrigger extends Trigger{
   // Points
   PVector[] points;
   
-  public PolygonTrigger(PVector[] _points, PApplet _app){
+  public PolygonTrigger(PVector[] _points, Augmenta_triggers _app){
     super(_app);
     points = _points;
   }

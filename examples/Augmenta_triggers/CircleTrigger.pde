@@ -5,7 +5,7 @@ public class CircleTrigger extends Trigger{
   PVector pos;
   float radius;
   
-  public CircleTrigger(float _x, float _y, float _radius, PApplet _app){
+  public CircleTrigger(float _x, float _y, float _radius, Augmenta_triggers _app){
     super(_app);
     pos = new PVector(_x, _y);
     radius = _radius;
