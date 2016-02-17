@@ -13,7 +13,6 @@
 import oscP5.*;
 import netP5.*;
 import augmentaP5.*;
-import g4p_controls.*;
 import codeanticode.syphon.*;
 import controlP5.*;
 
@@ -37,6 +36,10 @@ Textfield sceneY;
 Textlabel sceneSizeInfo;
 Textfield portInput;
 
+// Save manual scene size info
+int manualSceneX;
+int manualSceneY;
+
 // Declare a debug mode bool
 boolean debug=false;
 
@@ -50,6 +53,9 @@ void setup() {
 
   // Create the canvas that will be used to send the syphon output
   canvas = createGraphics(width, height, P2D);
+  
+  manualSceneX = width;
+  manualSceneY = height;
 
   // Allow the frame to be resized
   if (surface != null) {
@@ -234,6 +240,18 @@ void setUI() {
       ;
 }
 
+void changeSceneWidth(String s){
+  updateManualSize();
+}
+void changeSceneHeight(String s){
+  updateManualSize(); 
+}
+
+void updateManualSize(){
+   manualSceneX = Integer.parseInt(sceneX.getText());
+   manualSceneY = Integer.parseInt(sceneY.getText()); 
+}
+
 void changeAutoSceneSize(float[] a) {
   if (autoSceneSize.getArrayValue()[0] == 1) {
     sceneSizeInfo.setVisible(true);
@@ -243,8 +261,6 @@ void changeAutoSceneSize(float[] a) {
     sceneSizeInfo.setVisible(false);
     sceneX.setVisible(true);
     sceneY.setVisible(true);
-    sceneX.setText(""+width);
-    sceneY.setText(""+height);
   }
 }
 
@@ -256,13 +272,8 @@ void adjustSceneSize() {
     sw = sceneSize[0];
     sh = sceneSize[1];
   } else {
-    try {
-      sw = Integer.parseInt(sceneX.getText());
-      sh = Integer.parseInt(sceneY.getText());
-    }
-    catch(NumberFormatException e) {
-      println("The values entered for the screen size are not ints ! "+e);
-    }
+      sw = manualSceneX;
+      sh = manualSceneY;
   }
   if ( (canvas.width!=sw || canvas.height!=sh) && sw>100 && sh>100 && sw<=16000 && sh <=16000 ) {
     // Create the output canvas with the correct size
