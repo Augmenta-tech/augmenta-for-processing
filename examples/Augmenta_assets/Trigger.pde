@@ -5,10 +5,12 @@ public class Trigger{
   AugmentaPerson[] people;
   IntList peopleInside;
   Augmenta_assets app;
+  PGraphics canvas;
   
   public Trigger(Augmenta_assets _app){
     peopleInside = new IntList();
     app = _app;
+    canvas = _app.canvas;
   }
   
   public void update(AugmentaPerson[] _people){

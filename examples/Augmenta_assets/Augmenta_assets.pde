@@ -60,6 +60,8 @@ AudioInput mic;
 float volume;
 float cappedVolume;
 float gain;
+// KNOWN ISSUE : Sound working on OSX 10.11 : deactivate sound on this version
+boolean activateSound = false;
 
 // [Video]
 Movie bgVideo;
@@ -81,8 +83,8 @@ void setup() {
   canvas = createGraphics(width, height, P2D);
 
   // Allow the frame to be resized
-  if (frame != null) {
-    frame.setResizable(true);
+  if (surface != null) {
+    surface.setResizable(true);
   }
 
   // Create the Augmenta receiver
@@ -106,9 +108,11 @@ void setup() {
   img = loadImage("plexus.png");
   
   // [Sound]
-  minim = new Minim(this);
-  // The file has to be in you sketch's "data" folder
-  ding = minim.loadFile("ding.wav");
+  if(activateSound){
+    minim = new Minim(this);
+    // The file has to be in you sketch's "data" folder
+    ding = minim.loadFile("ding.wav");
+  }
   
   // [Video]
   // The file has to be in you sketch's "data" folder. MP4 works well, MOV not so well.
@@ -117,18 +121,20 @@ void setup() {
   
   // [Audioreaction]
   // UI
-  gainSlider = new GCustomSlider(this, 10, 55, 170, 50, "blue18px");
-  gainSlider.setShowDecor(false, false, false, false);
-  gainSlider.setNumberFormat(G4P.DECIMAL, 3);
-  gainSlider.setLimits(0.5f, 0f, 100.0f);
-  gainSlider.setShowValue(false); 
-  // Get the microphone input
-  //minim = new Minim(this); Warning ! Uncomment this line if you haven't already created an instance of Minim
-  mic = minim.getLineIn(Minim.STEREO, 512);
-  volume=0;
-  gain=1;
-  // The capped volume is the same as the volume but limited to a max value of 1
-  cappedVolume=0;
+  if(activateSound){
+    gainSlider = new GCustomSlider(this, 10, 55, 170, 50, "blue18px");
+    gainSlider.setShowDecor(false, false, false, false);
+    gainSlider.setNumberFormat(G4P.DECIMAL, 3);
+    gainSlider.setLimits(0.5f, 0f, 100.0f);
+    gainSlider.setShowValue(false); 
+    // Get the microphone input
+    //minim = new Minim(this); Warning ! Uncomment this line if you haven't already created an instance of Minim
+    mic = minim.getLineIn(Minim.STEREO, 512);
+    volume=0;
+    gain=1;
+    // The capped volume is the same as the volume but limited to a max value of 1
+    cappedVolume=0;
+  }
   
   // [Triggers]
   ct = new CircleTrigger(width/2, height/2, 50, this);
@@ -148,7 +154,7 @@ void setup() {
 void draw() {
 
   // Adjust the scene size
-  adjustSceneSize();
+  //adjustSceneSize();
   // Draw a background for the window
   background(0);
   // Begin drawing the canvas
@@ -159,31 +165,36 @@ void draw() {
   AugmentaPerson[] people = auReceiver.getPeopleArray();
   
   // [Video]
-  canvas.imageMode(CORNER);
-  canvas.image(bgVideo, 0, 0, canvas.width, canvas.height);
+  // For an unknow reason trying to display the video on first frame outputs a nullpointerexception, this tests fixes it
+  if (frameCount > 1){
+    canvas.imageMode(CORNER);
+    canvas.image(bgVideo, 0, 0, canvas.width, canvas.height);
+  }
   
   // [Audioreaction]
   // Compute the current audio volume
-  gain = gainSlider.getValueF();
-  volume = (mic.left.level()+mic.right.level())*gain/2;
-  if (volume >1){
-    cappedVolume = 1;
-  } else {
-    cappedVolume = volume;
-  }
-  // Display the VUmeter
-  if (guiIsVisible){
-    canvas.noStroke();
-    // Draw the debug rectangle symbolizing the volume
-    if (volume > 1){
-      fill(255,0,0);
-      rect(gainSlider.getX()+3, gainSlider.getY()+30, gainSlider.getWidth()-6, 5);
-    } else if (volume > 0.8){
-      fill(255,128,0); 
-      rect(gainSlider.getX()+3, gainSlider.getY()+30, (gainSlider.getWidth())*volume, 5);
+  if(activateSound){
+    gain = gainSlider.getValueF();
+    volume = (mic.left.level()+mic.right.level())*gain/2;
+    if (volume >1){
+      cappedVolume = 1;
     } else {
-      fill(0,255,0); 
-      rect(gainSlider.getX()+3, gainSlider.getY()+30, (gainSlider.getWidth())*volume, 5);
+      cappedVolume = volume;
+    }
+    // Display the VUmeter
+    if (guiIsVisible){
+      canvas.noStroke();
+      // Draw the debug rectangle symbolizing the volume
+      if (volume > 1){
+        fill(255,0,0);
+        rect(gainSlider.getX()+3, gainSlider.getY()+30, gainSlider.getWidth()-6, 5);
+      } else if (volume > 0.8){
+        fill(255,128,0); 
+        rect(gainSlider.getX()+3, gainSlider.getY()+30, (gainSlider.getWidth())*volume, 5);
+      } else {
+        fill(0,255,0); 
+        rect(gainSlider.getX()+3, gainSlider.getY()+30, (gainSlider.getWidth())*volume, 5);
+      }
     }
   }
 
@@ -214,10 +225,12 @@ void draw() {
     // Draw a circle
     canvas.fill(255); // Filled in white
     canvas.noStroke(); // Without stroke
-    // Normal version (commented)
-    // ellipse(pos.x*width, pos.y*height, 20, 20); // 20 pixels in diameter
     // [Audioreaction] version
-    canvas.ellipse(pos.x*canvas.width, pos.y*canvas.height, 15+cappedVolume*50, 15+cappedVolume*50);
+    if(activateSound){
+      canvas.ellipse(pos.x*canvas.width, pos.y*canvas.height, 15+cappedVolume*50, 15+cappedVolume*50);
+    }else{
+      canvas.ellipse(pos.x*canvas.width, pos.y*canvas.height, 20, 20); // 20 pixels in diameter
+    }
 
     // Draw debug informations
     if (debug) {
@@ -235,10 +248,14 @@ void draw() {
   rt.update(people);
   pt.update(people);
   if (debug){
+    
     ct.draw(); 
     rt.draw();
     pt.draw();
   }
+  
+  // End the main draw loop
+  canvas.endDraw();
   
   // Syphon output
   if (platform == MACOSX) {
@@ -247,15 +264,17 @@ void draw() {
   
   //draw augmenta canvas
   image(canvas, 0, 0, width, height);
-  canvas.endDraw();
+  
 }
 
 void personEntered (AugmentaPerson p) {
   //println("Person entered : "+ p.id + "at ("+p.centroid.x+","+p.centroid.y+")");
   
   // [Sound]
-  ding.rewind();
-  ding.play();
+    if(activateSound){
+    ding.rewind();
+    ding.play();
+  }
 }
 
 void personUpdated (AugmentaPerson p) {
@@ -388,6 +407,7 @@ void movieEvent(Movie m) {
 
 void setUI(){
   // Set the UI
+  /*
   autoSceneSize = new GCheckbox(this, 10, 10, 110, 20, "Auto scene size");
   autoSceneSize.setOpaque(true);
   sceneSizeInfo = new GLabel(this, 125, 10, 70, 20);
@@ -401,8 +421,9 @@ void setUI(){
   portInputButton = new GButton(this, 70, 40, 110, 20, "Change Osc Port");
   portInput.setText(""+oscPort);
   G4P.registerSketch(this);
+  */
 }
-
+/*
 void adjustSceneSize() {
   int sh = 0;
   int sw = 0;
@@ -434,9 +455,10 @@ void adjustSceneSize() {
         sw = (int)(sh*ratio);
       }
     }
-    frame.setSize(sw+frame.getInsets().left+frame.getInsets().right, sh+frame.getInsets().top+frame.getInsets().bottom);
+    surface.setSize(sw+frame.getInsets().left+frame.getInsets().right, sh+frame.getInsets().top+frame.getInsets().bottom);
   }
   
   // Update the UI text field
   sceneSizeInfo.setText(canvas.width+"x"+canvas.height, GAlign.MIDDLE, GAlign.MIDDLE);
 }
+*/
