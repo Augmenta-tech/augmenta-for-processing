@@ -51,6 +51,9 @@ public class AugmentaP5 {
 	private static int timeOut = 120; // After this number of frames, a point
 										// that hasn't been updated is
 										// destroyed. Do not set under 0.
+	
+	// Holds a boolean to know if we're connected to an OSC port
+	public static boolean isConnected = false;
 
 	private static final Lock lock = new ReentrantLock();
 
@@ -560,6 +563,25 @@ public class AugmentaP5 {
 			System.out.println("Lib : people id = "+people.get(key).id);
 		    PVector pos = people.get(key).centroid;
 		    if (people.get(key).age > bestAge) {
+		      bestAge = people.get(key).age;
+		      bestPerson = key;
+		    }
+		}
+		AugmentaPerson p = null;
+		if (bestPerson != -1){
+			p = people.get(bestPerson);
+		}	
+		return p;
+	}
+	
+	public AugmentaPerson getNewestPerson(){
+		int bestAge = Integer.MAX_VALUE;
+		int bestPerson = -1;
+		// For each person...
+		for (int key : people.keySet()) {
+			System.out.println("Lib : people id = "+people.get(key).id);
+		    PVector pos = people.get(key).centroid;
+		    if (people.get(key).age < bestAge) {
 		      bestAge = people.get(key).age;
 		      bestPerson = key;
 		    }
