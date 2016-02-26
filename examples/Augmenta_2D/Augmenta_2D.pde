@@ -12,6 +12,7 @@
 
 import oscP5.*;
 import netP5.*;
+import TUIO.*;
 import augmentaP5.*;
 import codeanticode.syphon.*;
 import controlP5.*;
@@ -19,7 +20,9 @@ import controlP5.*;
 // Declare the Augmenta receiver
 AugmentaP5 auReceiver;
 // Declare the inital OSC port
-int oscPort = 12000;
+int oscPort = 3333;
+
+boolean verbose =true;
 
 // Declare the syphon server
 SyphonServer server;
@@ -63,7 +66,7 @@ void setup() {
   }
 
   // Create the Augmenta receiver
-  auReceiver= new AugmentaP5(this, oscPort);
+  auReceiver= new AugmentaP5(this, oscPort, true);
   auReceiver.setTimeOut(30);
   // You can hardcode the interactive area if you need to
   //auReceiver.interactiveArea.set(0.25f, 0.25f, 0.5f, 0.5f);

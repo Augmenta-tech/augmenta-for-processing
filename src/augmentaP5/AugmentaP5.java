@@ -6,12 +6,16 @@ import processing.core.PApplet;
 import processing.core.PVector;
 import processing.core.PGraphics;
 
+// TUIO
+import TUIO.*;
+
 import java.util.*;
 import java.lang.reflect.Method;
 import java.lang.Integer;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.awt.geom.Point2D;
+import static java.lang.Math.toIntExact;
 
 /**
  * Augmenta Connection: Connects to Augmenta app and provides your applet with
@@ -19,10 +23,14 @@ import java.awt.geom.Point2D;
  * library for processing. More details at http://www.tsps.cc/
  */
 
-public class AugmentaP5 {
+public class AugmentaP5 extends PApplet implements TuioListener {
 	//
 	public static PApplet parent;
 	private OscP5 receiver;
+
+	// TUIO declare a TuioProcessing client
+	TuioClient client;
+	boolean tuio = false;
 
 	/**
 	 * Hashtable of current People objects. Accessibly by unique id, e.g.
@@ -35,9 +43,9 @@ public class AugmentaP5 {
 	 * draw()
 	 */
 	private Hashtable<Integer, AugmentaPerson> _currentPeople;
-	
+
 	public InteractiveArea interactiveArea;
-	
+
 	public static PGraphics canvas;
 
 	private Method personEntered;
@@ -49,9 +57,9 @@ public class AugmentaP5 {
 	private int height = 0;
 
 	private static int timeOut = 120; // After this number of frames, a point
-										// that hasn't been updated is
-										// destroyed. Do not set under 0.
-	
+	// that hasn't been updated is
+	// destroyed. Do not set under 0.
+
 	// Holds a boolean to know if we're connected to an OSC port
 	public static boolean isConnected = false;
 
@@ -82,18 +90,36 @@ public class AugmentaP5 {
 	 * @param int Port set in Augmenta app
 	 */
 	public AugmentaP5(PApplet _parent, int port) {
-		System.out
-				.println("[AugmentaP5] Starting the receiver with port ("
-						+ port + ")");
+		this(_parent, port, false); // By default : use augmenta, not TUIO
+	}
+	// TUIO
+	public AugmentaP5(PApplet _parent, int port, boolean tuioState) {
+
+		// first set the variable saying if we're in TUIO mode
+		tuio = tuioState;
+
+		// Common operations
 		parent = _parent;
-		receiver = new OscP5(this, port);
-		people = new Hashtable<Integer, AugmentaPerson>();
 		interactiveArea = new InteractiveArea();
+		people = new Hashtable<Integer, AugmentaPerson>();
 		_currentPeople = new Hashtable<Integer, AugmentaPerson>();
 		registerEvents();
 		parent. registerMethod("pre", this);
-		
 		canvas = (PGraphics)(_parent.g);
+
+		if(!tuio){ // normal behavior
+			System.out.println("[AugmentaP5] Starting the receiver with port ("+ port + ")");
+			receiver = new OscP5(this, port);
+		} else { // if TUIO
+			System.out.println("[AugmentaP5] Starting a TUIO receiver with port ("+ port + ")");
+			if (port != 3333){
+				System.out.println("[AugmentaP5] WARNING : default TUIO port is 3333");
+			}
+			client = new TuioClient(port);
+			client.addTuioListener(this);
+			client.connect();
+		}
+
 	}
 
 	public void setGraphicsTarget(PGraphics target)
@@ -102,10 +128,10 @@ public class AugmentaP5 {
 	}
 
 	public void sendSimulation(AugmentaPerson p, NetAddress address, String message) {
-		
+
 		// Create the message
 		OscMessage person = new OscMessage("/au/"+message);
-		
+
 		person.add(p.id); // pid
 		person.add(p.oid); // oid
 		person.add(p.age); // age
@@ -121,18 +147,18 @@ public class AugmentaP5 {
 		person.add(p.highest.x); // highest.x
 		person.add(p.highest.y); // highest.y
 		person.add(p.highest.z); // highest.z
-		
+
 		// Send the packet
 		receiver.send(person, address);
-		
+
 	}
-	
+
 	public void sendSimulation(AugmentaPerson p, NetAddress address) {
 		// Create the message
 		sendSimulation(p, address, "personUpdated");
 	}
-	
-	
+
+
 	public void sendScene(int width, int height, int depth, int age, float percentCovered, int numPeople, Point2D.Float averageMotion, NetAddress address) {
 		// Create the message
 		OscMessage msg = new OscMessage("/au/scene");
@@ -168,38 +194,39 @@ public class AugmentaP5 {
 	}
 
 	public void pre() {
+		if(!tuio){
+			// get enumeration, which helps us loop through Augmenta.people
+			Enumeration e = _currentPeople.keys();
 
-		// get enumeration, which helps us loop through Augmenta.people
-		Enumeration e = _currentPeople.keys();
+			// loop through people + copy all to public hashtable
+			people.clear();
 
-		// loop through people + copy all to public hashtable
-		people.clear();
+			lock.lock();
 
-		lock.lock();
+			while (e.hasMoreElements()) {
+				// get person
+				int id = (Integer) e.nextElement();
+				AugmentaPerson person = (AugmentaPerson) _currentPeople.get(id);
 
-		while (e.hasMoreElements()) {
-			// get person
-			int id = (Integer) e.nextElement();
-			AugmentaPerson person = (AugmentaPerson) _currentPeople.get(id);
-
-			// Adding this test to counteract nullPointerExceptions ocurring in
-			// rare cases
-			if (person != null) {
-				person.lastUpdated--;
-				// haven't gotten an update in a given number of frames
-				if (person.lastUpdated < -1) {
-					// System.out.println("[AugmentaP5] Person deleted because it has not been updated for 120 frames");
-					callPersonLeft(person);
-					_currentPeople.remove(person.id);
-				} else {
-					AugmentaPerson p = new AugmentaPerson();
-					p.copy(person);
-					people.put(p.id, p);
+				// Adding this test to counteract nullPointerExceptions ocurring in
+				// rare cases
+				if (person != null) {
+					person.lastUpdated--;
+					// haven't gotten an update in a given number of frames
+					if (person.lastUpdated < -1) {
+						System.out.println("[AugmentaP5] Person deleted because it has not been updated for 120 frames");
+						callPersonLeft(person);
+						_currentPeople.remove(person.id);
+					} else {
+						AugmentaPerson p = new AugmentaPerson();
+						p.copy(person);
+						people.put(p.id, p);
+					}
 				}
 			}
-		}
 
-		lock.unlock();
+			lock.unlock();
+		}
 	}
 
 	/**
@@ -226,91 +253,91 @@ public class AugmentaP5 {
 			p.id = theOscMessage.get(0).intValue();
 		} catch (Exception e) {
 			System.out
-					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [0] should be an int (id)");
+			.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [0] should be an int (id)");
 		}
 		try {
 			p.oid = theOscMessage.get(1).intValue();
 		} catch (Exception e) {
 			System.out
-					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [1] should be an int (oid)");
+			.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [1] should be an int (oid)");
 		}
 		try {
 			p.age = theOscMessage.get(2).intValue();
 		} catch (Exception e) {
 			System.out
-					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [2] should be an int (age)");
+			.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [2] should be an int (age)");
 		}
 		try {
 			p.centroid.x = theOscMessage.get(3).floatValue();
 		} catch (Exception e) {
 			System.out
-					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [3] should be a float (centroid.x)");
+			.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [3] should be a float (centroid.x)");
 		}
 		try {
 			p.centroid.y = theOscMessage.get(4).floatValue();
 		} catch (Exception e) {
 			System.out
-					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [4] should be a float (centroid.y)");
+			.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [4] should be a float (centroid.y)");
 		}
 		try {
 			p.velocity.x = theOscMessage.get(5).floatValue();
 		} catch (Exception e) {
 			System.out
-					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [5] should be a float (velocity.x)");
+			.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [5] should be a float (velocity.x)");
 		}
 		try {
 			p.velocity.y = theOscMessage.get(6).floatValue();
 		} catch (Exception e) {
 			System.out
-					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [6] should be a float (velocity.y)");
+			.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [6] should be a float (velocity.y)");
 		}
 		try {
 			p.depth = theOscMessage.get(7).floatValue();
 		} catch (Exception e) {
 			System.out
-					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [7] should be a float (depth)");
+			.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [7] should be a float (depth)");
 		}
 		try {
 			p.boundingRect.x = theOscMessage.get(8).floatValue();
 		} catch (Exception e) {
 			System.out
-					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [8] should be a float (boundignRect.x)");
+			.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [8] should be a float (boundignRect.x)");
 		}
 		try {
 			p.boundingRect.y = theOscMessage.get(9).floatValue();
 		} catch (Exception e) {
 			System.out
-					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [9] should be a float (boundignRect.y)");
+			.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [9] should be a float (boundignRect.y)");
 		}
 		try {
 			p.boundingRect.width = theOscMessage.get(10).floatValue();
 		} catch (Exception e) {
 			System.out
-					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [10] should be a float (boundignRect.width)");
+			.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [10] should be a float (boundignRect.width)");
 		}
 		try {
 			p.boundingRect.height = theOscMessage.get(11).floatValue();
 		} catch (Exception e) {
 			System.out
-					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [11] should be a float (boundignRect.height)");
+			.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [11] should be a float (boundignRect.height)");
 		}
 		try {
 			p.highest.x = theOscMessage.get(12).floatValue();
 		} catch (Exception e) {
 			System.out
-					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [12] should be a float (highest.x)");
+			.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [12] should be a float (highest.x)");
 		}
 		try {
 			p.highest.y = theOscMessage.get(13).floatValue();
 		} catch (Exception e) {
 			System.out
-					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [13] should be a float (highest.y)");
+			.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [13] should be a float (highest.y)");
 		}
 		try {
 			p.highest.z = theOscMessage.get(14).floatValue();
 		} catch (Exception e) {
 			System.out
-					.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [14] should be a float (highest.z)");
+			.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [14] should be a float (highest.z)");
 		}
 
 		/*
@@ -333,6 +360,29 @@ public class AugmentaP5 {
 		}
 		p.lastUpdated = timeOut;
 		lock.unlock();
+	}
+
+	private static void updatePerson(AugmentaPerson p, TuioCursor t){
+		// Fill the rest of the person
+		/*
+  		p.id = toIntExact(t.getSessionID());
+	  	p.oid = 0; // TODO
+	  	p.age = 0;
+		p.centroid.x = t.getX();
+		p.centroid.y = t.getY();
+		p.velocity.x = t.getXSpeed();
+		p.velocity.y = t.getYSpeed();
+		p.depth = 0f; // can't be defined
+		float size = 0.1f; // dummy var for the box size
+		p.boundingRect.x = t.getX()-size/2; // can't be defined
+		p.boundingRect.y = t.getY()-size/2; // can't be defined
+		p.boundingRect.width = size; // can't be defined
+		p.boundingRect.height = size; // can't be defined
+		p.highest.x = t.getX(); // can't be defined
+		p.highest.y = t.getY(); // can't be defined
+		p.highest.z = size; // can't be defined
+		p.lastUpdated = timeOut;
+		 */
 	}
 
 	// Set up (optional) Augmenta Events
@@ -358,239 +408,534 @@ public class AugmentaP5 {
 
 	// Parse incoming OSC Message
 	protected void oscEvent(OscMessage theOscMessage) {
-		// adding a person
-		if (theOscMessage.checkAddrPattern("/au/personEntered")
-				|| theOscMessage.checkAddrPattern("/au/personEntered/")) {
-			AugmentaPerson p = new AugmentaPerson();
-			
-			// Get the point's coordinates
-			PVector point = new PVector(-1f, -1f);
-			try {
-				point.x = theOscMessage.get(3).floatValue();
-			} catch (Exception e) {
-				System.out
-						.println("[AugmentaP5] The OSC message with address  'personEntered' could not be parsed : the value [3] should be a float (centroid.x)");
-			}
-			try {
-				point.y = theOscMessage.get(4).floatValue();
-			} catch (Exception e) {
-				System.out
-						.println("[AugmentaP5] The OSC message with address  'personEntered' could not be parsed : the value [4] should be a float (centroid.y)");
-			}
-			
-			// Check if the point is inside the interactive area first
-			if(interactiveArea.contains(point)){
-				updatePerson(p, theOscMessage);
-				callPersonEntered(p);
-			}
+		if(!tuio){
+			// adding a person
+			if (theOscMessage.checkAddrPattern("/au/personEntered")
+					|| theOscMessage.checkAddrPattern("/au/personEntered/")) {
+				AugmentaPerson p = new AugmentaPerson();
 
-			// updating a person (or adding them if they don't exist in the
-			// system yet)
-		} else if (theOscMessage.checkAddrPattern("/au/personUpdated")
-				|| theOscMessage.checkAddrPattern("/au/personUpdated/")) {
-
-			AugmentaPerson p = null;
-			try {
-				p = _currentPeople.get(theOscMessage.get(0).intValue());
-			} catch (Exception e) {
-				System.out
-						.println("[AugmentaP5] The OSC message with address  'personUpdated' could not be parsed : the value [0] should be an int (id)");
-			}
-			
-			// Get the point's coordinates
-			PVector point = new PVector(-1f, -1f);
-			try {
-				point.x = theOscMessage.get(3).floatValue();
-			} catch (Exception e) {
-				System.out
-						.println("[AugmentaP5] The OSC message with address  'personEntered' could not be parsed : the value [3] should be a float (centroid.x)");
-			}
-			try {
-				point.y = theOscMessage.get(4).floatValue();
-			} catch (Exception e) {
-				System.out
-						.println("[AugmentaP5] The OSC message with address  'personEntered' could not be parsed : the value [4] should be a float (centroid.y)");
-			}
-			
-			// Check if the person exists in the scene
-			boolean personExists = (p != null);
-			
-			// Check if the point is inside the interactive area
-			if(interactiveArea.contains(point)){
-				if (!personExists) {
-					p = new AugmentaPerson();
-					updatePerson(p, theOscMessage);
-					callPersonEntered(p);
-				} else {
-					updatePerson(p, theOscMessage);
-					callPersonUpdated(p);
+				// Get the point's coordinates
+				PVector point = new PVector(-1f, -1f);
+				try {
+					point.x = theOscMessage.get(3).floatValue();
+				} catch (Exception e) {
+					System.out
+					.println("[AugmentaP5] The OSC message with address  'personEntered' could not be parsed : the value [3] should be a float (centroid.x)");
 				}
-			} else {
-				// Else we have to act like that the person left
-				if (personExists) {
+				try {
+					point.y = theOscMessage.get(4).floatValue();
+				} catch (Exception e) {
+					System.out
+					.println("[AugmentaP5] The OSC message with address  'personEntered' could not be parsed : the value [4] should be a float (centroid.y)");
+				}
+
+				// Check if the point is inside the interactive area first
+				if(interactiveArea.contains(point)){
 					updatePerson(p, theOscMessage);
-					callPersonLeft(p);
-					_currentPeople.remove(p.id);
-				} // if the person does not exist in the scene no need to do this again
+					_currentPeople.put(p.id, p);
+					callPersonEntered(p);
+				}
+
+				// updating a person (or adding them if they don't exist in the
+				// system yet)
+			} else if (theOscMessage.checkAddrPattern("/au/personUpdated")
+					|| theOscMessage.checkAddrPattern("/au/personUpdated/")) {
+
+				AugmentaPerson p = null;
+				try {
+					p = _currentPeople.get(theOscMessage.get(0).intValue());
+				} catch (Exception e) {
+					System.out
+					.println("[AugmentaP5] The OSC message with address  'personUpdated' could not be parsed : the value [0] should be an int (id)");
+				}
+
+				// Get the point's coordinates
+				PVector point = new PVector(-1f, -1f);
+				try {
+					point.x = theOscMessage.get(3).floatValue();
+				} catch (Exception e) {
+					System.out
+					.println("[AugmentaP5] The OSC message with address  'personEntered' could not be parsed : the value [3] should be a float (centroid.x)");
+				}
+				try {
+					point.y = theOscMessage.get(4).floatValue();
+				} catch (Exception e) {
+					System.out
+					.println("[AugmentaP5] The OSC message with address  'personEntered' could not be parsed : the value [4] should be a float (centroid.y)");
+				}
+
+				// Check if the person exists in the scene
+				boolean personExists = (p != null);
+
+				// Check if the point is inside the interactive area
+				if(interactiveArea.contains(point)){
+					if (!personExists) {
+						p = new AugmentaPerson();
+						updatePerson(p, theOscMessage);
+						callPersonEntered(p);
+					} else {
+						updatePerson(p, theOscMessage);
+						callPersonUpdated(p);
+					}
+				} else {
+					// Else we have to act like that the person left
+					if (personExists) {
+						updatePerson(p, theOscMessage);
+						callPersonLeft(p);
+						_currentPeople.remove(p.id);
+					} // if the person does not exist in the scene no need to do this again
+				}
+
 			}
-			
+
+			// person is about to leave
+			else if (theOscMessage.checkAddrPattern("/au/personWillLeave")
+					|| theOscMessage.checkAddrPattern("/au/personWillLeave/")) {
+
+				AugmentaPerson p = null;
+				try {
+					p = _currentPeople.get(theOscMessage.get(0).intValue());
+				} catch (Exception e) {
+					System.out
+					.println("[AugmentaP5] The OSC message with address 'personWillLeave' could not be parsed : the value [0] should be an int (id)");
+				}
+				if (p == null) {
+					return;
+				}
+				updatePerson(p, theOscMessage);
+
+				callPersonLeft(p);
+				_currentPeople.remove(p.id);
+			}
+
+			// scene
+			else if (theOscMessage.checkAddrPattern("/au/scene")) {
+				try {
+					width = theOscMessage.get(5).intValue();
+				} catch (Exception e) {
+					System.out
+					.println("[AugmentaP5] The OSC message with address 'scene' could not be parsed : the value [5] should be an int (width)");
+				}
+				try {
+					height = theOscMessage.get(6).intValue();
+				} catch (Exception e) {
+					System.out
+					.println("[AugmentaP5] The OSC message with address 'scene' could not be parsed : the value [6] should be an int (height)");
+				}
+
+				// System.out.println("[Augmenta] Received OSC OK : width "+width+" height "+height);
+			}
+
+			// custom event
+			else if (theOscMessage.checkAddrPattern("/au/customEvent")
+					|| theOscMessage.checkAddrPattern("/au/customEvent/")) {
+				ArrayList<String> args = new ArrayList<String>();
+				for (int i = 0; i < theOscMessage.arguments().length; i++) {
+					args.add(theOscMessage.get(i).stringValue());
+				}
+				callCustomEvent(args);
+			}
+		}
+	}
+
+	// --------------------------------------------------------------
+	// TUIO bridge to augmenta
+	// --------------------------------------------------------------
+	// called when a cursor is added to the scene
+	public void addTuioCursor(TuioCursor t) {
+
+		AugmentaPerson p = new AugmentaPerson();
+
+		// First test if the area contains the point
+		PVector point = new PVector(-1f, -1f);
+		point.x = t.getX();
+		point.y = t.getY();
+		if(interactiveArea.contains(point)){
+			// update the person
+			updatePerson(p, t);
+			// Add to the list 
+			_currentPeople.put(p.id, p);
+			// Callback
+			callPersonEntered(p);
 		}
 
-		// person is about to leave
-		else if (theOscMessage.checkAddrPattern("/au/personWillLeave")
-				|| theOscMessage.checkAddrPattern("/au/personWillLeave/")) {
+	}
 
-			AugmentaPerson p = null;
-			try {
-				p = _currentPeople.get(theOscMessage.get(0).intValue());
-			} catch (Exception e) {
-				System.out
-						.println("[AugmentaP5] The OSC message with address 'personWillLeave' could not be parsed : the value [0] should be an int (id)");
-			}
-			if (p == null) {
-				return;
-			}
-			updatePerson(p, theOscMessage);
+	// called when a cursor is moved
+	public void updateTuioCursor (TuioCursor t) {
 
+		AugmentaPerson p = null;
+		try {
+			p = _currentPeople.get(t.getSessionID());
+		} catch (Exception e) {
+			System.out
+			.println("[AugmentaP5] Error : Coulnd't find the Augmenta person with the given id");
+		}
+
+		// First test if the area contains the point
+		PVector point = new PVector(-1f, -1f);
+		point.x = t.getX();
+		point.y = t.getY();
+		
+		// Check if the person exists in the scene
+					boolean personExists = (p != null);
+
+		// Check if the point is inside the interactive area
+		if(interactiveArea.contains(point)){
+			if (!personExists) {
+				// update the person
+				updatePerson(p, t);
+				// Add to the list 
+				_currentPeople.put(p.id, p);
+				// Callback
+				callPersonEntered(p);
+			} else {
+				updatePerson(p, t);
+				callPersonUpdated(p);
+			}
+		} else {
+			// Else we have to act like that the person left
+			if (personExists) {
+				updatePerson(p, t);
+				callPersonLeft(p);
+				_currentPeople.remove(p.id);
+			} // if the person does not exist in the scene no need to do this again
+		}
+
+	}
+
+	// called when a cursor is removed from the scene
+	public void removeTuioCursor(TuioCursor t) {
+		AugmentaPerson p = null;
+		try {
+			p = _currentPeople.get(t.getSessionID());
+		} catch (Exception e) {
+			System.out
+			.println("[AugmentaP5] Error : Couldn't find the AugmentaPerson for the given ID");
+		}
+		if (p == null) {
+			return;
+		}
+		updatePerson(p, t);
+		callPersonLeft(p);
+		_currentPeople.remove(p.id);
+	}
+
+
+	// Same for objects...
+	// called when an object is added to the scene
+	public void addTuioObject(TuioObject t) {
+
+	  	AugmentaPerson p = new AugmentaPerson();
+
+	  	// First test if the area contains the point
+	  	PVector point = new PVector(-1f, -1f);
+	  	point.x = t.getX();
+	  	point.y = t.getY();
+	  	if(interactiveArea.contains(point)){
+
+	  		// Fill the rest of the person
+	  		p.id = toIntExact(t.getSessionID());
+		  	p.oid = 0; // TODO
+		  	p.age = 0;
+			p.centroid.x = t.getX();
+			p.centroid.y = t.getY();
+			p.velocity.x = t.getXSpeed();
+			p.velocity.y = t.getYSpeed();
+			p.depth = 0f; // can't be defined
+			float size = 0.1f; // dummy var for the box size
+			p.boundingRect.x = t.getX()-size/2; // can't be defined
+			p.boundingRect.y = t.getY()-size/2; // can't be defined
+			p.boundingRect.width = size; // can't be defined
+			p.boundingRect.height = size; // can't be defined
+			p.highest.x = t.getX(); // can't be defined
+			p.highest.y = t.getY(); // can't be defined
+			p.highest.z = size; // can't be defined
+
+			// Callback
+			callPersonEntered(p);
+		}
+
+	}
+
+	// called when an object is moved
+	public void updateTuioObject(TuioObject t) {
+		AugmentaPerson p = new AugmentaPerson();
+
+	  	// First test if the area contains the point
+	  	PVector point = new PVector(-1f, -1f);
+	  	point.x = t.getX();
+	  	point.y = t.getY();
+	  	if(interactiveArea.contains(point)){
+
+	  		// Fill the rest of the person
+	  		p.id = toIntExact(t.getSessionID());
+		  	p.oid = 0; // TODO
+		  	p.age++;
+			p.centroid.x = t.getX();
+			p.centroid.y = t.getY();
+			p.velocity.x = t.getXSpeed();
+			p.velocity.y = t.getYSpeed();
+			p.depth = 0f; // can't be defined
+			float size = 0.1f; // dummy var for the box size
+			p.boundingRect.x = t.getX()-size/2; // can't be defined
+			p.boundingRect.y = t.getY()-size/2; // can't be defined
+			p.boundingRect.width = size; // can't be defined
+			p.boundingRect.height = size; // can't be defined
+			p.highest.x = t.getX(); // can't be defined
+			p.highest.y = t.getY(); // can't be defined
+			p.highest.z = size; // can't be defined
+
+			// Callback
+			callPersonUpdated(p);
+		}
+	}
+
+	// called when an object is removed from the scene
+	public void removeTuioObject(TuioObject t) {
+		AugmentaPerson p = new AugmentaPerson();
+
+	  	// First test if the area contains the point
+	  	PVector point = new PVector(-1f, -1f);
+	  	point.x = t.getX();
+	  	point.y = t.getY();
+	  	if(interactiveArea.contains(point)){
+
+	  		// Fill the rest of the person
+	  		p.id = toIntExact(t.getSessionID());
+		  	p.oid = 0; // TODO
+		  	p.age++;
+			p.centroid.x = t.getX();
+			p.centroid.y = t.getY();
+			p.velocity.x = t.getXSpeed();
+			p.velocity.y = t.getYSpeed();
+			p.depth = 0f; // can't be defined
+			float size = 0.1f; // dummy var for the box size
+			p.boundingRect.x = t.getX()-size/2; // can't be defined
+			p.boundingRect.y = t.getY()-size/2; // can't be defined
+			p.boundingRect.width = size; // can't be defined
+			p.boundingRect.height = size; // can't be defined
+			p.highest.x = t.getX(); // can't be defined
+			p.highest.y = t.getY(); // can't be defined
+			p.highest.z = size; // can't be defined
+
+			// Callback
 			callPersonLeft(p);
-			_currentPeople.remove(p.id);
-		}
-
-		// scene
-		else if (theOscMessage.checkAddrPattern("/au/scene")) {
-			try {
-				width = theOscMessage.get(5).intValue();
-			} catch (Exception e) {
-				System.out
-						.println("[AugmentaP5] The OSC message with address 'scene' could not be parsed : the value [5] should be an int (width)");
-			}
-			try {
-				height = theOscMessage.get(6).intValue();
-			} catch (Exception e) {
-				System.out
-						.println("[AugmentaP5] The OSC message with address 'scene' could not be parsed : the value [6] should be an int (height)");
-			}
-
-			// System.out.println("[Augmenta] Received OSC OK : width "+width+" height "+height);
-		}
-
-		// custom event
-		else if (theOscMessage.checkAddrPattern("/au/customEvent")
-				|| theOscMessage.checkAddrPattern("/au/customEvent/")) {
-			ArrayList<String> args = new ArrayList<String>();
-			for (int i = 0; i < theOscMessage.arguments().length; i++) {
-				args.add(theOscMessage.get(i).stringValue());
-			}
-			callCustomEvent(args);
 		}
 	}
 
-	private void callPersonEntered(AugmentaPerson p) {
-		_currentPeople.put(p.id, p);
-		if (personEntered != null) {
-			try {
-				personEntered.invoke(parent, new Object[] { p });
-			} catch (Exception e) {
-				System.err
-						.println("[AugmentaP5] Disabling personEntered() for Augmenta because of an error.");
-				e.printStackTrace();
-				personEntered = null;
-			}
-		}
-	}
+	// Same for blobs (a little bit more info)
+	public void addTuioBlob(TuioBlob t) {
 
-	private void callPersonUpdated(AugmentaPerson p) {
-		if (personUpdated != null) {
-			try {
-				personUpdated.invoke(parent, new Object[] { p });
-			} catch (Exception e) {
-				System.err
-						.println("[AugmentaP5] Disabling personUpdated() for Augmenta because of an error.");
-				e.printStackTrace();
-				personUpdated = null;
-			}
-		}
-	}
+	  	AugmentaPerson p = new AugmentaPerson();
 
-	private void callPersonLeft(AugmentaPerson p) {
-		if (personLeft != null) {
-			try {
-				personLeft.invoke(parent, new Object[] { p });
-			} catch (Exception e) {
-				System.err
-						.println("[AugmentaP5] Disabling personLeft() for Augmenta because of an error.");
-				e.printStackTrace();
-				personLeft = null;
-			}
-		}
-	}
+	  	// First test if the area contains the point
+	  	PVector point = new PVector(-1f, -1f);
+	  	point.x = t.getX();
+	  	point.y = t.getY();
+	  	if(interactiveArea.contains(point)){
 
-	private void callCustomEvent(ArrayList<String> strings) {
-		if (customEvent != null) {
-			try {
-				customEvent.invoke(parent, new Object[] { strings });
-			} catch (Exception e) {
-				System.err
-						.println("[AugmentaP5] Disabling customEvent() for Augmenta because of an error.");
-				e.printStackTrace();
-				customEvent = null;
-			}
-		}
-	}
+	  		// Fill the rest of the person
+	  		p.id = toIntExact(t.getSessionID());
+		  	p.oid = 0; // TODO
+		  	p.age = 0;
+			p.centroid.x = t.getX();
+			p.centroid.y = t.getY();
+			p.velocity.x = t.getXSpeed();
+			p.velocity.y = t.getYSpeed();
+			p.depth = 0f; // can't be defined
+			p.boundingRect.x = t.getX()-t.getWidth()/2;
+			p.boundingRect.y = t.getY()-t.getHeight()/2;
+			p.boundingRect.width = t.getWidth();
+			p.boundingRect.height = t.getHeight();
+			p.highest.x = t.getX(); // can't be defined
+			p.highest.y = t.getY(); // can't be defined
+			float size = 0.1f; // dummy var for the box size
+			p.highest.z = size; // can't be defined
 
-	public int[] getSceneSize() {
-		int[] res = new int[2];
-		res[0] = width;
-		res[1] = height;
-		if (width == 0 || height == 0) {
-			// System.out.println("[AugmentaP5 Warning : at least one of the dimensions is null or equal to 0");
+			// Callback
+			callPersonEntered(p);
 		}
-		return res;
 
 	}
 
-	public void setTimeOut(int n) {
-		if (n >= 0) {
-			timeOut = n;
+	// called when a blob is moved
+	public void updateTuioBlob (TuioBlob t) {
+		AugmentaPerson p = new AugmentaPerson();
+
+	  	// First test if the area contains the point
+	  	PVector point = new PVector(-1f, -1f);
+	  	point.x = t.getX();
+	  	point.y = t.getY();
+	  	if(interactiveArea.contains(point)){
+
+	  	// Fill the rest of the person
+	  		p.id = toIntExact(t.getSessionID());
+		  	p.oid = 0; // TODO
+		  	p.age++;
+			p.centroid.x = t.getX();
+			p.centroid.y = t.getY();
+			p.velocity.x = t.getXSpeed();
+			p.velocity.y = t.getYSpeed();
+			p.depth = 0f; // can't be defined
+			p.boundingRect.x = t.getX()-t.getWidth()/2;
+			p.boundingRect.y = t.getY()-t.getHeight()/2;
+			p.boundingRect.width = t.getWidth();
+			p.boundingRect.height = t.getHeight();
+			p.highest.x = t.getX(); // can't be defined
+			p.highest.y = t.getY(); // can't be defined
+			float size = 0.1f; // dummy var for the box size
+			p.highest.z = size; // can't be defined
+
+			// Callback
+			callPersonUpdated(p);
 		}
 	}
-	
-	public AugmentaPerson getOldestPerson(){
-		int bestAge = 0;
-		int bestPerson = -1;
-		// For each person...
-		for (int key : people.keySet()) {
-			System.out.println("Lib : people id = "+people.get(key).id);
-		    PVector pos = people.get(key).centroid;
-		    if (people.get(key).age > bestAge) {
-		      bestAge = people.get(key).age;
-		      bestPerson = key;
-		    }
+
+	// called when a blob is removed from the scene
+	public void removeTuioBlob(TuioBlob t) {
+		AugmentaPerson p = new AugmentaPerson();
+
+	  	// First test if the area contains the point
+	  	PVector point = new PVector(-1f, -1f);
+	  	point.x = t.getX();
+	  	point.y = t.getY();
+	  	if(interactiveArea.contains(point)){
+
+	  	// Fill the rest of the person
+	  		p.id = toIntExact(t.getSessionID());
+		  	p.oid = 0; // TODO
+		  	p.age++;
+			p.centroid.x = t.getX();
+			p.centroid.y = t.getY();
+			p.velocity.x = t.getXSpeed();
+			p.velocity.y = t.getYSpeed();
+			p.depth = 0f; // can't be defined
+			p.boundingRect.x = t.getX()-t.getWidth()/2;
+			p.boundingRect.y = t.getY()-t.getHeight()/2;
+			p.boundingRect.width = t.getWidth();
+			p.boundingRect.height = t.getHeight();
+			p.highest.x = t.getX(); // can't be defined
+			p.highest.y = t.getY(); // can't be defined
+			float size = 0.1f; // dummy var for the box size
+			p.highest.z = size; // can't be defined
+
+			// Callback
+			callPersonLeft(p);
 		}
-		AugmentaPerson p = null;
-		if (bestPerson != -1){
-			p = people.get(bestPerson);
-		}	
-		return p;
+
 	}
-	
-	public AugmentaPerson getNewestPerson(){
-		int bestAge = Integer.MAX_VALUE;
-		int bestPerson = -1;
-		// For each person...
-		for (int key : people.keySet()) {
-			System.out.println("Lib : people id = "+people.get(key).id);
-		    PVector pos = people.get(key).centroid;
-		    if (people.get(key).age < bestAge) {
-		      bestAge = people.get(key).age;
-		      bestPerson = key;
-		    }
+ 
+	public void refresh(TuioTime frameTime) {
+		System.out.println("frame #"+frameTime.getFrameID()+" ("+frameTime.getTotalMilliseconds()+")");
+	}
+// ----------------------------------------------------------------
+
+private void callPersonEntered(AugmentaPerson p) {
+	if (personEntered != null) {
+		try {
+			personEntered.invoke(parent, new Object[] { p });
+		} catch (Exception e) {
+			System.err
+			.println("[AugmentaP5] Disabling personEntered() for Augmenta because of an error.");
+			e.printStackTrace();
+			personEntered = null;
 		}
-		AugmentaPerson p = null;
-		if (bestPerson != -1){
-			p = people.get(bestPerson);
-		}	
-		return p;
 	}
+}
+
+private void callPersonUpdated(AugmentaPerson p) {
+	if (personUpdated != null) {
+		try {
+			personUpdated.invoke(parent, new Object[] { p });
+		} catch (Exception e) {
+			System.err
+			.println("[AugmentaP5] Disabling personUpdated() for Augmenta because of an error.");
+			e.printStackTrace();
+			personUpdated = null;
+		}
+	}
+}
+
+private void callPersonLeft(AugmentaPerson p) {
+	if (personLeft != null) {
+		try {
+			personLeft.invoke(parent, new Object[] { p });
+		} catch (Exception e) {
+			System.err
+			.println("[AugmentaP5] Disabling personLeft() for Augmenta because of an error.");
+			e.printStackTrace();
+			personLeft = null;
+		}
+	}
+}
+
+private void callCustomEvent(ArrayList<String> strings) {
+	if (customEvent != null) {
+		try {
+			customEvent.invoke(parent, new Object[] { strings });
+		} catch (Exception e) {
+			System.err
+			.println("[AugmentaP5] Disabling customEvent() for Augmenta because of an error.");
+			e.printStackTrace();
+			customEvent = null;
+		}
+	}
+}
+
+public int[] getSceneSize() {
+	int[] res = new int[2];
+	res[0] = width;
+	res[1] = height;
+	if (width == 0 || height == 0) {
+		// System.out.println("[AugmentaP5 Warning : at least one of the dimensions is null or equal to 0");
+	}
+	return res;
+
+}
+
+public void setTimeOut(int n) {
+	if (n >= 0) {
+		timeOut = n;
+	}
+}
+
+public AugmentaPerson getOldestPerson(){
+	int bestAge = 0;
+	int bestPerson = -1;
+	// For each person...
+	for (int key : people.keySet()) {
+		System.out.println("Lib : people id = "+people.get(key).id);
+		PVector pos = people.get(key).centroid;
+		if (people.get(key).age > bestAge) {
+			bestAge = people.get(key).age;
+			bestPerson = key;
+		}
+	}
+	AugmentaPerson p = null;
+	if (bestPerson != -1){
+		p = people.get(bestPerson);
+	}	
+	return p;
+}
+
+public AugmentaPerson getNewestPerson(){
+	int bestAge = Integer.MAX_VALUE;
+	int bestPerson = -1;
+	// For each person...
+	for (int key : people.keySet()) {
+		System.out.println("Lib : people id = "+people.get(key).id);
+		PVector pos = people.get(key).centroid;
+		if (people.get(key).age < bestAge) {
+			bestAge = people.get(key).age;
+			bestPerson = key;
+		}
+	}
+	AugmentaPerson p = null;
+	if (bestPerson != -1){
+		p = people.get(bestPerson);
+	}	
+	return p;
+}
 
 };
