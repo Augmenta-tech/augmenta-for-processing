@@ -100,7 +100,7 @@ void draw() {
 
   // Get the person data
   AugmentaPerson[] people = auReceiver.getPeopleArray();
-
+  
   // For each person...
   for (int i=0; i<people.length; i++) {
     PVector pos = people[i].centroid;
@@ -135,7 +135,7 @@ void draw() {
 }
 
 void personEntered (AugmentaPerson p) {
-  //println("Person entered : "+ p.id + "at ("+p.centroid.x+","+p.centroid.y+")");
+  //println("Person entered : "+ p.id + " at ("+p.centroid.x+","+p.centroid.y+")");
 }
 
 void personUpdated (AugmentaPerson p) {

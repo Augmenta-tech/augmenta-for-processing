@@ -194,39 +194,39 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 	}
 
 	public void pre() {
-		if(!tuio){
-			// get enumeration, which helps us loop through Augmenta.people
-			Enumeration e = _currentPeople.keys();
+		
+		// get enumeration, which helps us loop through Augmenta.people
+		Enumeration e = _currentPeople.keys();
 
-			// loop through people + copy all to public hashtable
-			people.clear();
+		// loop through people + copy all to public hashtable
+		people.clear();
 
-			lock.lock();
+		lock.lock();
 
-			while (e.hasMoreElements()) {
-				// get person
-				int id = (Integer) e.nextElement();
-				AugmentaPerson person = (AugmentaPerson) _currentPeople.get(id);
+		while (e.hasMoreElements()) {
+			// get person
+			int id = (Integer) e.nextElement();
+			AugmentaPerson person = (AugmentaPerson) _currentPeople.get(id);
 
-				// Adding this test to counteract nullPointerExceptions ocurring in
-				// rare cases
-				if (person != null) {
-					person.lastUpdated--;
-					// haven't gotten an update in a given number of frames
-					if (person.lastUpdated < -1) {
-						System.out.println("[AugmentaP5] Person deleted because it has not been updated for 120 frames");
-						callPersonLeft(person);
-						_currentPeople.remove(person.id);
-					} else {
-						AugmentaPerson p = new AugmentaPerson();
-						p.copy(person);
-						people.put(p.id, p);
-					}
+			// Adding this test to counteract nullPointerExceptions ocurring in
+			// rare cases
+			if (person != null) {
+				person.lastUpdated--;
+				// haven't gotten an update in a given number of frames
+				if (person.lastUpdated < -1 && !tuio) {
+					System.out.println("[AugmentaP5] Person deleted because it has not been updated for 120 frames");
+					callPersonLeft(person);
+					_currentPeople.remove(person.id);
+				} else {
+					AugmentaPerson p = new AugmentaPerson();
+					p.copy(person);
+					people.put(p.id, p);
 				}
-			}
-
-			lock.unlock();
+			}	
 		}
+
+		lock.unlock();
+		
 	}
 
 	/**
@@ -364,7 +364,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 
 	private static void updatePerson(AugmentaPerson p, TuioCursor t){
 		// Fill the rest of the person
-		/*
+		
   		p.id = toIntExact(t.getSessionID());
 	  	p.oid = 0; // TODO
 	  	p.age = 0;
@@ -382,7 +382,50 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 		p.highest.y = t.getY(); // can't be defined
 		p.highest.z = size; // can't be defined
 		p.lastUpdated = timeOut;
-		 */
+	}
+	
+	private static void updatePerson(AugmentaPerson p, TuioObject t){
+		// Fill the rest of the person
+		
+  		p.id = toIntExact(t.getSessionID());
+	  	p.oid = 0; // TODO
+	  	p.age = 0;
+		p.centroid.x = t.getX();
+		p.centroid.y = t.getY();
+		p.velocity.x = t.getXSpeed();
+		p.velocity.y = t.getYSpeed();
+		p.depth = 0f; // can't be defined
+		float size = 0.1f; // dummy var for the box size
+		p.boundingRect.x = t.getX()-size/2; // can't be defined
+		p.boundingRect.y = t.getY()-size/2; // can't be defined
+		p.boundingRect.width = size; // can't be defined
+		p.boundingRect.height = size; // can't be defined
+		p.highest.x = t.getX(); // can't be defined
+		p.highest.y = t.getY(); // can't be defined
+		p.highest.z = size; // can't be defined
+		p.lastUpdated = timeOut;
+	}
+	
+	private static void updatePerson(AugmentaPerson p, TuioBlob t){
+		// Fill the rest of the person
+		
+		p.id = toIntExact(t.getSessionID());
+	  	p.oid = 0; // TODO
+	  	p.age++;
+		p.centroid.x = t.getX();
+		p.centroid.y = t.getY();
+		p.velocity.x = t.getXSpeed();
+		p.velocity.y = t.getYSpeed();
+		p.depth = 0f; // can't be defined
+		p.boundingRect.x = t.getX()-t.getWidth()/2;
+		p.boundingRect.y = t.getY()-t.getHeight()/2;
+		p.boundingRect.width = t.getWidth();
+		p.boundingRect.height = t.getHeight();
+		p.highest.x = t.getX(); // can't be defined
+		p.highest.y = t.getY(); // can't be defined
+		float size = 0.1f; // dummy var for the box size
+		p.highest.z = size; // can't be defined
+		p.lastUpdated = timeOut;
 	}
 
 	// Set up (optional) Augmenta Events
@@ -541,6 +584,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 	// --------------------------------------------------------------
 	// TUIO bridge to augmenta
 	// --------------------------------------------------------------
+	// CURSORS
 	// called when a cursor is added to the scene
 	public void addTuioCursor(TuioCursor t) {
 
@@ -565,9 +609,8 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 	public void updateTuioCursor (TuioCursor t) {
 
 		AugmentaPerson p = null;
-		try {
-			p = _currentPeople.get(t.getSessionID());
-		} catch (Exception e) {
+		p = _currentPeople.get(toIntExact(t.getSessionID()));
+		if (p==null){
 			System.out
 			.println("[AugmentaP5] Error : Coulnd't find the Augmenta person with the given id");
 		}
@@ -578,11 +621,12 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 		point.y = t.getY();
 		
 		// Check if the person exists in the scene
-					boolean personExists = (p != null);
-
+		boolean personExists = (p != null);
 		// Check if the point is inside the interactive area
 		if(interactiveArea.contains(point)){
 			if (!personExists) {
+				// Create a new person
+				p = new AugmentaPerson();
 				// update the person
 				updatePerson(p, t);
 				// Add to the list 
@@ -607,13 +651,11 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 	// called when a cursor is removed from the scene
 	public void removeTuioCursor(TuioCursor t) {
 		AugmentaPerson p = null;
-		try {
-			p = _currentPeople.get(t.getSessionID());
-		} catch (Exception e) {
-			System.out
-			.println("[AugmentaP5] Error : Couldn't find the AugmentaPerson for the given ID");
-		}
+		p = _currentPeople.get(toIntExact(t.getSessionID()));
+
 		if (p == null) {
+			System.out
+			.println("[AugmentaP5] Error : Couldn't find and remove the AugmentaPerson for the given ID");
 			return;
 		}
 		updatePerson(p, t);
@@ -621,37 +663,21 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 		_currentPeople.remove(p.id);
 	}
 
-
-	// Same for objects...
+	// OBJECTS
 	// called when an object is added to the scene
 	public void addTuioObject(TuioObject t) {
 
-	  	AugmentaPerson p = new AugmentaPerson();
+		AugmentaPerson p = new AugmentaPerson();
 
-	  	// First test if the area contains the point
-	  	PVector point = new PVector(-1f, -1f);
-	  	point.x = t.getX();
-	  	point.y = t.getY();
-	  	if(interactiveArea.contains(point)){
-
-	  		// Fill the rest of the person
-	  		p.id = toIntExact(t.getSessionID());
-		  	p.oid = 0; // TODO
-		  	p.age = 0;
-			p.centroid.x = t.getX();
-			p.centroid.y = t.getY();
-			p.velocity.x = t.getXSpeed();
-			p.velocity.y = t.getYSpeed();
-			p.depth = 0f; // can't be defined
-			float size = 0.1f; // dummy var for the box size
-			p.boundingRect.x = t.getX()-size/2; // can't be defined
-			p.boundingRect.y = t.getY()-size/2; // can't be defined
-			p.boundingRect.width = size; // can't be defined
-			p.boundingRect.height = size; // can't be defined
-			p.highest.x = t.getX(); // can't be defined
-			p.highest.y = t.getY(); // can't be defined
-			p.highest.z = size; // can't be defined
-
+		// First test if the area contains the point
+		PVector point = new PVector(-1f, -1f);
+		point.x = t.getX();
+		point.y = t.getY();
+		if(interactiveArea.contains(point)){
+			// update the person
+			updatePerson(p, t);
+			// Add to the list 
+			_currentPeople.put(p.id, p);
 			// Callback
 			callPersonEntered(p);
 		}
@@ -659,149 +685,143 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 	}
 
 	// called when an object is moved
-	public void updateTuioObject(TuioObject t) {
-		AugmentaPerson p = new AugmentaPerson();
+	public void updateTuioObject (TuioObject t) {
 
-	  	// First test if the area contains the point
-	  	PVector point = new PVector(-1f, -1f);
-	  	point.x = t.getX();
-	  	point.y = t.getY();
-	  	if(interactiveArea.contains(point)){
-
-	  		// Fill the rest of the person
-	  		p.id = toIntExact(t.getSessionID());
-		  	p.oid = 0; // TODO
-		  	p.age++;
-			p.centroid.x = t.getX();
-			p.centroid.y = t.getY();
-			p.velocity.x = t.getXSpeed();
-			p.velocity.y = t.getYSpeed();
-			p.depth = 0f; // can't be defined
-			float size = 0.1f; // dummy var for the box size
-			p.boundingRect.x = t.getX()-size/2; // can't be defined
-			p.boundingRect.y = t.getY()-size/2; // can't be defined
-			p.boundingRect.width = size; // can't be defined
-			p.boundingRect.height = size; // can't be defined
-			p.highest.x = t.getX(); // can't be defined
-			p.highest.y = t.getY(); // can't be defined
-			p.highest.z = size; // can't be defined
-
-			// Callback
-			callPersonUpdated(p);
+		AugmentaPerson p = null;
+		p = _currentPeople.get(toIntExact(t.getSessionID()));
+		if (p==null){
+			System.out
+			.println("[AugmentaP5] Error : Coulnd't find the Augmenta person with the given id");
 		}
+
+		// First test if the area contains the point
+		PVector point = new PVector(-1f, -1f);
+		point.x = t.getX();
+		point.y = t.getY();
+		
+		// Check if the person exists in the scene
+		boolean personExists = (p != null);
+		// Check if the point is inside the interactive area
+		if(interactiveArea.contains(point)){
+			if (!personExists) {
+				// Create a new person
+				p = new AugmentaPerson();
+				// update the person
+				updatePerson(p, t);
+				// Add to the list 
+				_currentPeople.put(p.id, p);
+				// Callback
+				callPersonEntered(p);
+			} else {
+				updatePerson(p, t);
+				callPersonUpdated(p);
+			}
+		} else {
+			// Else we have to act like that the person left
+			if (personExists) {
+				updatePerson(p, t);
+				callPersonLeft(p);
+				_currentPeople.remove(p.id);
+			} // if the person does not exist in the scene no need to do this again
+		}
+
 	}
 
 	// called when an object is removed from the scene
 	public void removeTuioObject(TuioObject t) {
-		AugmentaPerson p = new AugmentaPerson();
+		AugmentaPerson p = null;
+		p = _currentPeople.get(toIntExact(t.getSessionID()));
 
-	  	// First test if the area contains the point
-	  	PVector point = new PVector(-1f, -1f);
-	  	point.x = t.getX();
-	  	point.y = t.getY();
-	  	if(interactiveArea.contains(point)){
-
-	  		// Fill the rest of the person
-	  		p.id = toIntExact(t.getSessionID());
-		  	p.oid = 0; // TODO
-		  	p.age++;
-			p.centroid.x = t.getX();
-			p.centroid.y = t.getY();
-			p.velocity.x = t.getXSpeed();
-			p.velocity.y = t.getYSpeed();
-			p.depth = 0f; // can't be defined
-			float size = 0.1f; // dummy var for the box size
-			p.boundingRect.x = t.getX()-size/2; // can't be defined
-			p.boundingRect.y = t.getY()-size/2; // can't be defined
-			p.boundingRect.width = size; // can't be defined
-			p.boundingRect.height = size; // can't be defined
-			p.highest.x = t.getX(); // can't be defined
-			p.highest.y = t.getY(); // can't be defined
-			p.highest.z = size; // can't be defined
-
-			// Callback
-			callPersonLeft(p);
+		if (p == null) {
+			System.out
+			.println("[AugmentaP5] Error : Couldn't find and remove the AugmentaPerson for the given ID");
+			return;
 		}
+		updatePerson(p, t);
+		callPersonLeft(p);
+		_currentPeople.remove(p.id);
 	}
-
-	// Same for blobs (a little bit more info)
+	
+	// BLOBS
+	// called when a blob is added to the scene
 	public void addTuioBlob(TuioBlob t) {
 
-	  	AugmentaPerson p = new AugmentaPerson();
+		AugmentaPerson p = new AugmentaPerson();
 
-	  	// First test if the area contains the point
-	  	PVector point = new PVector(-1f, -1f);
-	  	point.x = t.getX();
-	  	point.y = t.getY();
-	  	if(interactiveArea.contains(point)){
-
-	  		// Fill the rest of the person
-	  		p.id = toIntExact(t.getSessionID());
-		  	p.oid = 0; // TODO
-		  	p.age = 0;
-			p.centroid.x = t.getX();
-			p.centroid.y = t.getY();
-			p.velocity.x = t.getXSpeed();
-			p.velocity.y = t.getYSpeed();
-			p.depth = 0f; // can't be defined
-			p.boundingRect.x = t.getX()-t.getWidth()/2;
-			p.boundingRect.y = t.getY()-t.getHeight()/2;
-			p.boundingRect.width = t.getWidth();
-			p.boundingRect.height = t.getHeight();
-			p.highest.x = t.getX(); // can't be defined
-			p.highest.y = t.getY(); // can't be defined
-			float size = 0.1f; // dummy var for the box size
-			p.highest.z = size; // can't be defined
-
+		// First test if the area contains the point
+		PVector point = new PVector(-1f, -1f);
+		point.x = t.getX();
+		point.y = t.getY();
+		if(interactiveArea.contains(point)){
+			// update the person
+			updatePerson(p, t);
+			// Add to the list 
+			_currentPeople.put(p.id, p);
 			// Callback
 			callPersonEntered(p);
 		}
 
 	}
 
-	// called when a blob is moved
+	// called when a cursor is moved
 	public void updateTuioBlob (TuioBlob t) {
-		AugmentaPerson p = new AugmentaPerson();
 
-	  	// First test if the area contains the point
-	  	PVector point = new PVector(-1f, -1f);
-	  	point.x = t.getX();
-	  	point.y = t.getY();
-	  	if(interactiveArea.contains(point)){
-
-	  	// Fill the rest of the person
-	  		p.id = toIntExact(t.getSessionID());
-		  	p.oid = 0; // TODO
-		  	p.age++;
-			p.centroid.x = t.getX();
-			p.centroid.y = t.getY();
-			p.velocity.x = t.getXSpeed();
-			p.velocity.y = t.getYSpeed();
-			p.depth = 0f; // can't be defined
-			p.boundingRect.x = t.getX()-t.getWidth()/2;
-			p.boundingRect.y = t.getY()-t.getHeight()/2;
-			p.boundingRect.width = t.getWidth();
-			p.boundingRect.height = t.getHeight();
-			p.highest.x = t.getX(); // can't be defined
-			p.highest.y = t.getY(); // can't be defined
-			float size = 0.1f; // dummy var for the box size
-			p.highest.z = size; // can't be defined
-
-			// Callback
-			callPersonUpdated(p);
+		AugmentaPerson p = null;
+		p = _currentPeople.get(toIntExact(t.getSessionID()));
+		if (p==null){
+			System.out
+			.println("[AugmentaP5] Error : Coulnd't find the Augmenta person with the given id");
 		}
+
+		// First test if the area contains the point
+		PVector point = new PVector(-1f, -1f);
+		point.x = t.getX();
+		point.y = t.getY();
+		
+		// Check if the person exists in the scene
+		boolean personExists = (p != null);
+		// Check if the point is inside the interactive area
+		if(interactiveArea.contains(point)){
+			if (!personExists) {
+				// Create a new person
+				p = new AugmentaPerson();
+				// update the person
+				updatePerson(p, t);
+				// Add to the list 
+				_currentPeople.put(p.id, p);
+				// Callback
+				callPersonEntered(p);
+			} else {
+				updatePerson(p, t);
+				callPersonUpdated(p);
+			}
+		} else {
+			// Else we have to act like that the person left
+			if (personExists) {
+				updatePerson(p, t);
+				callPersonLeft(p);
+				_currentPeople.remove(p.id);
+			} // if the person does not exist in the scene no need to do this again
+		}
+
 	}
 
-	// called when a blob is removed from the scene
+	// called when a cursor is removed from the scene
 	public void removeTuioBlob(TuioBlob t) {
-		AugmentaPerson p = new AugmentaPerson();
+		AugmentaPerson p = null;
+		p = _currentPeople.get(toIntExact(t.getSessionID()));
 
-	  	// First test if the area contains the point
-	  	PVector point = new PVector(-1f, -1f);
-	  	point.x = t.getX();
-	  	point.y = t.getY();
-	  	if(interactiveArea.contains(point)){
+		if (p == null) {
+			System.out
+			.println("[AugmentaP5] Error : Couldn't find and remove the AugmentaPerson for the given ID");
+			return;
+		}
+		updatePerson(p, t);
+		callPersonLeft(p);
+		_currentPeople.remove(p.id);
+	}
 
+/*
 	  	// Fill the rest of the person
 	  		p.id = toIntExact(t.getSessionID());
 		  	p.oid = 0; // TODO
@@ -819,15 +839,10 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 			p.highest.y = t.getY(); // can't be defined
 			float size = 0.1f; // dummy var for the box size
 			p.highest.z = size; // can't be defined
-
-			// Callback
-			callPersonLeft(p);
-		}
-
-	}
+*/
  
 	public void refresh(TuioTime frameTime) {
-		System.out.println("frame #"+frameTime.getFrameID()+" ("+frameTime.getTotalMilliseconds()+")");
+		//System.out.println("frame #"+frameTime.getFrameID()+" ("+frameTime.getTotalMilliseconds()+")");
 	}
 // ----------------------------------------------------------------
 
