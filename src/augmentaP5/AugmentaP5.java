@@ -498,13 +498,13 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 					point.x = theOscMessage.get(3).floatValue();
 				} catch (Exception e) {
 					System.out
-					.println("[AugmentaP5] The OSC message with address  'personEntered' could not be parsed : the value [3] should be a float (centroid.x)");
+					.println("[AugmentaP5] The OSC message with address  'personUpdated' could not be parsed : the value [3] should be a float (centroid.x)");
 				}
 				try {
 					point.y = theOscMessage.get(4).floatValue();
 				} catch (Exception e) {
 					System.out
-					.println("[AugmentaP5] The OSC message with address  'personEntered' could not be parsed : the value [4] should be a float (centroid.y)");
+					.println("[AugmentaP5] The OSC message with address  'personUpdated' could not be parsed : the value [4] should be a float (centroid.y)");
 				}
 
 				// Check if the person exists in the scene
@@ -512,10 +512,12 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 
 				// Check if the point is inside the interactive area
 				if(interactiveArea.contains(point)){
+					
 					if (!personExists) {
 						p = new AugmentaPerson();
 						updatePerson(p, theOscMessage);
 						callPersonEntered(p);
+						_currentPeople.put(p.id, p);
 					} else {
 						updatePerson(p, theOscMessage);
 						callPersonUpdated(p);
@@ -542,7 +544,8 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 					System.out
 					.println("[AugmentaP5] The OSC message with address 'personWillLeave' could not be parsed : the value [0] should be an int (id)");
 				}
-				if (p == null) {
+				if(p == null){
+					System.out.println("ERROR : no person found with id "+theOscMessage.get(0).intValue());
 					return;
 				}
 				updatePerson(p, theOscMessage);
@@ -820,26 +823,6 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 		callPersonLeft(p);
 		_currentPeople.remove(p.id);
 	}
-
-/*
-	  	// Fill the rest of the person
-	  		p.id = toIntExact(t.getSessionID());
-		  	p.oid = 0; // TODO
-		  	p.age++;
-			p.centroid.x = t.getX();
-			p.centroid.y = t.getY();
-			p.velocity.x = t.getXSpeed();
-			p.velocity.y = t.getYSpeed();
-			p.depth = 0f; // can't be defined
-			p.boundingRect.x = t.getX()-t.getWidth()/2;
-			p.boundingRect.y = t.getY()-t.getHeight()/2;
-			p.boundingRect.width = t.getWidth();
-			p.boundingRect.height = t.getHeight();
-			p.highest.x = t.getX(); // can't be defined
-			p.highest.y = t.getY(); // can't be defined
-			float size = 0.1f; // dummy var for the box size
-			p.highest.z = size; // can't be defined
-*/
  
 	public void refresh(TuioTime frameTime) {
 		//System.out.println("frame #"+frameTime.getFrameID()+" ("+frameTime.getTotalMilliseconds()+")");
