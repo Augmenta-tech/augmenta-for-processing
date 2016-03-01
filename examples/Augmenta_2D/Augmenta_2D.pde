@@ -23,6 +23,8 @@ AugmentaP5 auReceiver;
 // Declare the inital OSC port
 int oscPort = 12000;
 
+boolean verbose =true;
+
 // Declare the syphon server
 SyphonServer server;
 // Graphics that will hold the syphon/spout texture to send
@@ -65,7 +67,7 @@ void setup() {
   }
 
   // Create the Augmenta receiver
-  auReceiver= new AugmentaP5(this, oscPort);
+  auReceiver= new AugmentaP5(this, oscPort, false);
   auReceiver.setTimeOut(30);
   auReceiver.setGraphicsTarget(canvas);
   // You can hardcode the interactive area if you need to
@@ -99,7 +101,7 @@ void draw() {
 
   // Get the person data
   AugmentaPerson[] people = auReceiver.getPeopleArray();
-
+  
   // For each person...
   for (int i=0; i<people.length; i++) {
     PVector pos = people[i].centroid;
@@ -132,7 +134,7 @@ void draw() {
 }
 
 void personEntered (AugmentaPerson p) {
-  //println("Person entered : "+ p.id + "at ("+p.centroid.x+","+p.centroid.y+")");
+  //println("Person entered : "+ p.id + " at ("+p.centroid.x+","+p.centroid.y+")");
 }
 
 void personUpdated (AugmentaPerson p) {
