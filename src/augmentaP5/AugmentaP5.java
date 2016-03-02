@@ -941,7 +941,6 @@ public AugmentaPerson getOldestPerson(){
 	int bestPerson = -1;
 	// For each person...
 	for (int key : people.keySet()) {
-		System.out.println("Lib : people id = "+people.get(key).id);
 		PVector pos = people.get(key).centroid;
 		if (people.get(key).age > bestAge) {
 			bestAge = people.get(key).age;
@@ -960,7 +959,6 @@ public AugmentaPerson getNewestPerson(){
 	int bestPerson = -1;
 	// For each person...
 	for (int key : people.keySet()) {
-		System.out.println("Lib : people id = "+people.get(key).id);
 		PVector pos = people.get(key).centroid;
 		if (people.get(key).age < bestAge) {
 			bestAge = people.get(key).age;

@@ -49,7 +49,7 @@ int manualSceneX;
 int manualSceneY;
 
 // Declare a debug mode bool
-boolean debug=true;
+boolean debug=false;
 
 void settings(){
   // Set the initial frame size
@@ -103,31 +103,41 @@ void draw() {
   canvas.beginDraw();
   canvas.background(0);
 
+  // Draw a green circle under the oldest person in the scene :
+  AugmentaPerson oldest = auReceiver.getOldestPerson();
+  if (oldest != null){
+    canvas.fill(0,255,0);
+    canvas.noStroke(); // Without stroke
+    canvas.ellipse(oldest.centroid.x*canvas.width, oldest.centroid.y*canvas.height, 25, 25); // 15 pixels in diameter
+  }
+  
+  // Draw a blue circle for everyone :
   // Get the person data
   AugmentaPerson[] people = auReceiver.getPeopleArray();
-  
-  // For each person...
+  // For each person we will...
   for (int i=0; i<people.length; i++) {
+    //...get the position...
     PVector pos = people[i].centroid;
     
-    // Draw a circle
-    canvas.fill(0, 128, 255); // Filled in blue
+    //...and draw a blue circle
+    canvas.fill(0, 128, 255); // Filled in blue //<>//
     canvas.noStroke(); // Without stroke
     canvas.ellipse(pos.x*canvas.width, pos.y*canvas.height, 15, 15); // 15 pixels in diameter
     
     if (debug) {
+      // Draw the debug info if necessary
       people[i].draw();
     }
   }
 
-  if (debug) { //<>//
+  if (debug) {
     // Draw the interactive area
     auReceiver.interactiveArea.draw();
   }
 
   canvas.endDraw();
   
-  //draw augmenta canvas in the window
+  // Draw the augmenta canvas in the window
   image(canvas, 0, 0, width, height);
   
   // Syphon output
@@ -328,7 +338,6 @@ public void reconnectReceiver(){
     auReceiver.reconnect(oscPort, tuio);
   }
 }
-
 // --------------------------------------
 
 
