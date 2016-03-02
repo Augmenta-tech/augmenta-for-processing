@@ -22,8 +22,10 @@ import controlP5.*; // GUI
 AugmentaP5 auReceiver;
 // Declare the inital OSC port
 int oscPort = 12000;
+// Declare the boolean defining if we're in TUIO mode
+boolean tuio = false;
 
-boolean verbose =true;
+boolean verbose = true;
 
 // Declare the syphon server
 SyphonServer server;
@@ -32,6 +34,7 @@ PGraphics canvas;
 
 // Declare the UI
 boolean guiIsVisible=true;
+boolean uiIsLoaded=false;
 // ControlP5
 ControlP5 cp5;
 Toggle autoSceneSize;
@@ -39,13 +42,14 @@ Textfield sceneX;
 Textfield sceneY;
 Textlabel sceneSizeInfo;
 Textfield portInput;
+Toggle tuioToggle;
 
 // Save manual scene size info
 int manualSceneX;
 int manualSceneY;
 
 // Declare a debug mode bool
-boolean debug=false;
+boolean debug=true;
 
 void settings(){
   // Set the initial frame size
@@ -67,7 +71,7 @@ void setup() {
   }
 
   // Create the Augmenta receiver
-  auReceiver= new AugmentaP5(this, oscPort, false);
+  auReceiver= new AugmentaP5(this, oscPort, tuio);
   auReceiver.setTimeOut(30);
   auReceiver.setGraphicsTarget(canvas);
   // You can hardcode the interactive area if you need to
@@ -153,6 +157,7 @@ void keyPressed(){
   } else if (key == 'd') {
     // Show/hide the debug info
     debug=!debug;
+    println("debug : "+debug);
   } else if (keyCode == TAB){
     // Go to next textfield when typing in sceneX
     if (sceneX.isFocus()){
@@ -163,6 +168,8 @@ void keyPressed(){
    saveSettings("settings"); 
   } else if(key == 'l'){
    loadSettings("settings"); 
+  } else if (key == 'i'){
+   changeTuio(false); 
   }
 }
 
@@ -263,6 +270,18 @@ void setUI() {
       .setText("OSC input port")
       .setPosition(55, 46)
       ;
+      
+  // TUIO toggle
+  tuioToggle = cp5.addToggle("changeTuio")
+     .setPosition(10, 70)
+     .setSize(20, 20)
+     .setLabel("")
+     .setValue(false)
+     ;
+  cp5.addTextlabel("labelTuioToggle")
+      .setText("TUIO mode")
+      .setPosition(30, 76)
+      ;
 }
 // --------------------------------------
 
@@ -294,11 +313,20 @@ void changeAutoSceneSize(boolean b) {
   }
 }
 public void changeInputPort(String s) {
-  if (Integer.parseInt(s) != oscPort) {
-    oscPort = Integer.parseInt(portInput.getText());
-    auReceiver.unbind();
-    auReceiver=null;
-    auReceiver= new AugmentaP5(this, oscPort);
+  oscPort = Integer.parseInt(s);
+  reconnectReceiver();
+}
+public void changeTuio(boolean b) {
+  tuio = b;
+  reconnectReceiver();
+}
+public void reconnectReceiver(){
+  if(tuioToggle != null && portInput != null && auReceiver != null){ // Sanity check
+    if(auReceiver.getPort() != oscPort || auReceiver.isTuio() != tuio){
+      auReceiver.unbind();
+      auReceiver=null;
+      auReceiver= new AugmentaP5(this, oscPort, tuio);
+    }
   }
 }
 // --------------------------------------

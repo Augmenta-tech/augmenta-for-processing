@@ -27,6 +27,8 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 	//
 	public static PApplet parent;
 	private OscP5 receiver;
+	
+	private static int oscPort = 12000;
 
 	// TUIO declare a TuioProcessing client
 	TuioClient client;
@@ -75,7 +77,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 	 *            _parent Your app (pass in as "this")
 	 */
 	public AugmentaP5(PApplet _parent) {
-		this(_parent, 12000);
+		this(_parent, oscPort);
 	}
 
 	/**
@@ -106,20 +108,34 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 		registerEvents();
 		parent. registerMethod("pre", this);
 		canvas = (PGraphics)(_parent.g);
+		
+		if (port <= 1024 || port > 65535){
+			System.out.println("ERROR : port "+port+" is not allowed, switching back to default ("+oscPort);
+		} else {
+			oscPort = port;
+		}
 
 		if(!tuio){ // normal behavior
-			System.out.println("[AugmentaP5] Starting the receiver with port ("+ port + ")");
-			receiver = new OscP5(this, port);
+			System.out.println("[AugmentaP5] Starting the receiver with port ("+ oscPort + ")");
+			receiver = new OscP5(this, oscPort);
 		} else { // if TUIO
-			System.out.println("[AugmentaP5] Starting a TUIO receiver with port ("+ port + ")");
-			if (port != 3333){
+			System.out.println("[AugmentaP5] Starting a TUIO receiver with port ("+ oscPort + ")");
+			if (oscPort != 3333){
 				System.out.println("[AugmentaP5] WARNING : default TUIO port is 3333");
 			}
-			client = new TuioClient(port);
+			client = new TuioClient(oscPort);
 			client.addTuioListener(this);
 			client.connect();
 		}
 
+	}
+	
+	public boolean isTuio(){
+		return tuio;
+	}
+	
+	public int getPort(){
+		return oscPort;
 	}
 
 	public void setGraphicsTarget(PGraphics target)
@@ -180,17 +196,27 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 
 	public void unbind() {
 		System.out.println("[AugmentaP5] AugmentaP5 object unbinding...");
-		receiver.stop();
-		receiver = null;
+		if(!tuio){
+			if (receiver != null){
+				receiver.stop();
+				receiver = null;
+			}
+		} else {
+			if(client != null && client.isConnected()){
+				client.disconnect();
+				client.removeAllTuioListeners();
+				client = null;
+			}
+		}
+		people.clear();
+		_currentPeople.clear();
 	}
 
 	public void finalize() {
 		System.out.println("[AugmentaP5] AugmentaP5 object terminating...");
-		receiver.stop();
-		receiver = null;
+		unbind();
 		people = null;
 		_currentPeople = null;
-
 	}
 
 	public void pre() {
@@ -367,7 +393,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 		
   		p.id = toIntExact(t.getSessionID());
 	  	p.oid = 0; // TODO
-	  	p.age = 0;
+	  	p.age ++;
 		p.centroid.x = t.getX();
 		p.centroid.y = t.getY();
 		p.velocity.x = t.getXSpeed();
@@ -389,7 +415,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 		
   		p.id = toIntExact(t.getSessionID());
 	  	p.oid = 0; // TODO
-	  	p.age = 0;
+	  	p.age ++;
 		p.centroid.x = t.getX();
 		p.centroid.y = t.getY();
 		p.velocity.x = t.getXSpeed();

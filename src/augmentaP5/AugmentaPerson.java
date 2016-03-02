@@ -17,11 +17,11 @@ public class AugmentaPerson
 	//private final PApplet app;
 
 	/** Unique ID, different for each Person as long as Augmenta is running */
-	public int id;
+	public int id = 0;
 	/** Ordered ID (not usually used), ID ranging from 0-Total Number of people */ 
-	public int oid; 
+	public int oid = 0; 
 	/** How long a person has been around (in seconds) */
-	public int age; 
+	public int age = 0; 
 	/** Normalized (0.0-1.0) distance from camera. For Kinect camera, highest value (1) is approx. 10 meters*/
 	public float depth; 
 	/** Center of mass of person */
@@ -122,7 +122,6 @@ public class AugmentaPerson
 		
 		if(g != null)
 		{
-			
 			// Compute a color for the points
 			int rc,gc,bc;
 			if (id%5 == 0){
@@ -189,6 +188,7 @@ public class AugmentaPerson
 			g.textSize(10);
 			g.fill(255);
 			g.text("id: "+id+" age: "+age, centroid.x*g.width+12, centroid.y*g.height + 2);
+			System.out.println("id: "+id+" age: "+age+ " /"+centroid.x*g.width+12 +","+ centroid.y*g.height + 2);
 		}
 	}
 };
