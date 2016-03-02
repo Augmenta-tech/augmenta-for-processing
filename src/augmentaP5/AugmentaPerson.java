@@ -188,7 +188,6 @@ public class AugmentaPerson
 			g.textSize(10);
 			g.fill(255);
 			g.text("id: "+id+" age: "+age, centroid.x*g.width+12, centroid.y*g.height + 2);
-			System.out.println("id: "+id+" age: "+age+ " /"+centroid.x*g.width+12 +","+ centroid.y*g.height + 2);
 		}
 	}
 };

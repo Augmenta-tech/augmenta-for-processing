@@ -120,7 +120,7 @@ void draw() {
     }
   }
 
-  if (debug) {
+  if (debug) { //<>//
     // Draw the interactive area
     auReceiver.interactiveArea.draw();
   }
@@ -198,7 +198,7 @@ void adjustSceneSize() {
       sw = manualSceneX;
       sh = manualSceneY;
   }
-  if ( (canvas.width!=sw || canvas.height!=sh) && sw>100 && sh>100 && sw<=16000 && sh <=16000 ) {
+  if ( (canvas.width!=sw || canvas.height!=sh) && sw>=100 && sh>=100 && sw<=16000 && sh <=16000 ) {
     // Create the output canvas with the correct size
     canvas = createGraphics(sw, sh);
     float ratio = (float)sw/(float)sh;
@@ -213,6 +213,9 @@ void adjustSceneSize() {
       }
     }
     surface.setSize(sw+frame.getInsets().left+frame.getInsets().right, sh+frame.getInsets().top+frame.getInsets().bottom);
+    auReceiver.setGraphicsTarget(canvas);
+  } else if (sw <100 || sh <100 || sw > 16000 || sh > 16000) {
+     println("ERROR : cannot set a window size smaller than 100 or greater than 16000"); 
   }
   // Update the UI text field
   sceneSizeInfo.setText(canvas.width+"x"+canvas.height);
@@ -322,13 +325,10 @@ public void changeTuio(boolean b) {
 }
 public void reconnectReceiver(){
   if(tuioToggle != null && portInput != null && auReceiver != null){ // Sanity check
-    if(auReceiver.getPort() != oscPort || auReceiver.isTuio() != tuio){
-      auReceiver.unbind();
-      auReceiver=null;
-      auReceiver= new AugmentaP5(this, oscPort, tuio);
-    }
+    auReceiver.reconnect(oscPort, tuio);
   }
 }
+
 // --------------------------------------
 
 

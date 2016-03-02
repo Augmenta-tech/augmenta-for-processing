@@ -115,6 +115,10 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 			oscPort = port;
 		}
 
+		createReceiver();
+	}
+	
+	private void createReceiver(){
 		if(!tuio){ // normal behavior
 			System.out.println("[AugmentaP5] Starting the receiver with port ("+ oscPort + ")");
 			receiver = new OscP5(this, oscPort);
@@ -127,7 +131,6 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 			client.addTuioListener(this);
 			client.connect();
 		}
-
 	}
 	
 	public boolean isTuio(){
@@ -217,6 +220,15 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 		unbind();
 		people = null;
 		_currentPeople = null;
+	}
+	
+	public void reconnect(int _port, boolean _tuio){
+		if(_port != oscPort || _tuio != tuio){
+		      unbind();
+		      oscPort = _port;
+		      tuio = _tuio;
+		      createReceiver();
+		}
 	}
 
 	public void pre() {
