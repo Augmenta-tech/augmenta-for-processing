@@ -25,8 +25,6 @@ int oscPort = 12000;
 // Declare the boolean defining if we're in TUIO mode
 boolean tuio = false;
 
-boolean verbose = true;
-
 // Declare the syphon server
 SyphonServer server;
 // Graphics that will hold the syphon/spout texture to send
@@ -38,11 +36,14 @@ boolean uiIsLoaded=false;
 // ControlP5
 ControlP5 cp5;
 Toggle autoSceneSize;
+Textlabel autoSizeLabel;
 Textfield sceneX;
 Textfield sceneY;
 Textlabel sceneSizeInfo;
 Textfield portInput;
+Textlabel portInputLabel;
 Toggle tuioToggle;
+Textlabel tuioLabel;
 
 // Save manual scene size info
 int manualSceneX;
@@ -64,11 +65,6 @@ void setup() {
   
   manualSceneX = width;
   manualSceneY = height;
-
-  // Allow the frame to be resized
-  if (surface != null) {
-    surface.setResizable(true);
-  }
 
   // Create the Augmenta receiver
   auReceiver= new AugmentaP5(this, oscPort, tuio);
@@ -185,15 +181,20 @@ void keyPressed(){
 
 void showGUI(boolean val) {
   // Show or hide the GUI (always after the Syphon output)
-  portInput.setVisible(val);
-
   autoSceneSize.setVisible(val);
-  if (autoSceneSize.getArrayValue()[0] == 1) {
+  autoSizeLabel.setVisible(val);
+  if (autoSceneSize.getBooleanValue()) {
     sceneSizeInfo.setVisible(val);
   } else {
     sceneX.setVisible(val);
     sceneY.setVisible(val);
   }
+  
+  portInput.setVisible(val);
+  portInputLabel.setVisible(val);
+  
+  tuioToggle.setVisible(val);
+  tuioLabel.setVisible(val);
 }
 
 void adjustSceneSize() {
@@ -243,7 +244,7 @@ void setUI() {
      .setLabel("")
      .setValue(false)
      ;
-  cp5.addTextlabel("labelAutoSceneSize")
+  autoSizeLabel = cp5.addTextlabel("labelAutoSceneSize")
       .setText("Auto scene size")
       .setPosition(30, 16)
       ;
@@ -279,7 +280,7 @@ void setUI() {
      .setInputFilter(ControlP5.INTEGER);
      ;
   portInput.setText(""+oscPort);
-  cp5.addTextlabel("labeloscport")
+  portInputLabel = cp5.addTextlabel("labeloscport")
       .setText("OSC input port")
       .setPosition(55, 46)
       ;
@@ -291,7 +292,7 @@ void setUI() {
      .setLabel("")
      .setValue(false)
      ;
-  cp5.addTextlabel("labelTuioToggle")
+  tuioLabel = cp5.addTextlabel("labelTuioToggle")
       .setText("TUIO mode")
       .setPosition(30, 76)
       ;
