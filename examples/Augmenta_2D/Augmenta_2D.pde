@@ -222,7 +222,7 @@ void adjustSceneSize() {
         sw = (int)(sh*ratio);
       }
     }
-    surface.setSize(sw+frame.getInsets().left+frame.getInsets().right, sh+frame.getInsets().top+frame.getInsets().bottom);
+    surface.setSize(sw, sh);
     auReceiver.setGraphicsTarget(canvas);
   } else if (sw <100 || sh <100 || sw > 16000 || sh > 16000) {
      println("ERROR : cannot set a window size smaller than 100 or greater than 16000"); 
