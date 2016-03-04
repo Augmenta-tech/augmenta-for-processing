@@ -10,7 +10,6 @@
  *
  */
 
-import netP5.*; // needed for oscP5
 import oscP5.*; // needed for augmenta
 import TUIO.*; // Needed for augmenta
 import augmentaP5.*; // Augmenta
@@ -310,8 +309,12 @@ void changeSceneHeight(String s){
   updateManualSize(); 
 }
 void updateManualSize(){
+  try{
    manualSceneX = Integer.parseInt(sceneX.getText());
    manualSceneY = Integer.parseInt(sceneY.getText()); 
+  } catch(Exception e){
+    return;
+  }
 }
 void changeAutoSceneSize(boolean b) {
   if(sceneSizeInfo != null && sceneX != null && sceneY != null){
@@ -327,7 +330,11 @@ void changeAutoSceneSize(boolean b) {
   }
 }
 public void changeInputPort(String s) {
-  oscPort = Integer.parseInt(s);
+  try{
+    oscPort = Integer.parseInt(s);
+  } catch(Exception e){
+    return;
+  }
   reconnectReceiver();
 }
 public void changeTuio(boolean b) {
