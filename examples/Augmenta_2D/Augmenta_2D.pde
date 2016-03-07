@@ -178,6 +178,39 @@ void keyPressed(){
   }
 }
 
+// Used to set the interactive area
+// click and drag to set a custom area, right click to set it to default (full scene)
+float originX;
+float originY;
+void mousePressed(){
+  if (debug){
+    if (mouseButton == LEFT){
+      originX = (float)mouseX/(float)width;
+      originY = (float)mouseY/(float)height;
+    } else {
+      auReceiver.interactiveArea.set(0f, 0f, 1f, 1f);
+    }
+  }
+}
+void mouseDragged(){
+  if (debug){
+    if (mouseButton == LEFT){
+      float w = (float)mouseX/(float)width-originX;
+      float h = (float)mouseY/(float)height-originY;
+      if (w > 0 && h > 0){
+        auReceiver.interactiveArea.set(originX, originY, w, h); 
+      } else if (w < 0 && h > 0){
+        auReceiver.interactiveArea.set((float)mouseX/(float)width, originY, -w, h);
+      } else if (h < 0 && w > 0){
+        auReceiver.interactiveArea.set(originX, (float)mouseY/(float)height, w, -h);
+      } else {
+        auReceiver.interactiveArea.set((float)mouseX/(float)width, (float)mouseY/(float)height, -w, -h);
+        println("Rect : "+(float)mouseX/(float)width+" "+ (float)mouseY/(float)height+" "+ -w+" "+ -h);
+      }
+    }
+  }
+}
+
 void showGUI(boolean val) {
   // Show or hide the GUI (always after the Syphon output)
   autoSceneSize.setVisible(val);
