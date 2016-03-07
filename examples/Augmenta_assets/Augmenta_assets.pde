@@ -17,10 +17,12 @@
  *
  */
 
-import oscP5.*;
-import augmentaP5.*;
-import g4p_controls.*;
-import codeanticode.syphon.*;
+import oscP5.*; // needed for augmenta
+import TUIO.*; // Needed for augmenta
+import augmentaP5.*; // Augmenta
+import codeanticode.syphon.*; // Syphon
+import java.util.List; // Needed for the GUI implementation
+import controlP5.*; // GUI
 // [Sound] and [Audioreaction]
 import ddf.minim.*;
 // [Video]
@@ -32,19 +34,33 @@ AugmentaP5 auReceiver;
 int oscPort = 12000;
 // Declare the syphon server
 SyphonServer server;
+// Declare the boolean defining if we're in TUIO mode
+boolean tuio = false;
+
 // Graphics that will hold the syphon/spout texture to send
 PGraphics canvas;
 
 // Declare the UI
 boolean guiIsVisible=true;
-GTextField portInput;
-GButton portInputButton;
-GCheckbox autoSceneSize;
-GLabel sceneSizeInfo;
-GTextField sceneX;
-GTextField sceneY;
+boolean uiIsLoaded=false;
+// ControlP5
+ControlP5 cp5;
+Toggle autoSceneSize;
+Textlabel autoSizeLabel;
+Textfield sceneX;
+Textfield sceneY;
+Textlabel sceneSizeInfo;
+Textfield portInput;
+Textlabel portInputLabel;
+Toggle tuioToggle;
+Textlabel tuioLabel;
 // [Audioreaction]
-GCustomSlider gainSlider;
+Slider gainSlider;
+float gainSliderValue;
+
+// Save manual scene size info
+int manualSceneX;
+int manualSceneY;
 
 // Declare a debug mode bool
 boolean debug=false;
@@ -60,8 +76,8 @@ AudioInput mic;
 float volume;
 float cappedVolume;
 float gain;
-// KNOWN ISSUE : Sound working on OSX 10.11 : deactivate sound on this version
-boolean activateSound = false;
+// KNOWN ISSUE : Sound not working on OSX 10.11 : deactivate sound on this version
+boolean activateSound = true;
 
 // [Video]
 Movie bgVideo;
@@ -81,16 +97,14 @@ void setup() {
 
   // Create the canvas that will be used to send the syphon output
   canvas = createGraphics(width, height, P2D);
-
-  // Allow the frame to be resized
-  if (surface != null) {
-    surface.setResizable(true);
-  }
+  
+  manualSceneX = width;
+  manualSceneY = height;
 
   // Create the Augmenta receiver
   auReceiver= new AugmentaP5(this, oscPort);
   auReceiver.setTimeOut(30);
-  
+  auReceiver.setGraphicsTarget(canvas);
   // You can hardcode the interactive area if you need to
   //auReceiver.interactiveArea.set(0.25f, 0.25f, 0.5f, 0.5f);
 
@@ -99,8 +113,14 @@ void setup() {
     server = new SyphonServer(this, "Processing Syphon");
   }
   
+  // New GUI instance
+  cp5 = new ControlP5(this);
+  
   // Set the UI
   setUI();
+  
+  // Load the settings
+  loadSettings("settings");
   
   // [Sprites]
   // Load an image (.png/.jpg/.tga/.gif)
@@ -122,11 +142,6 @@ void setup() {
   // [Audioreaction]
   // UI
   if(activateSound){
-    gainSlider = new GCustomSlider(this, 10, 55, 170, 50, "blue18px");
-    gainSlider.setShowDecor(false, false, false, false);
-    gainSlider.setNumberFormat(G4P.DECIMAL, 3);
-    gainSlider.setLimits(0.5f, 0f, 100.0f);
-    gainSlider.setShowValue(false); 
     // Get the microphone input
     //minim = new Minim(this); Warning ! Uncomment this line if you haven't already created an instance of Minim
     mic = minim.getLineIn(Minim.STEREO, 512);
@@ -154,7 +169,7 @@ void setup() {
 void draw() {
 
   // Adjust the scene size
-  //adjustSceneSize();
+  adjustSceneSize();
   // Draw a background for the window
   background(0);
   // Begin drawing the canvas
@@ -174,28 +189,33 @@ void draw() {
   // [Audioreaction]
   // Compute the current audio volume
   if(activateSound){
-    gain = gainSlider.getValueF();
+    gain = gainSliderValue;
     volume = (mic.left.level()+mic.right.level())*gain/2;
     if (volume >1){
       cappedVolume = 1;
     } else {
       cappedVolume = volume;
     }
+    
     // Display the VUmeter
     if (guiIsVisible){
       canvas.noStroke();
       // Draw the debug rectangle symbolizing the volume
+      int xp = 30;
+      int yp = 150;
+      int sliderWidth = 150;
       if (volume > 1){
         fill(255,0,0);
-        rect(gainSlider.getX()+3, gainSlider.getY()+30, gainSlider.getWidth()-6, 5);
+        rect(xp, yp, sliderWidth, 5);
       } else if (volume > 0.8){
         fill(255,128,0); 
-        rect(gainSlider.getX()+3, gainSlider.getY()+30, (gainSlider.getWidth())*volume, 5);
+        rect(xp, yp, sliderWidth*volume, 5);
       } else {
         fill(0,255,0); 
-        rect(gainSlider.getX()+3, gainSlider.getY()+30, (gainSlider.getWidth())*volume, 5);
+        rect(xp, yp, sliderWidth*volume, 5);
       }
     }
+    
   }
 
   // Draw a line between all the blobs
@@ -267,6 +287,12 @@ void draw() {
   
 }
 
+// [Video]
+// Called every time a new frame is available to read
+void movieEvent(Movie m) {
+  m.read();
+}
+
 void personEntered (AugmentaPerson p) {
   //println("Person entered : "+ p.id + "at ("+p.centroid.x+","+p.centroid.y+")");
   
@@ -297,22 +323,6 @@ void personEnteredTrigger(int id, Trigger t){
 // DO NOT REMOVE unless you remove the trigger classes
 void personLeftTrigger(int id, Trigger t){
   //println("The person with id '"+id+"' left a trigger");
-}
-
-void keyPressed() {
-
-  // Show/Hide Gui
-  if (key == 'h') {
-    guiIsVisible = !guiIsVisible;
-    showGUI(guiIsVisible);
-  } else if (key == 'd') {
-    // Show/hide the debug info
-    debug = !debug;
-  }   else if (key == ENTER || key == RETURN){
-    if(portInput.hasFocus() == true) {
-      handlePortInputButton();
-    }
-  }
 }
 
 // Used to set the interactive area
@@ -348,101 +358,62 @@ void mouseDragged(){
   }
 }
 
-public void handleButtonEvents(GButton button, GEvent event) { 
-  if (button == portInputButton) {
-    handlePortInputButton();
-  }
-}
-public void handleToggleControlEvents(GToggleControl box, GEvent event) {
-  if (box == autoSceneSize) {
-    handleAutoSceneSizeCheckbox();
-  }
-} 
-
-public void handleAutoSceneSizeCheckbox() {  
-  if (autoSceneSize.isSelected()) {
-    sceneSizeInfo.setVisible(true);
-    sceneX.setVisible(false);
-    sceneY.setVisible(false);
-  } else {
-    sceneSizeInfo.setVisible(false);
-    sceneX.setVisible(true);
-    sceneY.setVisible(true);
-    sceneX.setText(""+width);
-    sceneY.setText(""+height);
-  }
-}
-
-public void handlePortInputButton() {
-
-  if (Integer.parseInt(portInput.getText()) != oscPort) {
-    println("input :"+portInput.getText());
-    oscPort = Integer.parseInt(portInput.getText());
-    auReceiver.unbind();
-    auReceiver=null;
-    auReceiver= new AugmentaP5(this, oscPort);
+void keyPressed(){
+  if (key == 'h') {
+    // Show/Hide Gui
+    guiIsVisible=!guiIsVisible;
+    showGUI(guiIsVisible);
+  } else if (key == 'd') {
+    // Show/hide the debug info
+    debug=!debug;
+    println("debug : "+debug);
+  } else if (keyCode == TAB){
+    // Go to next textfield when typing in sceneX
+    if (sceneX.isFocus()){
+       sceneX.setFocus(false);
+       sceneY.setFocus(true);
+    }
+  } else if(key == 's'){
+   saveSettings("settings"); 
+  } else if(key == 'l'){
+   loadSettings("settings"); 
+  } else if (key == 'i'){
+   changeTuio(false); 
   }
 }
 
 void showGUI(boolean val) {
-  // Show or hide the GUI after the Syphon output
-  portInput.setVisible(val); 
-  portInputButton.setVisible(val);
-  gainSlider.setVisible(val);
-
+  // Show or hide the GUI (always after the Syphon output)
   autoSceneSize.setVisible(val);
-  if (autoSceneSize.isSelected()) {
+  autoSizeLabel.setVisible(val);
+  if (autoSceneSize.getBooleanValue()) {
     sceneSizeInfo.setVisible(val);
   } else {
     sceneX.setVisible(val);
     sceneY.setVisible(val);
   }
+  
+  portInput.setVisible(val);
+  portInputLabel.setVisible(val);
+  
+  tuioToggle.setVisible(val);
+  tuioLabel.setVisible(val);
 }
 
-// [Video]
-// Called every time a new frame is available to read
-void movieEvent(Movie m) {
-  m.read();
-}
-
-void setUI(){
-  // Set the UI
-  /*
-  autoSceneSize = new GCheckbox(this, 10, 10, 110, 20, "Auto scene size");
-  autoSceneSize.setOpaque(true);
-  sceneSizeInfo = new GLabel(this, 125, 10, 70, 20);
-  sceneSizeInfo.setOpaque(true);
-  sceneSizeInfo.setVisible(false);
-  sceneX = new GTextField(this, 125, 10, 35, 20);
-  sceneX.setText(""+width);
-  sceneY = new GTextField(this, 161, 10, 35, 20);
-  sceneY.setText(""+height);
-  portInput = new GTextField(this, 10, 40, 60, 20);
-  portInputButton = new GButton(this, 70, 40, 110, 20, "Change Osc Port");
-  portInput.setText(""+oscPort);
-  G4P.registerSketch(this);
-  */
-}
-/*
 void adjustSceneSize() {
+  // Called each frame, adjust the scene size depending on various parameters
   int sh = 0;
   int sw = 0;
-  if (autoSceneSize.isSelected()) {
+  if (autoSceneSize.getBooleanValue()) {
     int[] sceneSize = auReceiver.getSceneSize();
     sw = sceneSize[0];
     sh = sceneSize[1];
   } else {
-    try {
-      sw = Integer.parseInt(sceneX.getText());
-      sh = Integer.parseInt(sceneY.getText());
-    }
-    catch(NumberFormatException e) {
-      println("The values entered for the screen size are not ints ! "+e);
-    }
+      sw = manualSceneX;
+      sh = manualSceneY;
   }
-  if ( (canvas.width!=sw || canvas.height!=sh) && sw>100 && sh>100) {
+  if ( (canvas.width!=sw || canvas.height!=sh) && sw>=100 && sh>=100 && sw<=16000 && sh <=16000 ) {
     // Create the output canvas with the correct size
-    println("adjust");
     canvas = createGraphics(sw, sh);
     float ratio = (float)sw/(float)sh;
     if (sw >= displayWidth*0.9f || sh >= displayHeight*0.9f) {
@@ -455,10 +426,172 @@ void adjustSceneSize() {
         sw = (int)(sh*ratio);
       }
     }
-    surface.setSize(sw+frame.getInsets().left+frame.getInsets().right, sh+frame.getInsets().top+frame.getInsets().bottom);
+    surface.setSize(sw, sh);
+    auReceiver.setGraphicsTarget(canvas);
+  } else if (sw <100 || sh <100 || sw > 16000 || sh > 16000) {
+     println("ERROR : cannot set a window size smaller than 100 or greater than 16000"); 
   }
-  
   // Update the UI text field
-  sceneSizeInfo.setText(canvas.width+"x"+canvas.height, GAlign.MIDDLE, GAlign.MIDDLE);
+  sceneSizeInfo.setText(canvas.width+"x"+canvas.height);
 }
-*/
+
+// --------------------------------------
+// Set the GUI
+// --------------------------------------
+void setUI() {
+  
+  //Auto scene size + manual scene size
+  autoSceneSize = cp5.addToggle("changeAutoSceneSize")
+     .setPosition(10, 10)
+     .setSize(20, 20)
+     .setLabel("")
+     .setValue(false)
+     ;
+  autoSizeLabel = cp5.addTextlabel("labelAutoSceneSize")
+      .setText("Auto scene size")
+      .setPosition(30, 16)
+      ;
+  sceneX = cp5.addTextfield("changeSceneWidth")
+     .setPosition(110,10)
+     .setSize(30,20)
+     .setAutoClear(false)
+     .setCaptionLabel("")
+     .setInputFilter(ControlP5.INTEGER);
+     ;
+     
+  sceneX.setText(""+width);
+  sceneY = cp5.addTextfield("changeSceneHeight")
+     .setPosition(140,10)
+     .setSize(30,20)
+     .setAutoClear(false)
+     .setCaptionLabel("")
+     .setInputFilter(ControlP5.INTEGER);
+     ;
+  sceneY.setText(""+height);
+  sceneSizeInfo = cp5.addTextlabel("label")
+                    .setText("500x500")
+                    .setPosition(110,16)
+                    ;
+  sceneSizeInfo.setVisible(false);
+  
+  // Port input OSC
+  portInput = cp5.addTextfield("changeInputPort")
+     .setPosition(10,40)
+     .setSize(40,20)
+     .setAutoClear(false)
+     .setCaptionLabel("")
+     .setInputFilter(ControlP5.INTEGER);
+     ;
+  portInput.setText(""+oscPort);
+  portInputLabel = cp5.addTextlabel("labeloscport")
+      .setText("OSC input port")
+      .setPosition(55, 46)
+      ;
+      
+  // TUIO toggle
+  tuioToggle = cp5.addToggle("changeTuio")
+     .setPosition(10, 70)
+     .setSize(20, 20)
+     .setLabel("")
+     .setValue(false)
+     ;
+  tuioLabel = cp5.addTextlabel("labelTuioToggle")
+      .setText("TUIO mode")
+      .setPosition(30, 76)
+      ;
+      
+  // Gain slider for [AudioReaction]
+  cp5.addSlider("gainSLider")
+     .setPosition(10,100)
+     .setSize(150, 15)
+     .setLabel("")
+     .setRange(0,1)
+     ;
+}
+// --------------------------------------
+
+
+// --------------------------------------
+// GUI change handlers
+// --------------------------------------
+void changeSceneWidth(String s){
+  updateManualSize();
+}
+void changeSceneHeight(String s){
+  updateManualSize(); 
+}
+void updateManualSize(){
+  try{
+   manualSceneX = Integer.parseInt(sceneX.getText());
+   manualSceneY = Integer.parseInt(sceneY.getText()); 
+  } catch(Exception e){
+    return;
+  }
+}
+void changeAutoSceneSize(boolean b) {
+  if(sceneSizeInfo != null && sceneX != null && sceneY != null){
+    if (b) {
+      sceneSizeInfo.setVisible(true);
+      sceneX.setVisible(false);
+      sceneY.setVisible(false);
+    } else {
+      sceneSizeInfo.setVisible(false);
+      sceneX.setVisible(true);
+      sceneY.setVisible(true);
+    }
+  }
+}
+public void changeInputPort(String s) {
+  try{
+    oscPort = Integer.parseInt(s);
+  } catch(Exception e){
+    return;
+  }
+  reconnectReceiver();
+}
+public void changeTuio(boolean b) {
+  tuio = b;
+  reconnectReceiver();
+}
+public void reconnectReceiver(){
+  if(tuioToggle != null && portInput != null && auReceiver != null){ // Sanity check
+    auReceiver.reconnect(oscPort, tuio);
+  }
+}
+// --------------------------------------
+
+
+// --------------------------------------
+// Save / Load
+// --------------------------------------
+void saveSettings(String file){
+  println("Saving to : "+file);
+  cp5.saveProperties(file);
+}
+
+void loadSettings(String file){
+  println("Loading from : "+file);
+  cp5.loadProperties(file);
+  // After load force the textfields callbacks
+  List<Textfield> list = cp5.getAll(Textfield.class);
+  for(Textfield b:list) {
+    b.submit();
+  }
+}
+// --------------------------------------
+
+
+// --------------------------------------
+// Exit function (This way of handling the exit of the app works everywhere except in the editor)
+// --------------------------------------
+void exit(){
+  // Save the settings on exit
+  saveSettings("settings");
+  
+  // Add custom code here
+  // ...
+  
+  // Finish by forwarding the exit call
+  super.exit();
+}
+// ---------------------
