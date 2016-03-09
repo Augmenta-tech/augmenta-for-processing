@@ -88,13 +88,11 @@ Sketch -> Import Library... -> Add Library -> ControlP5
 Documentation
 -------------
 
-Protocol is described here : https://github.com/Theoriz/Augmenta/wiki
-
-Documentation can be found in the reference folder
+Data protocol is here : https://github.com/Theoriz/Augmenta/wiki
 
 Here is a presentation explaining how to use the API
 
-http://fr.slideshare.net/theoriz/augmentap5-api
+http://fr.slideshare.net/DavidAlexandreCHANEL/augmentap5-api-59334230
 
 Contribute
 ----------
