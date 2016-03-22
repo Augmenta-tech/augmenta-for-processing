@@ -1,4 +1,4 @@
-Augmenta for Processing
+﻿Augmenta for Processing
 =======================
 
 A [Processing][] Augmenta helper library and examples maintained by [Théoriz studio][]
@@ -62,15 +62,33 @@ Receive and draw Augmenta data without any other library
 
 ### 2D and 3D examples
 
-Examples for receiving and drawing Augmenta data including a Syphon output (Mac only) and a basic UI
+Examples for receiving and drawing Augmenta data including a Syphon/Spout output (Mac/Windows only) and a basic UI
 
-Install the needed libraries first :
+Install the available libraries first :
 
 ```
 Sketch -> Import Library... -> Add Library -> Syphon by Andres Colubri
 Sketch -> Import Library... -> Add Library -> ControlP5
 Sketch -> Import Library... -> Add Library -> PeasyCam by Jonathan Feinberg (for the 3D example only)
 ```
+
+Then get the Spout library from here
+
+https://github.com/leadedge/SpoutProcessing/archive/master.zip (and rename to spout)
+
+or
+
+```
+git clone https://github.com/leadedge/SpoutProcessing.git
+```
+
+in the following directory
+
+- Mac OSX : /Users/Username/Documents/Processing/libraries
+- Windows : C:/My Documents/Processing/libraries
+- Linux   : /home/Username/sketchbook/libraries
+
+You should now have a folder named *spout* in this directory.
 
 ### Assets
 
