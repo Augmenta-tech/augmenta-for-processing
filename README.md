@@ -6,12 +6,10 @@ A [Processing][] Augmenta helper library and examples maintained by [Théoriz st
 Install
 -------
 
-Open [Processing][] and install the OscP5, Syphon and ControlP5 libraries
+Open [Processing][] and install the OscP5 library
 
 ```
 Sketch -> Import Library... -> Add Library -> OscP5
-Sketch -> Import Library... -> Add Library -> Syphon
-Sketch -> Import Library... -> Add Library -> ControlP5
 ```
 
 Then get AugmentaP5 library from here
