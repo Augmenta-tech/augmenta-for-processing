@@ -1,4 +1,5 @@
 import augmentaP5.*;
+import TUIO.*; // Needed for augmenta
 import oscP5.*;
 
 // Declare the Augmenta Receiver
