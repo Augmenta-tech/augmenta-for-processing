@@ -6,10 +6,12 @@ A [Processing][] Augmenta helper library and examples maintained by [Théoriz st
 Install
 -------
 
-Open [Processing][] and install the OscP5 library
+Open [Processing][] and install the OscP5, Syphon and ControlP5 libraries
 
 ```
-Sketch -> Import Library... -> Add Library -> OscP5 by Andreas Schlegel
+Sketch -> Import Library... -> Add Library -> OscP5
+Sketch -> Import Library... -> Add Library -> Syphon
+Sketch -> Import Library... -> Add Library -> ControlP5
 ```
 
 Then get AugmentaP5 library from here
@@ -31,6 +33,7 @@ in the following directory
 You should now have a folder named *AugmentaP5* in this directory.
 
 Do the same for the TUIO library downloadable here :
+
 http://prdownloads.sourceforge.net/reactivision/TUIO11_Processing-1.1.5.zip?download
 
 Then restart [Processing][]
