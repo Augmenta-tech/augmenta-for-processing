@@ -30,6 +30,9 @@ in the following directory
 
 You should now have a folder named *AugmentaP5* in this directory.
 
+Do the same for the TUIO library downloadable here :
+http://prdownloads.sourceforge.net/reactivision/TUIO11_Processing-1.1.5.zip?download
+
 Then restart [Processing][]
 
 Use
