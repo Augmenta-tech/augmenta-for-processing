@@ -22,6 +22,7 @@ public class CircleTrigger extends Trigger{
 
   @Override
   public void draw(){
+    canvas = app.canvas;
     canvas.strokeWeight(2); 
     canvas.stroke(255);
     if ( peopleInside.size() > 0){
@@ -34,6 +35,6 @@ public class CircleTrigger extends Trigger{
   
   @Override
   public Boolean pointIsInside(PVector p){
-    return (dist(p.x*width, p.y*height, pos.x, pos.y) < radius);
+    return (dist(p.x*canvas.width, p.y*canvas.height, pos.x, pos.y) < radius);
   }
 }
