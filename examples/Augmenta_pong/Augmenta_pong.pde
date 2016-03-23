@@ -55,7 +55,18 @@ boolean debug=false;
 PVector ballPos, p1Pos, p2Pos, initDir, dir;
 int pWidth, pHeight;
 
-void settings(){
+void initGame(PGraphics canvas) {
+
+  ballPos = new PVector(canvas.width/2, canvas.height/2);
+  initDir = new PVector(7,4);
+  dir = initDir;
+  p1Pos = new PVector(30, -100);
+  p2Pos = new PVector(canvas.width-30, -100);
+  pWidth = 20;
+  pHeight = 100;
+}
+
+void settings() {
   // Set the initial frame size
   size(640, 400, P2D);
   PJOGL.profile=1; // Force OpenGL2 mode for Syphobn compatibility
@@ -90,14 +101,7 @@ void setup() {
   // Load the settings
   loadSettings("settings");
   
-  // PONG
-  ballPos = new PVector(width/2, height/2);
-  initDir = new PVector(7,4);
-  dir = initDir;
-  p1Pos = new PVector(30, -100);
-  p2Pos = new PVector(width-30, -100);
-  pWidth = 20;
-  pHeight = 100;
+  initGame(canvas);
   
 }
 
@@ -270,6 +274,10 @@ void adjustSceneSize() {
     }
     surface.setSize(sw+frame.getInsets().left+frame.getInsets().right, sh+frame.getInsets().top+frame.getInsets().bottom);
     auReceiver.setGraphicsTarget(canvas);
+    
+    // Adjust Pong vars
+    initGame(canvas);    
+    
   } else if (sw <100 || sh <100 || sw > 16000 || sh > 16000) {
      println("ERROR : cannot set a window size smaller than 100 or greater than 16000"); 
   }
