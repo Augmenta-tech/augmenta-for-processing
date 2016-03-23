@@ -266,7 +266,7 @@ void adjustSceneSize() {
   }
   if ( (canvas.width!=sw || canvas.height!=sh) && sw>=minSize && sh>=minSize && sw<=16000 && sh <=16000 ) {
     // Create the output canvas with the correct size
-    canvas = createGraphics(sw, sh);
+    canvas = createGraphics(sw, sh, P2D);
     float ratio = (float)sw/(float)sh;
     if (sw >= displayWidth*0.9f || sh >= displayHeight*0.9f) {
       // Resize the window to fit in the screen with the correct ratio
