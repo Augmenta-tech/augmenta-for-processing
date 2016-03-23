@@ -105,7 +105,7 @@ http://fr.slideshare.net/DavidAlexandreCHANEL/augmentap5-api-59334230
 Contribute
 ----------
 
-Check [TODO](TODO.md) and [TOFIX](TOFIX.md), then get [Eclipse][] to modify this library.
+Fork and submit pull requests. Get [Eclipse][] to modify the library.
 
 Instructions are here : [https://github.com/processing/processing-library-template](https://github.com/processing/processing-library-template)
 
