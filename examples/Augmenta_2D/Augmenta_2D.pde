@@ -13,7 +13,8 @@
 import oscP5.*; // needed for augmenta
 import TUIO.*; // Needed for augmenta
 import augmentaP5.*; // Augmenta
-import codeanticode.syphon.*; // Syphon
+import codeanticode.syphon.*; // Syphon (mac)
+import spout.*; // Spout (windows)
 import java.util.List; // Needed for the GUI implementation
 import controlP5.*; // GUI
 
@@ -25,7 +26,9 @@ int oscPort = 12000;
 boolean tuio = false;
 
 // Declare the syphon server
-SyphonServer server;
+SyphonServer syphon_server;
+Spout spout_server;
+boolean sendTexture = true;
 // Graphics that will hold the syphon/spout texture to send
 PGraphics canvas;
 
@@ -47,6 +50,7 @@ Textlabel tuioLabel;
 // Save manual scene size info
 int manualSceneX;
 int manualSceneY;
+int minSize = 300;
 
 // Declare a debug mode bool
 boolean debug=false;
@@ -72,9 +76,24 @@ void setup() {
   // You can hardcode the interactive area if you need to
   //auReceiver.interactiveArea.set(0.25f, 0.25f, 0.5f, 0.5f);
 
-  // Create a syphon server to send frames out.
-  if (platform == MACOSX) {
-    server = new SyphonServer(this, "Processing Syphon");
+  if(sendTexture){
+    // Create a syphon server to send frames out.
+    if (platform == MACOSX) {
+      try{
+        syphon_server = new SyphonServer(this, "Processing Syphon");
+      } catch (Exception e){
+        println("Creating the syphon server failed, deactivating the output"); 
+        sendTexture = false;
+      }
+    } else if (platform == WINDOWS){
+      try{
+        spout_server = new Spout(this);
+        spout_server.createSender("Processing Spout", width, height);
+      } catch (Exception e){
+        println("Creating the spout server failed, deactivating the output"); 
+        sendTexture = false;
+      }
+    }
   }
   
   // New GUI instance
@@ -108,7 +127,7 @@ void draw() {
   
   // Draw a blue circle for everyone :
   // Get the person data
-  AugmentaPerson[] people = auReceiver.getPeopleArray();
+  AugmentaPerson[] people = auReceiver.getPeopleArray(); //<>//
   // For each person we will...
   for (int i=0; i<people.length; i++) {
     //...get the position...
@@ -135,9 +154,13 @@ void draw() {
   // Draw the augmenta canvas in the window
   image(canvas, 0, 0, width, height);
   
-  // Syphon output
-  if (platform == MACOSX) {
-    server.sendImage(canvas);
+  if(sendTexture){
+    // Syphon output
+    if (platform == MACOSX) {
+      syphon_server.sendImage(canvas);
+    } else if (platform == WINDOWS){
+      spout_server.sendTexture(canvas); // Sends at the size of the window 
+    }
   }
 
 }
@@ -241,7 +264,7 @@ void adjustSceneSize() {
       sw = manualSceneX;
       sh = manualSceneY;
   }
-  if ( (canvas.width!=sw || canvas.height!=sh) && sw>=100 && sh>=100 && sw<=16000 && sh <=16000 ) {
+  if ( (canvas.width!=sw || canvas.height!=sh) && sw>=minSize && sh>=minSize && sw<=16000 && sh <=16000 ) {
     // Create the output canvas with the correct size
     canvas = createGraphics(sw, sh);
     float ratio = (float)sw/(float)sh;
@@ -257,8 +280,9 @@ void adjustSceneSize() {
     }
     surface.setSize(sw, sh);
     auReceiver.setGraphicsTarget(canvas);
-  } else if (sw <100 || sh <100 || sw > 16000 || sh > 16000) {
-     println("ERROR : cannot set a window size smaller than 100 or greater than 16000"); 
+
+  } else if (sw <minSize || sh <minSize || sw > 16000 || sh > 16000) {
+     println("ERROR : cannot set a window size smaller than minSize or greater than 16000"); 
   }
   // Update the UI text field
   sceneSizeInfo.setText(canvas.width+"x"+canvas.height);

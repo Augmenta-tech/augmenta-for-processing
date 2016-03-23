@@ -44,3 +44,5 @@ application.windows32
 application.windows64
 application.macosx
 
+examples/Augmenta_2D/settings.json
+*.json

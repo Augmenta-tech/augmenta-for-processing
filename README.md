@@ -1,4 +1,4 @@
-Augmenta for Processing
+﻿Augmenta for Processing
 =======================
 
 A [Processing][] Augmenta helper library and examples maintained by [Théoriz studio][]
@@ -9,7 +9,7 @@ Install
 Open [Processing][] and install the OscP5 library
 
 ```
-Sketch -> Import Library... -> Add Library -> OscP5 by Andreas Schlegel
+Sketch -> Import Library... -> Add Library -> OscP5
 ```
 
 Then get AugmentaP5 library from here
@@ -29,6 +29,10 @@ in the following directory
 - Linux   : /home/Username/sketchbook/libraries
 
 You should now have a folder named *AugmentaP5* in this directory.
+
+Do the same for the TUIO library downloadable here :
+
+http://prdownloads.sourceforge.net/reactivision/TUIO11_Processing-1.1.5.zip?download
 
 Then restart [Processing][]
 
@@ -58,15 +62,21 @@ Receive and draw Augmenta data without any other library
 
 ### 2D and 3D examples
 
-Examples for receiving and drawing Augmenta data including a Syphon output (Mac only) and a basic UI
+Examples for receiving and drawing Augmenta data including a Syphon/Spout output (Mac/Windows only) and a basic UI
 
-Install the needed libraries first :
+Install the available libraries first :
 
 ```
 Sketch -> Import Library... -> Add Library -> Syphon by Andres Colubri
 Sketch -> Import Library... -> Add Library -> ControlP5
 Sketch -> Import Library... -> Add Library -> PeasyCam by Jonathan Feinberg (for the 3D example only)
 ```
+
+Then get the Spout library from here (find the latest release and download spout.zip)
+
+https://github.com/leadedge/SpoutProcessing/releases 
+
+You should now have a folder named *spout* in this directory.
 
 ### Assets
 
@@ -88,13 +98,11 @@ Sketch -> Import Library... -> Add Library -> ControlP5
 Documentation
 -------------
 
-Protocol is described here : https://github.com/Theoriz/Augmenta/wiki
-
-Documentation can be found in the reference folder
+Data protocol is here : https://github.com/Theoriz/Augmenta/wiki
 
 Here is a presentation explaining how to use the API
 
-http://fr.slideshare.net/theoriz/augmentap5-api
+http://fr.slideshare.net/DavidAlexandreCHANEL/augmentap5-api-59334230
 
 Contribute
 ----------

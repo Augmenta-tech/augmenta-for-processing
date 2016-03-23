@@ -16,6 +16,7 @@ public class PolygonTrigger extends Trigger{
 
   @Override
   public void draw(){
+    canvas = app.canvas;
     canvas.strokeWeight(2); 
     canvas.stroke(255);
     if ( peopleInside.size() > 0){
@@ -36,8 +37,8 @@ public class PolygonTrigger extends Trigger{
     int j;
     boolean result = false;
     for (i = 0, j = points.length - 1; i < points.length; j = i++) {
-      if ((points[i].y > p.y*height) != (points[j].y > p.y*height) &&
-          (p.x*width < (points[j].x - points[i].x) * (p.y*height - points[i].y) / (points[j].y-points[i].y) + points[i].x)) {
+      if ((points[i].y > p.y*canvas.height) != (points[j].y > p.y*canvas.height) &&
+          (p.x*canvas.width < (points[j].x - points[i].x) * (p.y*canvas.height - points[i].y) / (points[j].y-points[i].y) + points[i].x)) {
         result = !result;
        }
     }
