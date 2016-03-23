@@ -73,9 +73,8 @@ Sketch -> Import Library... -> Add Library -> PeasyCam by Jonathan Feinberg (for
 ```
 
 **Spout** library :  [https://github.com/leadedge/SpoutProcessing/releases](https://github.com/leadedge/SpoutProcessing/releases 
-) (Be careful to download the latest version ! >= 2.0.5.2)
-
-You must rename the folder to spout in the lib directory.
+)
+Be careful to download the latest version ! >= 2.0.5.2 and to rename the folder to spout in the lib directory.
 
 ### Assets
 
