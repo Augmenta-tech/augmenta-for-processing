@@ -72,10 +72,10 @@ Sketch -> Import Library... -> Add Library -> ControlP5
 Sketch -> Import Library... -> Add Library -> PeasyCam by Jonathan Feinberg (for the 3D example only)
 ```
 
-*Spout* library :  [https://github.com/leadedge/SpoutProcessing/releases](https://github.com/leadedge/SpoutProcessing/releases 
-) (Be careful to download the latest version ! 5.0.2)
+**Spout** library :  [https://github.com/leadedge/SpoutProcessing/releases](https://github.com/leadedge/SpoutProcessing/releases 
+) (Be careful to download the latest version ! >= 5.0.2)
 
-You must rename the folder to *spout* in the lib directory.
+You must rename the folder to spout in the lib directory.
 
 ### Assets
 
