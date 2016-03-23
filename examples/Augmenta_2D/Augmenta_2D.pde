@@ -28,7 +28,6 @@ boolean tuio = false;
 // Declare the syphon server
 SyphonServer syphon_server;
 Spout spout_server;
-boolean sendTexture = true;
 // Graphics that will hold the syphon/spout texture to send
 PGraphics canvas;
 
@@ -76,24 +75,12 @@ void setup() {
   // You can hardcode the interactive area if you need to
   //auReceiver.interactiveArea.set(0.25f, 0.25f, 0.5f, 0.5f);
 
-  if(sendTexture){
-    // Create a syphon server to send frames out.
-    if (platform == MACOSX) {
-      try{
-        syphon_server = new SyphonServer(this, "Processing Syphon");
-      } catch (Exception e){
-        println("Creating the syphon server failed, deactivating the output"); 
-        sendTexture = false;
-      }
-    } else if (platform == WINDOWS){
-      try{
-        spout_server = new Spout(this);
-        spout_server.createSender("Processing Spout", width, height);
-      } catch (Exception e){
-        println("Creating the spout server failed, deactivating the output"); 
-        sendTexture = false;
-      }
-    }
+  // Create a syphon server to send frames out.
+  if (platform == MACOSX) {
+    syphon_server = new SyphonServer(this, "Processing Syphon");
+  } else if (platform == WINDOWS){
+    spout_server = new Spout(this);
+    spout_server.createSender("Processing Spout", width, height);
   }
   
   // New GUI instance
@@ -154,13 +141,11 @@ void draw() {
   // Draw the augmenta canvas in the window
   image(canvas, 0, 0, width, height);
   
-  if(sendTexture){
-    // Syphon output
-    if (platform == MACOSX) {
-      syphon_server.sendImage(canvas);
-    } else if (platform == WINDOWS){
-      spout_server.sendTexture(canvas); // Sends at the size of the window 
-    }
+  // Syphon output
+  if (platform == MACOSX) {
+    syphon_server.sendImage(canvas);
+  } else if (platform == WINDOWS){
+    spout_server.sendTexture(canvas); // Sends at the size of the window 
   }
 
 }
