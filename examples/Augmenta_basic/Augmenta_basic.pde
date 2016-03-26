@@ -24,7 +24,7 @@ void draw() {
   // For each person...
   for (int i=0; i<people.length; i++) {
     
-    // ... get its coordinates
+    // ... get its position
     PVector pos = people[i].centroid;
     
     // ... and draw a disk
