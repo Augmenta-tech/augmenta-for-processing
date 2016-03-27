@@ -44,12 +44,6 @@ float gain;
 boolean activateSound = true;
 // [Video]
 Movie bgVideo;
-// [Triggers]
-CircleTrigger ct;
-RectangleTrigger rt;
-PolygonTrigger pt;
-
-
 
 void setup() {
 
@@ -84,22 +78,7 @@ void setup() {
     gain=1;
     // The capped volume is the same as the volume but limited to a max value of 1
     cappedVolume=0;
-  }
-  
-  // [Triggers]
-  ct = new CircleTrigger(width/2, height/2, 50, this);
-  rt = new RectangleTrigger(width/2, height/4, width, 0.75f*height, this);
-  PVector[] points = new PVector[8];
-  points[0]= new PVector(0,0);
-  points[1]= new PVector(300,0);
-  points[2]= new PVector(320,150);
-  points[3]= new PVector(140,160);
-  points[4]= new PVector(200,40);
-  points[5]= new PVector(100,40);
-  points[6]= new PVector(120,150);
-  points[7]= new PVector(0,140);
-  pt = new PolygonTrigger(points, this);
-
+  }  
 }
 
 void draw() {
@@ -188,17 +167,6 @@ void draw() {
       canvas.ellipse(pos.x*canvas.width, pos.y*canvas.height, 20, 20); // 20 pixels in diameter
     }
   }
-    
-  // [Triggers]
-  ct.update(people);
-  rt.update(people);
-  pt.update(people);
-  
-  if (drawDebugData){  
-    ct.draw(); 
-    rt.draw();
-    pt.draw();
-  }
 
   drawAugmenta();
 
@@ -240,18 +208,4 @@ void personUpdated (AugmentaPerson p) {
 
 void personLeft (AugmentaPerson p) {
   //println("Person left : "+ p.id + " at ("+p.centroid.x+","+p.centroid.y+")");
-}
-
-// DO NOT REMOVE unless you remove the trigger classes
-void personEnteredTrigger(int id, Trigger t){
-  //println("The person with id '"+id+"' entered a trigger"); 
-  // How to test which object has been triggered :
-  if (t == ct){
-    //println("It's the circle trigger");
-  }
-}
-
-// DO NOT REMOVE unless you remove the trigger classes
-void personLeftTrigger(int id, Trigger t){
-  //println("The person with id '"+id+"' left a trigger");
 }
