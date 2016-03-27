@@ -15,6 +15,8 @@ import augmentaP5.*;
 import TUIO.*;
 import oscP5.*;
 
+boolean mode3D = false;
+
 void setup() {
 
   setupAugmenta();
@@ -26,7 +28,7 @@ void setup() {
 
 void draw() {
 
-  updateAugmenta();
+  adjustSceneSize();
   background(0);
   
   // All visuals to send must be drawn in this canvas
