@@ -158,6 +158,11 @@ boolean adjustSceneSize() {
     
     if(newWidth == canvas.width && newHeight == canvas.height) {
       
+      // If we were in Auto with default size we need to update
+      if(sceneSizeInfo.get().getText() == "0 x 0")
+      {
+        sceneSizeInfo.setText(newWidth + " x " + newHeight);
+      }
       // Same size than current size, do nothing
       hasChanged = false;
       
@@ -169,8 +174,12 @@ boolean adjustSceneSize() {
       
     } else if(newWidth != canvas.width || newHeight != canvas.height) {
       
-      // New size from Augmenta
-      return changeSize(newWidth,newHeight);
+      // New size or same size newly received from Augmenta
+      hasChanged = changeSize(newWidth,newHeight);
+      // Update text only if it did change (prevent displaying wrong values)
+      if(hasChanged) {
+        sceneSizeInfo.setText(newWidth + " x " + newHeight);
+      }
     }
   }
   
