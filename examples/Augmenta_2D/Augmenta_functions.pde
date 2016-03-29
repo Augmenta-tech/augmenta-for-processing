@@ -23,9 +23,8 @@ Toggle tuioToggle;
 Textlabel tuioLabel;
 
 // Manual scene size info
-int manualSceneX;
-int manualSceneY;
-int minSize = 300;
+int manualSceneX = 640; // default
+int manualSceneY = 480; // default
 
 // Used to set the interactive area
 // click and drag to set a custom area, right click to set it to default (full scene)
@@ -39,13 +38,11 @@ boolean drawDebugData = false;
 
 void settings(){
   if(mode3D) {
-    size(640, 480, P3D);
+    size(manualSceneX, manualSceneY, P3D);
   } else {
-    size(640, 480, P2D);
+    size(manualSceneX, manualSceneY, P2D);
   }
   
-  manualSceneX = width;
-  manualSceneY = height;
   PJOGL.profile=1; // Force OpenGL2 mode for Syphon compatibility
 }
 
@@ -105,51 +102,77 @@ void showGUI(boolean val) {
   tuioLabel.setVisible(val);
 }
 
-boolean adjustSceneSize() {
+boolean changeSize(int a_width, int a_height) {
   
-  boolean hasChanged = false;
+    boolean hasChanged = false;
+    int minSize = 200;
+    int maxSize = 16000;
   
-  // Called each frame, adjust the scene size depending on various parameters
-  int sh = 0;
-  int sw = 0;
-  if (autoSceneSize.getBooleanValue()) {
-    int[] sceneSize = auReceiver.getSceneSize();
-    sw = sceneSize[0];
-    sh = sceneSize[1];
-  } else {
-      sw = manualSceneX;
-      sh = manualSceneY;
-  }
-  if ( (canvas.width!=sw || canvas.height!=sh) && sw>=minSize && sh>=minSize && sw<=16000 && sh <=16000 ) {
-    // Create the output canvas with the correct size
-    if(mode3D) {
-      canvas = createGraphics(sw, sh, P3D);
-    } else {
-      canvas = createGraphics(sw, sh, P2D);
-    }
-  
-    float ratio = (float)sw/(float)sh;
-    if (sw >= displayWidth*0.9f || sh >= displayHeight*0.9f) {
-      // Resize the window to fit in the screen with the correct ratio
-      if ( ratio > displayWidth/displayHeight ) {
-        sw = (int)(displayWidth*0.8f);
-        sh = (int)(sw/ratio);
+   // Check that size is correct
+   if ( (canvas.width!=a_width || canvas.height!=a_height) && a_width>=minSize && a_height>=minSize && a_width<=maxSize && a_height <=maxSize ) {
+      // Create the output canvas with the correct size
+      if(mode3D) {
+        canvas = createGraphics(a_width, a_height, P3D);
       } else {
-        sh = (int)(displayHeight*0.8f);
-        sw = (int)(sh*ratio);
+        canvas = createGraphics(a_width, a_height, P2D);
       }
-    }
     
-    surface.setSize(sw, sh);
-    auReceiver.setGraphicsTarget(canvas);
-    
-    hasChanged = true;
+      // Change window size if needed
+      float ratio = (float)a_width/(float)a_height;
+      if (a_width >= displayWidth*0.9f || a_height >= displayHeight*0.9f) {
+        // Resize the window to fit in the screen with the correct ratio
+        if ( ratio > displayWidth/displayHeight ) {
+          a_width = (int)(displayWidth*0.8f);
+          a_height = (int)(a_width/ratio);
+        } else {
+          a_width = (int)(a_height*ratio);
+          a_height = (int)(displayHeight*0.8f);
+        }
+      }
+      
+      surface.setSize(a_width, a_height);
+      auReceiver.setGraphicsTarget(canvas);
+      
+      hasChanged = true;
 
-  } else if (sw <minSize || sh <minSize || sw > 16000 || sh > 16000) {
-     println("ERROR : cannot set a window size smaller than minSize or greater than 16000"); 
+  } else if (a_width < minSize || a_height < minSize || a_width > maxSize || a_height > maxSize) {
+     println("ERROR : Cannot set a window size of :" + a_width + "x" + a_height + " : smaller than " +  minSize + " or greater than " + maxSize); 
   }
-  // Update the UI text field
-  sceneSizeInfo.setText(canvas.width+" x "+canvas.height);
+  
+  return hasChanged;
+}
+
+// Called each frame, adjust the scene size depending on various parameters
+boolean adjustSceneSize() {
+   
+  boolean hasChanged = false;
+  int newWidth = 0;
+  int newHeight = 0;
+  
+  // Auto size
+  if (autoSceneSize.getBooleanValue()) {
+    
+    int[] sceneSize = auReceiver.getSceneSize();
+    newWidth = sceneSize[0];
+    newHeight = sceneSize[1];
+    
+    if(newWidth == canvas.width && newHeight == canvas.height) {
+      
+      // Same size than current size, do nothing
+      hasChanged = false;
+      
+    } else if(newWidth == 0 && newHeight == 0) {
+    
+      // No data received, display 0x0 and keep current size
+      sceneSizeInfo.setText("0 x 0");
+      hasChanged = false;
+      
+    } else if(newWidth != canvas.width || newHeight != canvas.height) {
+      
+      // New size from Augmenta
+      return changeSize(newWidth,newHeight);
+    }
+  }
   
   return hasChanged;
 }
@@ -229,7 +252,7 @@ void changeSceneWidth(String s){
   updateManualSize();
 }
 void changeSceneHeight(String s){
-  updateManualSize(); 
+  updateManualSize();
 }
 void updateManualSize(){
   try{
@@ -237,6 +260,11 @@ void updateManualSize(){
    manualSceneY = Integer.parseInt(sceneY.getText()); 
   } catch(Exception e){
     return;
+  }
+  
+  // If new size requested, change it
+  if(manualSceneX != canvas.width || manualSceneY != canvas.height) {
+    changeSize(manualSceneX,manualSceneY);
   }
 }
 void changeAutoSceneSize(boolean b) {

@@ -19,6 +19,7 @@ boolean mode3D = false;
 
 void setup() {
 
+  background(0);
   setupAugmenta();
   setupSyphonSpout();
   setupGUI();
