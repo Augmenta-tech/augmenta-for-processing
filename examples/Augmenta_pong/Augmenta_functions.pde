@@ -220,7 +220,7 @@ void setUI() {
      ;
   sceneY.setText(""+height);
   sceneSizeInfo = cp5.addTextlabel ("label")
-                    .setText("500 x 500")
+                    .setText(width+" x "+height)
                     .setPosition(96,41)
                     ;
   sceneSizeInfo.setVisible(false);
