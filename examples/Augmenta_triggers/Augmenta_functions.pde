@@ -339,10 +339,9 @@ void drawAugmenta() {
   }
 
   // Draw interactive area
-  // TMP COMMENT BECAUSE CRASH ON SOME CONDITIONS
-  /*if (drawDebugData) {
+  if (drawDebugData) {
     auReceiver.interactiveArea.draw();
-  } */ 
+  } 
 }
 
 // --------------------------------------

@@ -20,8 +20,9 @@ boolean mode3D = false;
 void setup() {
 
   background(0);
-  setupAugmenta();
+  // /!\ Keep this setup order !
   setupSyphonSpout();
+  setupAugmenta();
   setupGUI();
   
   // Add your code here

@@ -47,8 +47,9 @@ Movie bgVideo;
 
 void setup() {
 
-  setupAugmenta();
+  // /!\ Keep this setup order !
   setupSyphonSpout();
+  setupAugmenta();
   setupGUI();
   
   // [Sprites]

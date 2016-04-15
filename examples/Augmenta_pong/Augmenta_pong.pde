@@ -19,8 +19,9 @@ boolean mode3D = false;
 
 void setup() {
 
-  setupAugmenta();
+  // /!\ Keep this setup order !
   setupSyphonSpout();
+  setupAugmenta();
   setupGUI();
   setupPong(canvas);
 

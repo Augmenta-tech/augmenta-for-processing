@@ -24,8 +24,9 @@ boolean mode3D = true;
 
 void setup() {
 
-  setupAugmenta();
+  // /!\ Keep this setup order !
   setupSyphonSpout();
+  setupAugmenta();
   setupGUI();
   
   // Save the basic matrix of the scene before peasycam
