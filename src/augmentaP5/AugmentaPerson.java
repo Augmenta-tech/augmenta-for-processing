@@ -122,6 +122,8 @@ public class AugmentaPerson
 		
 		if(g != null)
 		{
+			g.pushStyle();
+
 			// Compute a color for the points
 			int rc,gc,bc;
 			if (id%5 == 0){
@@ -188,6 +190,8 @@ public class AugmentaPerson
 			g.textSize(10);
 			g.fill(255);
 			g.text("id: "+id+" age: "+age, centroid.x*g.width+12, centroid.y*g.height + 2);
+
+			g.popStyle();
 		}
 	}
 };
