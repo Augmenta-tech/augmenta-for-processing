@@ -23,18 +23,21 @@ public class AugmentaPerson
 	/** How long a person has been around (in seconds) */
 	public int age = 0; 
 	/** Normalized (0.0-1.0) distance from camera. For Kinect camera, highest value (1) is approx. 10 meters*/
-	public float depth; 
+	public float depth;
+	private float lastDepth;
 	/** Center of mass of person */
 	public PVector centroid;
-	public PVector lastcentroid;  
+	private PVector lastCentroid;  
 	/** Speed since last update */
 	public PVector velocity;
 	/** Closest point to the camera (with Kinect). If using non-depth camera, represents brightest point on person. */
-	public PVector highest; 
+	public PVector highest;
+	private PVector lastHighest;
 	/** Average motion within a Person's area */
 	public PVector opticalFlow; 
 	/** Bounding rectangle that surrounds Person's shape*/
 	public RectangleF boundingRect;
+	private RectangleF lastBoundingRect;
 	/** Rectangle representing a detected HAAR feature (if there is one) */
 	public RectangleF haarRect;
 	/** Defines the rough outline of a Person*/
@@ -59,6 +62,10 @@ public class AugmentaPerson
 		dead 			= false;
 		contours 		= new ArrayList<PVector>();
 		lastUpdated		= 0;
+		
+		lastBoundingRect 	= new RectangleF();
+		lastCentroid 		= new PVector();
+		lastHighest			= new PVector();
 	}
 	public AugmentaPerson(int _id, int _oid, int _age, float _depth, PVector _centroid, PVector _velocity, RectangleF _boundingRect, float _highestX, float _highestY, float _highestZ){
 		id = _id;
@@ -193,5 +200,37 @@ public class AugmentaPerson
 
 			g.popStyle();
 		}
+	}
+	
+	/**
+	 * Exponential smooth people's data
+	 */
+	public void smooth(float amount){		
+		// Apply smooth
+		depth = depth*(1-amount) + lastDepth * amount;
+		centroid.x = centroid.x*(1-amount) + lastCentroid.x * amount;
+		centroid.y = centroid.y*(1-amount) + lastCentroid.y * amount;
+		highest.x = highest.x*(1-amount) + lastHighest.x * amount;
+		highest.y = highest.y*(1-amount) + lastHighest.y * amount;
+		boundingRect.x = boundingRect.x*(1-amount) + boundingRect.x * amount;
+		boundingRect.y = boundingRect.y*(1-amount) + boundingRect.y * amount;
+		boundingRect.width = boundingRect.width*(1-amount) + boundingRect.width * amount;
+		boundingRect.height = boundingRect.height*(1-amount) + boundingRect.height * amount;
+		
+		// Recalculate smoothed velocity
+		velocity.x = centroid.x - lastCentroid.x;
+		velocity.y = centroid.y - lastCentroid.y;
+
+		// Save current values as last values for next frame
+		lastDepth = depth;
+		lastCentroid.x = centroid.x;
+		lastCentroid.y = centroid.y;
+		lastHighest.x = highest.x;
+		lastHighest.y = highest.y;
+		lastBoundingRect.x = boundingRect.x;
+		lastBoundingRect.y = boundingRect.y;
+		lastBoundingRect.width = boundingRect.width;
+		lastBoundingRect.height = boundingRect.height;
+		
 	}
 };

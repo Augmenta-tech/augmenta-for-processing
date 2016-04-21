@@ -66,6 +66,8 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 	public static boolean isConnected = false;
 
 	private static final Lock lock = new ReentrantLock();
+	
+	private static float smoothAmount = 0;
 
 	/**
 	 * Starts up Augmenta with the default port (12000). Will also attempt to
@@ -396,6 +398,11 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 			point.y = theOscMessage.get(i + 1).floatValue();
 			p.contours.add(point);
 		}
+		
+		if(smoothAmount != 0){
+			p.smooth(smoothAmount);
+		}
+		
 		p.lastUpdated = timeOut;
 		lock.unlock();
 	}
@@ -419,6 +426,11 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 		p.highest.x = t.getX(); // can't be defined
 		p.highest.y = t.getY(); // can't be defined
 		p.highest.z = size; // can't be defined
+		
+		if(smoothAmount != 0){
+			p.smooth(smoothAmount);
+		}
+		
 		p.lastUpdated = timeOut;
 	}
 	
@@ -441,6 +453,11 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 		p.highest.x = t.getX(); // can't be defined
 		p.highest.y = t.getY(); // can't be defined
 		p.highest.z = size; // can't be defined
+		
+		if(smoothAmount != 0){
+			p.smooth(smoothAmount);
+		}
+			
 		p.lastUpdated = timeOut;
 	}
 	
@@ -463,6 +480,11 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 		p.highest.y = t.getY(); // can't be defined
 		float size = 0.1f; // dummy var for the box size
 		p.highest.z = size; // can't be defined
+		
+		if(smoothAmount != 0){
+			p.smooth(smoothAmount);
+		}
+		
 		p.lastUpdated = timeOut;
 	}
 
@@ -970,6 +992,17 @@ public AugmentaPerson getNewestPerson(){
 		p = people.get(bestPerson);
 	}	
 	return p;
+}
+
+public void setSmooth(float amount){
+	// Check amount bounds
+	if(amount < 0){
+		smoothAmount = 0;
+	} else if(amount > 0.99){
+		smoothAmount = 0.99f;
+	} else {
+		smoothAmount = amount;
+	}
 }
 
 };
