@@ -34,7 +34,7 @@ public class Trigger{
      for (int i=0; i<peopleInside.size(); i++) {
          // Test if the point is not in the trigger anymore
          if (!newPeopleInside.hasValue(peopleInside.get(i))){
-           app.personLeftTrigger(peopleInside.get(i), this);
+           app.personWillLeaveTrigger(peopleInside.get(i), this);
          }
      }
      

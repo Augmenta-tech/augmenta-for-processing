@@ -52,7 +52,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 
 	private Method personEntered;
 	private Method personUpdated;
-	private Method personLeft;
+	private Method personWillLeave;
 	private Method customEvent;
 
 	private int width = 0;
@@ -73,7 +73,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 	 * Starts up Augmenta with the default port (12000). Will also attempt to
 	 * set up default Augmenta events, so will look for three methods
 	 * implemented in your app: void personEntered( AugmentaPerson p); void
-	 * personUpdated( AugmentaPerson p); void personLeft( AugmentaPerson p);
+	 * personUpdated( AugmentaPerson p); void personWillLeave( AugmentaPerson p);
 	 * 
 	 * @param PApplet
 	 *            _parent Your app (pass in as "this")
@@ -87,7 +87,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 	 * specified in the Augmenta GUI. Will also attempt to set up default
 	 * Augmenta events, so will look for three methods implemented in your app:
 	 * void personEntered( AugmentaPerson p); void personUpdated( AugmentaPerson
-	 * p); void personLeft( AugmentaPerson p);
+	 * p); void personWillLeave( AugmentaPerson p);
 	 * 
 	 * @param PApplet
 	 *            _parent Your app (pass in as "this")
@@ -255,7 +255,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 				// haven't gotten an update in a given number of frames
 				if (person.lastUpdated < -1 && !tuio) {
 					System.out.println("[AugmentaP5] Person deleted because it has not been updated for 120 frames");
-					callPersonLeft(person);
+					callPersonWillLeave(person);
 					_currentPeople.remove(person.id);
 				} else {
 					AugmentaPerson p = new AugmentaPerson();
@@ -500,7 +500,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 					new Class[] { AugmentaPerson.class });
 			personUpdated = parent.getClass().getMethod("personUpdated",
 					new Class[] { AugmentaPerson.class });
-			personLeft = parent.getClass().getMethod("personLeft",
+			personWillLeave = parent.getClass().getMethod("personWillLeave",
 					new Class[] { AugmentaPerson.class });
 			customEvent = parent.getClass().getMethod("customEvent",
 					new Class[] { ArrayList.class });
@@ -586,7 +586,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 					// Else we have to act like that the person left
 					if (personExists) {
 						updatePerson(p, theOscMessage);
-						callPersonLeft(p);
+						callPersonWillLeave(p);
 						_currentPeople.remove(p.id);
 					} // if the person does not exist in the scene no need to do this again
 				}
@@ -610,7 +610,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 				}
 				updatePerson(p, theOscMessage);
 
-				callPersonLeft(p);
+				callPersonWillLeave(p);
 				_currentPeople.remove(p.id);
 			}
 
@@ -704,7 +704,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 			// Else we have to act like that the person left
 			if (personExists) {
 				updatePerson(p, t);
-				callPersonLeft(p);
+				callPersonWillLeave(p);
 				_currentPeople.remove(p.id);
 			} // if the person does not exist in the scene no need to do this again
 		}
@@ -722,7 +722,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 			return;
 		}
 		updatePerson(p, t);
-		callPersonLeft(p);
+		callPersonWillLeave(p);
 		_currentPeople.remove(p.id);
 	}
 
@@ -783,7 +783,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 			// Else we have to act like that the person left
 			if (personExists) {
 				updatePerson(p, t);
-				callPersonLeft(p);
+				callPersonWillLeave(p);
 				_currentPeople.remove(p.id);
 			} // if the person does not exist in the scene no need to do this again
 		}
@@ -801,7 +801,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 			return;
 		}
 		updatePerson(p, t);
-		callPersonLeft(p);
+		callPersonWillLeave(p);
 		_currentPeople.remove(p.id);
 	}
 	
@@ -862,7 +862,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 			// Else we have to act like that the person left
 			if (personExists) {
 				updatePerson(p, t);
-				callPersonLeft(p);
+				callPersonWillLeave(p);
 				_currentPeople.remove(p.id);
 			} // if the person does not exist in the scene no need to do this again
 		}
@@ -880,7 +880,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 			return;
 		}
 		updatePerson(p, t);
-		callPersonLeft(p);
+		callPersonWillLeave(p);
 		_currentPeople.remove(p.id);
 	}
  
@@ -915,15 +915,15 @@ private void callPersonUpdated(AugmentaPerson p) {
 	}
 }
 
-private void callPersonLeft(AugmentaPerson p) {
-	if (personLeft != null) {
+private void callPersonWillLeave(AugmentaPerson p) {
+	if (personWillLeave != null) {
 		try {
-			personLeft.invoke(parent, new Object[] { p });
+			personWillLeave.invoke(parent, new Object[] { p });
 		} catch (Exception e) {
 			System.err
-			.println("[AugmentaP5] Disabling personLeft() for Augmenta because of an error.");
+			.println("[AugmentaP5] Disabling personWillLeave() for Augmenta because of an error.");
 			e.printStackTrace();
-			personLeft = null;
+			personWillLeave = null;
 		}
 	}
 }

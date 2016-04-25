@@ -110,8 +110,8 @@ void personEnteredTrigger(int id, Trigger t){
 }
 
 // DO NOT REMOVE unless you remove the trigger classes
-void personLeftTrigger(int id, Trigger t){
-  println("The person with id '"+id+"' left a trigger");
+void personWillLeaveTrigger(int id, Trigger t){
+  println("The person with id '"+id+"' will leave a trigger");
 }
 
 // You can also use these events functions which are triggered automatically
@@ -124,6 +124,6 @@ void personUpdated (AugmentaPerson p) {
   //println("Person updated : "+ p.id + " at ("+p.centroid.x+","+p.centroid.y+")");
 }
 
-void personLeft (AugmentaPerson p) {
-  //println("Person left : "+ p.id + " at ("+p.centroid.x+","+p.centroid.y+")");
+void personWillLeave (AugmentaPerson p) {
+  //println("Person will leave : "+ p.id + " at ("+p.centroid.x+","+p.centroid.y+")");
 }

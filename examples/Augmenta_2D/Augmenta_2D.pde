@@ -88,6 +88,6 @@ void personUpdated (AugmentaPerson p) {
   //println("Person updated : "+ p.id + " at ("+p.centroid.x+","+p.centroid.y+")");
 }
 
-void personLeft (AugmentaPerson p) {
-  //println("Person left : "+ p.id + " at ("+p.centroid.x+","+p.centroid.y+")");
+void personWillLeave (AugmentaPerson p) {
+  //println("Person will leave : "+ p.id + " at ("+p.centroid.x+","+p.centroid.y+")");
 }
