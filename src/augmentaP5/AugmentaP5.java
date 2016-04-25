@@ -153,7 +153,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 		// Create the message
 		OscMessage person = new OscMessage("/au/"+message);
 
-		person.add(p.id); // pid
+		person.add(p.pid); // pid
 		person.add(p.oid); // oid
 		person.add(p.age); // age
 		person.add(p.centroid.x); // centroid.x
@@ -256,11 +256,11 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 				if (person.lastUpdated < -1 && !tuio) {
 					System.out.println("[AugmentaP5] Person deleted because it has not been updated for 120 frames");
 					callPersonWillLeave(person);
-					_currentPeople.remove(person.id);
+					_currentPeople.remove(person.pid);
 				} else {
 					AugmentaPerson p = new AugmentaPerson();
 					p.copy(person);
-					people.put(p.id, p);
+					people.put(p.pid, p);
 				}
 			}	
 		}
@@ -290,7 +290,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 	private static void updatePerson(AugmentaPerson p, OscMessage theOscMessage) {
 		lock.lock();
 		try {
-			p.id = theOscMessage.get(0).intValue();
+			p.pid = theOscMessage.get(0).intValue();
 		} catch (Exception e) {
 			System.out
 			.println("[AugmentaP5] The OSC message with address 'updatedPerson' could not be parsed : the value [0] should be an int (id)");
@@ -410,7 +410,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 	private static void updatePerson(AugmentaPerson p, TuioCursor t){
 		// Fill the rest of the person
 		
-  		p.id = toIntExact(t.getSessionID());
+  		p.pid = toIntExact(t.getSessionID());
 	  	p.oid = 0; // TODO
 	  	p.age ++;
 		p.centroid.x = t.getX();
@@ -437,7 +437,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 	private static void updatePerson(AugmentaPerson p, TuioObject t){
 		// Fill the rest of the person
 		
-  		p.id = toIntExact(t.getSessionID());
+  		p.pid = toIntExact(t.getSessionID());
 	  	p.oid = 0; // TODO
 	  	p.age ++;
 		p.centroid.x = t.getX();
@@ -464,7 +464,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 	private static void updatePerson(AugmentaPerson p, TuioBlob t){
 		// Fill the rest of the person
 		
-		p.id = toIntExact(t.getSessionID());
+		p.pid = toIntExact(t.getSessionID());
 	  	p.oid = 0; // TODO
 	  	p.age++;
 		p.centroid.x = t.getX();
@@ -535,7 +535,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 				// Check if the point is inside the interactive area first
 				if(interactiveArea.contains(point)){
 					updatePerson(p, theOscMessage);
-					_currentPeople.put(p.id, p);
+					_currentPeople.put(p.pid, p);
 					callPersonEntered(p);
 				}
 
@@ -577,7 +577,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 						p = new AugmentaPerson();
 						updatePerson(p, theOscMessage);
 						callPersonEntered(p);
-						_currentPeople.put(p.id, p);
+						_currentPeople.put(p.pid, p);
 					} else {
 						updatePerson(p, theOscMessage);
 						callPersonUpdated(p);
@@ -587,7 +587,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 					if (personExists) {
 						updatePerson(p, theOscMessage);
 						callPersonWillLeave(p);
-						_currentPeople.remove(p.id);
+						_currentPeople.remove(p.pid);
 					} // if the person does not exist in the scene no need to do this again
 				}
 
@@ -611,7 +611,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 				updatePerson(p, theOscMessage);
 
 				callPersonWillLeave(p);
-				_currentPeople.remove(p.id);
+				_currentPeople.remove(p.pid);
 			}
 
 			// scene
@@ -661,7 +661,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 			// update the person
 			updatePerson(p, t);
 			// Add to the list 
-			_currentPeople.put(p.id, p);
+			_currentPeople.put(p.pid, p);
 			// Callback
 			callPersonEntered(p);
 		}
@@ -693,7 +693,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 				// update the person
 				updatePerson(p, t);
 				// Add to the list 
-				_currentPeople.put(p.id, p);
+				_currentPeople.put(p.pid, p);
 				// Callback
 				callPersonEntered(p);
 			} else {
@@ -705,7 +705,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 			if (personExists) {
 				updatePerson(p, t);
 				callPersonWillLeave(p);
-				_currentPeople.remove(p.id);
+				_currentPeople.remove(p.pid);
 			} // if the person does not exist in the scene no need to do this again
 		}
 
@@ -723,7 +723,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 		}
 		updatePerson(p, t);
 		callPersonWillLeave(p);
-		_currentPeople.remove(p.id);
+		_currentPeople.remove(p.pid);
 	}
 
 	// OBJECTS
@@ -740,7 +740,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 			// update the person
 			updatePerson(p, t);
 			// Add to the list 
-			_currentPeople.put(p.id, p);
+			_currentPeople.put(p.pid, p);
 			// Callback
 			callPersonEntered(p);
 		}
@@ -772,7 +772,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 				// update the person
 				updatePerson(p, t);
 				// Add to the list 
-				_currentPeople.put(p.id, p);
+				_currentPeople.put(p.pid, p);
 				// Callback
 				callPersonEntered(p);
 			} else {
@@ -784,7 +784,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 			if (personExists) {
 				updatePerson(p, t);
 				callPersonWillLeave(p);
-				_currentPeople.remove(p.id);
+				_currentPeople.remove(p.pid);
 			} // if the person does not exist in the scene no need to do this again
 		}
 
@@ -802,7 +802,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 		}
 		updatePerson(p, t);
 		callPersonWillLeave(p);
-		_currentPeople.remove(p.id);
+		_currentPeople.remove(p.pid);
 	}
 	
 	// BLOBS
@@ -819,7 +819,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 			// update the person
 			updatePerson(p, t);
 			// Add to the list 
-			_currentPeople.put(p.id, p);
+			_currentPeople.put(p.pid, p);
 			// Callback
 			callPersonEntered(p);
 		}
@@ -851,7 +851,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 				// update the person
 				updatePerson(p, t);
 				// Add to the list 
-				_currentPeople.put(p.id, p);
+				_currentPeople.put(p.pid, p);
 				// Callback
 				callPersonEntered(p);
 			} else {
@@ -863,7 +863,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 			if (personExists) {
 				updatePerson(p, t);
 				callPersonWillLeave(p);
-				_currentPeople.remove(p.id);
+				_currentPeople.remove(p.pid);
 			} // if the person does not exist in the scene no need to do this again
 		}
 
@@ -881,7 +881,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 		}
 		updatePerson(p, t);
 		callPersonWillLeave(p);
-		_currentPeople.remove(p.id);
+		_currentPeople.remove(p.pid);
 	}
  
 	public void refresh(TuioTime frameTime) {

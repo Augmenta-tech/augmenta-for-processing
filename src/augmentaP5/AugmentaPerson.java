@@ -17,7 +17,7 @@ public class AugmentaPerson
 	//private final PApplet app;
 
 	/** Unique ID, different for each Person as long as Augmenta is running */
-	public int id = 0;
+	public int pid = 0;
 	/** Ordered ID (not usually used), ID ranging from 0-Total Number of people */ 
 	public int oid = 0; 
 	/** How long a person has been around (in seconds) */
@@ -67,8 +67,8 @@ public class AugmentaPerson
 		lastCentroid 		= new PVector();
 		lastHighest			= new PVector();
 	}
-	public AugmentaPerson(int _id, int _oid, int _age, float _depth, PVector _centroid, PVector _velocity, RectangleF _boundingRect, float _highestX, float _highestY, float _highestZ){
-		id = _id;
+	public AugmentaPerson(int _pid, int _oid, int _age, float _depth, PVector _centroid, PVector _velocity, RectangleF _boundingRect, float _highestX, float _highestY, float _highestZ){
+		pid = _pid;
 		oid = _oid;
 		age = _age;
 		depth = _depth;
@@ -82,8 +82,8 @@ public class AugmentaPerson
 		contours = new ArrayList<PVector>();
 		lastUpdated	= 0;
 	}
-	public AugmentaPerson(int _id, PVector _centroid, RectangleF _boundingRect){
-		this(_id, 0, 0, 0, _centroid, new PVector(0,0), _boundingRect, 0, 0, 0);
+	public AugmentaPerson(int _pid, PVector _centroid, RectangleF _boundingRect){
+		this(_pid, 0, 0, 0, _centroid, new PVector(0,0), _boundingRect, 0, 0, 0);
 	}
 	public AugmentaPerson(PVector _centroid, RectangleF _boundingRect){
 		this((int)(Math.random() * 100000), _centroid, _boundingRect);
@@ -93,7 +93,7 @@ public class AugmentaPerson
 	}
 
 	public void copy( AugmentaPerson p){
-		id 				= p.id;
+		pid 			= p.pid;
 		oid 			= p.oid; 
 		age 			= p.age; 
 		depth 			= p.depth;
@@ -133,19 +133,19 @@ public class AugmentaPerson
 
 			// Compute a color for the points
 			int rc,gc,bc;
-			if (id%5 == 0){
+			if (pid%5 == 0){
 				rc = 255;
 				gc = 255;
 				bc = 0;
-			} else if (id%5 == 1){
+			} else if (pid%5 == 1){
 				rc = 255;
 				gc = 0;
 				bc = 255;
-			} else if (id%5 == 2){
+			} else if (pid%5 == 2){
 				rc = 0;
 				gc = 255;
 				bc = 255;
-			} else if (id%5 == 3){
+			} else if (pid%5 == 3){
 				rc = 0;
 				gc = 255;
 				bc = 50;
@@ -196,7 +196,7 @@ public class AugmentaPerson
 			// text shows more info available
 			g.textSize(10);
 			g.fill(255);
-			g.text("id: "+id+" age: "+age, centroid.x*g.width+12, centroid.y*g.height + 2);
+			g.text("pid: "+pid+" age: "+age, centroid.x*g.width+12, centroid.y*g.height + 2);
 
 			g.popStyle();
 		}

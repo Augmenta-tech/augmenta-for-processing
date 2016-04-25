@@ -64,13 +64,13 @@ void draw() {
 // You can also use these events functions which are triggered automatically
 
 void personEntered (AugmentaPerson p) {
-  //println("Person entered : "+ p.id + " at ("+p.centroid.x+","+p.centroid.y+")");
+  //println("Person entered : "+ p.pid + " at ("+p.centroid.x+","+p.centroid.y+")");
 }
 
 void personUpdated (AugmentaPerson p) {
-  //println("Person updated : "+ p.id + " at ("+p.centroid.x+","+p.centroid.y+")");
+  //println("Person updated : "+ p.pid + " at ("+p.centroid.x+","+p.centroid.y+")");
 }
 
 void personWillLeave (AugmentaPerson p) {
-  //println("Person will leave : "+ p.id + " at ("+p.centroid.x+","+p.centroid.y+")");
+  //println("Person will leave : "+ p.pid + " at ("+p.centroid.x+","+p.centroid.y+")");
 }

@@ -94,7 +94,7 @@ void draw() {
       //println("People size : "+rect.x+" "+rect.y+" "+rectHeight);
       canvas.pushMatrix();
       canvas.translate(15, 0, 0);
-      canvas.text("pid : "+people[i].id+"\n"+"oid : "+people[i].oid+"\n"+"age : "+people[i].age, 0, 0);
+      canvas.text("pid : "+people[i].pid+"\n"+"oid : "+people[i].oid+"\n"+"age : "+people[i].age, 0, 0);
       canvas.popMatrix();
     }
 
@@ -123,13 +123,13 @@ void draw() {
 // You can also use these events functions which are triggered automatically
 
 void personEntered (AugmentaPerson p) {
-  //println("Person entered : "+ p.id + " at ("+p.centroid.x+","+p.centroid.y+")");
+  //println("Person entered : "+ p.pid + " at ("+p.centroid.x+","+p.centroid.y+")");
 }
 
 void personUpdated (AugmentaPerson p) {
-  //println("Person updated : "+ p.id + " at ("+p.centroid.x+","+p.centroid.y+")");
+  //println("Person updated : "+ p.pid + " at ("+p.centroid.x+","+p.centroid.y+")");
 }
 
 void personWillLeave (AugmentaPerson p) {
-  //println("Person will leave : "+ p.id + " at ("+p.centroid.x+","+p.centroid.y+")");
+  //println("Person will leave : "+ p.pid + " at ("+p.centroid.x+","+p.centroid.y+")");
 }

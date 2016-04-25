@@ -22,11 +22,11 @@ public class Trigger{
     for (int i=0; i<people.length; i++) {
         PVector p = people[i].centroid;
         if (pointIsInside(p)){
-           if (!peopleInside.hasValue(people[i].id)){
+           if (!peopleInside.hasValue(people[i].pid)){
              // Send message to the app : someone entered
-             app.personEnteredTrigger(people[i].id, this);
+             app.personEnteredTrigger(people[i].pid, this);
            }
-           newPeopleInside.append(people[i].id);
+           newPeopleInside.append(people[i].pid);
         }
      }
      

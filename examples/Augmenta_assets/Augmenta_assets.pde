@@ -194,7 +194,7 @@ void movieEvent(Movie m) {
 }
 
 void personEntered (AugmentaPerson p) {
-  //println("Person entered : "+ p.id + "at ("+p.centroid.x+","+p.centroid.y+")");
+  //println("Person entered : "+ p.pid + "at ("+p.centroid.x+","+p.centroid.y+")");
   
   // [Sound]
     if(activateSound){
@@ -204,9 +204,9 @@ void personEntered (AugmentaPerson p) {
 }
 
 void personUpdated (AugmentaPerson p) {
-  //println("Person updated : "+ p.id + " at ("+p.centroid.x+","+p.centroid.y+")");
+  //println("Person updated : "+ p.pid + " at ("+p.centroid.x+","+p.centroid.y+")");
 }
 
 void personWillLeave (AugmentaPerson p) {
-  //println("Person will leave : "+ p.id + " at ("+p.centroid.x+","+p.centroid.y+")");
+  //println("Person will leave : "+ p.pid + " at ("+p.centroid.x+","+p.centroid.y+")");
 }
