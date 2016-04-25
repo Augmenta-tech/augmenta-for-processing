@@ -212,10 +212,10 @@ public class AugmentaPerson
 		centroid.y = centroid.y*(1-amount) + lastCentroid.y * amount;
 		highest.x = highest.x*(1-amount) + lastHighest.x * amount;
 		highest.y = highest.y*(1-amount) + lastHighest.y * amount;
-		boundingRect.x = boundingRect.x*(1-amount) + boundingRect.x * amount;
-		boundingRect.y = boundingRect.y*(1-amount) + boundingRect.y * amount;
-		boundingRect.width = boundingRect.width*(1-amount) + boundingRect.width * amount;
-		boundingRect.height = boundingRect.height*(1-amount) + boundingRect.height * amount;
+		boundingRect.x = boundingRect.x*(1-amount) + lastBoundingRect.x * amount;
+		boundingRect.y = boundingRect.y*(1-amount) + lastBoundingRect.y * amount;
+		boundingRect.width = boundingRect.width*(1-amount) + lastBoundingRect.width * amount;
+		boundingRect.height = boundingRect.height*(1-amount) + lastBoundingRect.height * amount;
 		
 		// Recalculate smoothed velocity
 		velocity.x = centroid.x - lastCentroid.x;
