@@ -206,21 +206,26 @@ public class AugmentaPerson
 	 * Exponential smooth people's data
 	 */
 	public void smooth(float amount){		
-		// Apply smooth
-		depth = depth*(1-amount) + lastDepth * amount;
-		centroid.x = centroid.x*(1-amount) + lastCentroid.x * amount;
-		centroid.y = centroid.y*(1-amount) + lastCentroid.y * amount;
-		highest.x = highest.x*(1-amount) + lastHighest.x * amount;
-		highest.y = highest.y*(1-amount) + lastHighest.y * amount;
-		boundingRect.x = boundingRect.x*(1-amount) + lastBoundingRect.x * amount;
-		boundingRect.y = boundingRect.y*(1-amount) + lastBoundingRect.y * amount;
-		boundingRect.width = boundingRect.width*(1-amount) + lastBoundingRect.width * amount;
-		boundingRect.height = boundingRect.height*(1-amount) + lastBoundingRect.height * amount;
+		// Check if "last" values have been initialized
+		if(lastDepth != 0 && lastCentroid != null && lastHighest != null && lastBoundingRect != null){
 		
-		// Recalculate smoothed velocity
-		velocity.x = centroid.x - lastCentroid.x;
-		velocity.y = centroid.y - lastCentroid.y;
+			// Apply smooth
+			depth = depth*(1-amount) + lastDepth * amount;
+			centroid.x = centroid.x*(1-amount) + lastCentroid.x * amount;
+			centroid.y = centroid.y*(1-amount) + lastCentroid.y * amount;
+			highest.x = highest.x*(1-amount) + lastHighest.x * amount;
+			highest.y = highest.y*(1-amount) + lastHighest.y * amount;
+			boundingRect.x = boundingRect.x*(1-amount) + lastBoundingRect.x * amount;
+			boundingRect.y = boundingRect.y*(1-amount) + lastBoundingRect.y * amount;
+			boundingRect.width = boundingRect.width*(1-amount) + lastBoundingRect.width * amount;
+			boundingRect.height = boundingRect.height*(1-amount) + lastBoundingRect.height * amount;
+			
+			// Recalculate smoothed velocity
+			velocity.x = centroid.x - lastCentroid.x;
+			velocity.y = centroid.y - lastCentroid.y;
 
+		}
+		
 		// Save current values as last values for next frame
 		lastDepth = depth;
 		lastCentroid.x = centroid.x;
