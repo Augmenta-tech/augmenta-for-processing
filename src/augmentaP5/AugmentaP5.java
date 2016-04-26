@@ -967,6 +967,12 @@ public AugmentaPerson getOldestPerson(){
 		if (people.get(key).age > bestAge) {
 			bestAge = people.get(key).age;
 			bestPerson = key;
+		} 
+		// If several persons have the same oldest age, take the one with smallest pid
+		else if (people.get(key).age == bestAge){
+			if(people.get(key).pid < people.get(bestPerson).pid){
+				bestPerson = key;
+			}
 		}
 	}
 	AugmentaPerson p = null;
@@ -985,6 +991,12 @@ public AugmentaPerson getNewestPerson(){
 		if (people.get(key).age < bestAge) {
 			bestAge = people.get(key).age;
 			bestPerson = key;
+		}
+		// If several persons have the same newest age, take the one with greatest pid
+		else if (people.get(key).age == bestAge){
+			if(people.get(key).pid > people.get(bestPerson).pid){
+				bestPerson = key;
+			}
 		}
 	}
 	AugmentaPerson p = null;
