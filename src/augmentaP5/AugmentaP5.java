@@ -54,7 +54,9 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 	private Method personUpdated;
 	private Method personWillLeave;
 	private Method customEvent;
-
+	
+	private AugmentaScene scene;
+	
 	private int width = 0;
 	private int height = 0;
 
@@ -105,6 +107,7 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 		// Common operations
 		parent = _parent;
 		interactiveArea = new InteractiveArea();
+		scene = new AugmentaScene();
 		people = new Hashtable<Integer, AugmentaPerson>();
 		_currentPeople = new Hashtable<Integer, AugmentaPerson>();
 		registerEvents();
@@ -617,17 +620,55 @@ public class AugmentaP5 extends PApplet implements TuioListener {
 			// scene
 			else if (theOscMessage.checkAddrPattern("/au/scene")) {
 				try {
+					scene.age = theOscMessage.get(0).intValue();
+				} catch (Exception e) {
+					System.out
+					.println("[AugmentaP5] The OSC message with address 'scene' could not be parsed : the value [0] should be an int (age)");
+				}
+				try {
+					scene.percentCovered = theOscMessage.get(1).floatValue();
+				} catch (Exception e) {
+					System.out
+					.println("[AugmentaP5] The OSC message with address 'scene' could not be parsed : the value [1] should be a float (percentCovered)");
+				}
+				try {
+					scene.numPeople = theOscMessage.get(2).intValue();
+				} catch (Exception e) {
+					System.out
+					.println("[AugmentaP5] The OSC message with address 'scene' could not be parsed : the value [2] should be an int (numPeople)");
+				}
+				try {
+					scene.averageMotion.x = theOscMessage.get(3).floatValue();
+				} catch (Exception e) {
+					System.out
+					.println("[AugmentaP5] The OSC message with address 'scene' could not be parsed : the value [3] should be a float (averageMotion.x)");
+				}
+				try {
+					scene.averageMotion.y = theOscMessage.get(4).floatValue();
+				} catch (Exception e) {
+					System.out
+					.println("[AugmentaP5] The OSC message with address 'scene' could not be parsed : the value [4] should be a float (averageMotion.y)");
+				}
+				try {
 					width = theOscMessage.get(5).intValue();
+					scene.width = theOscMessage.get(5).intValue();
 				} catch (Exception e) {
 					System.out
 					.println("[AugmentaP5] The OSC message with address 'scene' could not be parsed : the value [5] should be an int (width)");
 				}
 				try {
 					height = theOscMessage.get(6).intValue();
+					scene.height = theOscMessage.get(6).intValue();
 				} catch (Exception e) {
 					System.out
 					.println("[AugmentaP5] The OSC message with address 'scene' could not be parsed : the value [6] should be an int (height)");
 				}
+				/*try {
+					scene.depth = theOscMessage.get(7).intValue();
+				} catch (Exception e) {
+					System.out
+					.println("[AugmentaP5] The OSC message with address 'scene' could not be parsed : the value [7] should be an int (depth)");
+				}*/
 
 				// System.out.println("[Augmenta] Received OSC OK : width "+width+" height "+height);
 			}
@@ -1015,6 +1056,10 @@ public void setSmooth(float amount){
 	} else {
 		smoothAmount = amount;
 	}
+}
+
+public AugmentaScene getScene(){
+	return scene;
 }
 
 };
