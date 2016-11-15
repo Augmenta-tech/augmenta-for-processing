@@ -125,8 +125,8 @@ boolean changeSize(int a_width, int a_height) {
           a_width = (int)(displayWidth*0.8f);
           a_height = (int)(a_width/ratio);
         } else {
-          a_width = (int)(a_height*ratio);
           a_height = (int)(displayHeight*0.8f);
+          a_width = (int)(a_height*ratio);
         }
       }
       
