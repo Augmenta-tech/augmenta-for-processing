@@ -91,6 +91,8 @@ Install the needed libraries first :
 Sketch -> Import Library... -> Add Library -> Syphon
 Sketch -> Import Library... -> Add Library -> Spout For Processing
 Sketch -> Import Library... -> Add Library -> ControlP5
+Sketch -> Import Library... -> Add Library -> Minim
+Sketch -> Import Library... -> Add Library -> Video
 ```
 
 Documentation
