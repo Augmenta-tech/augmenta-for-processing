@@ -60,7 +60,7 @@ Receive and draw Augmenta data without any other library
 
 // TODO add screenshot (insert basic view)
 
-**Install TUIO** library :  [TUIO11_Processing.zip](http://prdownloads.sourceforge.net/reactivision/TUIO11_Processing-1.1.5.zip?download)
+**Install TUIO library**  :  [TUIO11_Processing.zip](http://prdownloads.sourceforge.net/reactivision/TUIO11_Processing-1.1.5.zip?download)
 
 ### 2D and 3D examples
 
@@ -88,7 +88,8 @@ Full 2D example including various features you may find useful :
 Install the needed libraries first :
 
 ```
-Sketch -> Import Library... -> Add Library -> Syphon by Andres Colubri
+Sketch -> Import Library... -> Add Library -> Syphon
+Sketch -> Import Library... -> Add Library -> Spout For Processing
 Sketch -> Import Library... -> Add Library -> ControlP5
 ```
 
