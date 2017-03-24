@@ -60,6 +60,8 @@ Receive and draw Augmenta data without any other library
 
 // TODO add screenshot (insert basic view)
 
+**Install TUIO** library :  [TUIO11_Processing.zip](http://prdownloads.sourceforge.net/reactivision/TUIO11_Processing-1.1.5.zip?download)
+
 ### 2D and 3D examples
 
 Examples for receiving and drawing Augmenta data including a Syphon/Spout output (Mac/Windows only) and a basic UI
@@ -67,14 +69,11 @@ Examples for receiving and drawing Augmenta data including a Syphon/Spout output
 Install the available libraries first :
 
 ```
-Sketch -> Import Library... -> Add Library -> Syphon by Andres Colubri
+Sketch -> Import Library... -> Add Library -> Syphon
+Sketch -> Import Library... -> Add Library -> Spout For Processing
 Sketch -> Import Library... -> Add Library -> ControlP5
-Sketch -> Import Library... -> Add Library -> PeasyCam by Jonathan Feinberg (for the 3D example only)
+Sketch -> Import Library... -> Add Library -> PeasyCam (for the 3D example only)
 ```
-
-**Spout** library :  [spout.zip](https://github.com/leadedge/SpoutProcessing/releases 
-)
-Be careful to download the latest version ! >= 2.0.5.2 and to rename the folder to spout in the lib directory.
 
 ### Assets
 
