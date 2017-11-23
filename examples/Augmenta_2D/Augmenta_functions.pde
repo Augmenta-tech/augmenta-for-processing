@@ -54,16 +54,17 @@ void setupAugmenta() {
   auReceiver.setGraphicsTarget(canvas);
   // You can set the interactive area (can be set with the mouse in this example)
   //auReceiver.interactiveArea.set(0.25f, 0.25f, 0.5f, 0.5f);
-}
 
-void setupSyphonSpout() {
+    // Create the canvas that will be sent by Syphon/Spout
 
-  // Create the canvas that will be sent by Syphon/Spout
   if(mode3D) {
     canvas = createGraphics(width, height, P3D);
   } else {
     canvas = createGraphics(width, height, P2D);
   }
+}
+
+void setupSyphonSpout() {
 
   // Create a Syphon server to send frames out
   if (platform == MACOSX) {
