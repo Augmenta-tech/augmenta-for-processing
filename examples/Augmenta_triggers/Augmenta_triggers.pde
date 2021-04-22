@@ -13,7 +13,6 @@
  */
  
 import augmentaP5.*;
-import TUIO.*;
 import oscP5.*;
 
 boolean mode3D = false;

@@ -1,5 +1,4 @@
 import augmentaP5.*;
-import TUIO.*; // Needed for Augmenta
 import oscP5.*;
 
 AugmentaP5 auReceiver;

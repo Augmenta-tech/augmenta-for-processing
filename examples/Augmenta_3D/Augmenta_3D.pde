@@ -11,7 +11,6 @@
  */
  
 import augmentaP5.*;
-import TUIO.*;
 import oscP5.*;
 import peasy.*; // Peasycam to move around the area
 

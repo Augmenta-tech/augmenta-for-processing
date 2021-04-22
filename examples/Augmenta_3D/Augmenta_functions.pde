@@ -19,8 +19,6 @@ Textfield sceneY;
 Textlabel sceneSizeInfo;
 Textfield portInput;
 Textlabel portInputLabel;
-Toggle tuioToggle;
-Textlabel tuioLabel;
 
 // Manual scene size info
 int manualSceneX = 640; // default
@@ -33,7 +31,6 @@ float originY;
 
 AugmentaP5 auReceiver;
 int oscPort = 12000;  // OSC default reception port
-boolean tuio = false; // TUIO default mode
 boolean drawDebugData = false;
 
 void settings(){
@@ -49,7 +46,7 @@ void settings(){
 void setupAugmenta() {
   
   // Create the Augmenta receiver
-  auReceiver= new AugmentaP5(this, oscPort, tuio);
+  auReceiver= new AugmentaP5(this, oscPort);
   auReceiver.setTimeOut(30); // TODO : comment needed here !
   auReceiver.setGraphicsTarget(canvas);
   // You can set the interactive area (can be set with the mouse in this example)
@@ -98,9 +95,6 @@ void showGUI(boolean val) {
   
   portInput.setVisible(val);
   portInputLabel.setVisible(val);
-  
-  tuioToggle.setVisible(val);
-  tuioLabel.setVisible(val);
 }
 
 boolean changeSize(int a_width, int a_height) {
@@ -239,18 +233,6 @@ void setUI() {
       .setText("OSC input port")
       .setPosition(10, 16)
       ;
-      
-  // TUIO toggle
-  tuioToggle = cp5.addToggle("changeTuio")
-     .setPosition(14, 60)
-     .setSize(15, 15)
-     .setLabel("")
-     .setValue(false)
-     ;
-  tuioLabel = cp5.addTextlabel("labelTuioToggle")
-      .setText("TUIO mode")
-      .setPosition(34, 63)
-      ;
 }
 // --------------------------------------
 
@@ -299,12 +281,11 @@ public void changeInputPort(String s) {
   reconnectReceiver();
 }
 public void changeTuio(boolean b) {
-  tuio = b;
   reconnectReceiver();
 }
 public void reconnectReceiver(){
-  if(tuioToggle != null && portInput != null && auReceiver != null){ // Sanity check
-    auReceiver.reconnect(oscPort, tuio);
+  if(portInput != null && auReceiver != null){ // Sanity check
+    auReceiver.reconnect(oscPort);
   }
 }
 // --------------------------------------

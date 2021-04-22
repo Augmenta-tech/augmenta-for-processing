@@ -18,7 +18,6 @@
  */
  
 import augmentaP5.*;
-import TUIO.*;
 import oscP5.*;
 // [Sound] and [Audioreaction]
 import ddf.minim.*;
