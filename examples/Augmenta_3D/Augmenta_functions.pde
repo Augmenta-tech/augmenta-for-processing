@@ -29,7 +29,7 @@ int manualSceneY = 480; // default
 float originX;
 float originY;
 
-AugmentaP5 auReceiver;
+Augmenta auReceiver;
 int oscPort = 12000;  // OSC default reception port
 boolean drawDebugData = false;
 
@@ -46,7 +46,7 @@ void settings(){
 void setupAugmenta() {
   
   // Create the Augmenta receiver
-  auReceiver= new AugmentaP5(this, oscPort);
+  auReceiver= new Augmenta(this, oscPort);
   auReceiver.setTimeOut(30); // TODO : comment needed here !
   auReceiver.setGraphicsTarget(canvas);
   // You can set the interactive area (can be set with the mouse in this example)
@@ -113,17 +113,17 @@ boolean changeSize(int a_width, int a_height) {
       }
     
       // Change window size if needed
-      float ratio = (float)a_width/(float)a_height;
-      if (a_width >= displayWidth*0.9f || a_height >= displayHeight*0.9f) {
-        // Resize the window to fit in the screen with the correct ratio
-        if ( ratio > displayWidth/displayHeight ) {
-          a_width = (int)(displayWidth*0.8f);
-          a_height = (int)(a_width/ratio);
-        } else {
-          a_height = (int)(displayHeight*0.8f);
-          a_width = (int)(a_height*ratio);
-        }
-      }
+//      float ratio = (float)a_width/(float)a_height;
+//      if (a_width >= displayWidth*0.9f || a_height >= displayHeight*0.9f) {
+//        // Resize the window to fit in the screen with the correct ratio
+//        if ( ratio > displayWidth/displayHeight ) {
+//          a_width = (int)(displayWidth*0.8f);
+//          a_height = (int)(a_width/ratio);
+//        } else {
+//          a_height = (int)(displayHeight*0.8f);
+//          a_width = (int)(a_height*ratio);
+//        }
+//      }
       
       surface.setSize(a_width, a_height);
       auReceiver.setGraphicsTarget(canvas);
@@ -147,7 +147,7 @@ boolean adjustSceneSize() {
   // Auto size
   if (autoSceneSize.getBooleanValue()) {
     
-    int[] sceneSize = auReceiver.getSceneSize();
+    int[] sceneSize = auReceiver.getResolution();
     newWidth = sceneSize[0];
     newHeight = sceneSize[1];
     
@@ -156,6 +156,7 @@ boolean adjustSceneSize() {
       // If we were in Auto with default size we need to update
       if(sceneSizeInfo.get().getText() == "0 x 0")
       {
+        System.out.println("Init size: " + newWidth + "," + newHeight);
         sceneSizeInfo.setText(newWidth + " x " + newHeight);
       }
       // Same size than current size, do nothing
@@ -168,6 +169,8 @@ boolean adjustSceneSize() {
       hasChanged = false;
       
     } else if(newWidth != canvas.width || newHeight != canvas.height) {
+      
+      System.out.println("Changing size: " + newWidth + "," + newHeight);
       
       // New size or same size newly received from Augmenta
       hasChanged = changeSize(newWidth,newHeight);
@@ -314,9 +317,9 @@ void drawAugmenta() {
     
   // Draw debug data on top with [d] key
   if (drawDebugData) {
-    AugmentaPerson[] people = auReceiver.getPeopleArray();
-    for (int i=0; i<people.length; i++) {
-      people[i].draw();
+    AugmentaObject[] objects = auReceiver.getObjectsArray();
+    for (int i=0; i<objects.length; i++) {
+      objects[i].draw();
     }
   }
 

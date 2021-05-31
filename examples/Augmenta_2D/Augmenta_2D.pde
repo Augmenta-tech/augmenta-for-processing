@@ -11,7 +11,7 @@
  *
  */
  
-import augmentaP5.*;
+import augmenta.*;
 import oscP5.*;
 
 boolean mode3D = false;
@@ -23,7 +23,8 @@ void setup() {
   setupSyphonSpout();
   setupAugmenta();
   setupGUI();
-  
+  // enable the resizable window
+  surface.setResizable(true);
   // Add your code here
 }
 
@@ -38,7 +39,7 @@ void draw() {
   canvas.background(0);
 
   // Draw a green disk under the first person entdered in the scene
-  AugmentaPerson oldest = auReceiver.getOldestPerson();
+  AugmentaObject oldest = auReceiver.getOldestObject();
   if (oldest != null){
     canvas.fill(0,255,0); // green disk
     canvas.noStroke(); // Without stroke
@@ -46,7 +47,7 @@ void draw() {
   }
   
   // Draw a blue disk for every persons
-  AugmentaPerson[] people = auReceiver.getPeopleArray();
+  AugmentaObject[] people = auReceiver.getObjectsArray();
 
   for (int i=0; i<people.length; i++) {
     
@@ -79,14 +80,14 @@ void draw() {
 
 // You can also use these events functions which are triggered automatically
 
-void personEntered (AugmentaPerson p) {
+void objectEntered (AugmentaObject o) {
   //println("Person entered : "+ p.pid + " at ("+p.centroid.x+","+p.centroid.y+")");
 }
 
-void personUpdated (AugmentaPerson p) {
+void objectUpdated (AugmentaObject o) {
   //println("Person updated : "+ p.pid + " at ("+p.centroid.x+","+p.centroid.y+")");
 }
 
-void personWillLeave (AugmentaPerson p) {
+void objectWillLeave (AugmentaObject o) {
   //println("Person will leave : "+ p.pid + " at ("+p.centroid.x+","+p.centroid.y+")");
 }

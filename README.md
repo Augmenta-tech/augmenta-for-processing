@@ -1,10 +1,8 @@
-﻿Augmenta for Processing
-=======================
+﻿# Augmenta for Processing
 
-A [Processing][] Augmenta helper library and examples maintained by [Théoriz studio][]
+A [Processing][] helper library and examples maintained by [Théoriz studio][] that allows to use the [Augmenta][] tracking system.
 
-Install
--------
+## Install
 
 Open [Processing][] and install the OscP5 library
 
@@ -12,55 +10,52 @@ Open [Processing][] and install the OscP5 library
 Sketch -> Import Library... -> Add Library -> OscP5
 ```
 
-Then get AugmentaP5 library from here
+### Auto installation
 
-https://github.com/Lyptik/AugmentaP5/archive/master.zip (and rename to AugmentaP5)
+**Coming soon:** You can get the *Augmenta for Processing* library within the Processing editor, in Sketch>import a library...>add a library... search for "Augmenta for Processing" and add it to your Processing editor. This is the prefered way of installing it.
+
+### Manual installation
+
+You can also download it manually:
+
+get the library on github at this address: https://github.com/Theoriz/augmenta-for-processing/archive/refs/heads/master.zip and **rename it "Augmenta"**.
 
 or
 
 ```
-git clone https://github.com/Theoriz/AugmentaP5.git
+git clone https://github.com/Theoriz/augmenta-for-processing.git
 ```
 
-in the following directory
+Once you have downloaded the library and **renamed it "Augmenta"**, put it in the following directory
 
 - Mac OSX : /Users/Username/Documents/Processing/libraries
 - Windows : C:/My Documents/Processing/libraries
 - Linux   : /home/Username/sketchbook/libraries
 
-You should now have a folder named *AugmentaP5* in this directory.
-
-Do the same for the TUIO library downloadable here :
-
-http://prdownloads.sourceforge.net/reactivision/TUIO11_Processing-1.1.5.zip?download
+You should now have a folder named **Augmenta** in this directory.
 
 Then restart [Processing][]
 
-Use
----
+## Usage
+
 In [Processing][]
 
 ```
 Sketch -> Import Library... -> OscP5 (needed dependency)
-Sketch -> Import Library... -> AugmentaP5
+Sketch -> Import Library... -> Augmenta for Processing
 ```
 
-Examples
---------
+## Examples
 
 In [Processing][], start your example
 
 ```
-File -> Examples... -> Contributed Libraries -> AugmentaP5
+File -> Examples... -> Contributed Libraries -> Augmenta for Processing
 ```
 
 ### Basic example
 
 Receive and draw Augmenta data without any other library
-
-// TODO add screenshot (insert basic view)
-
-**Install TUIO library**  :  [TUIO11_Processing.zip](http://prdownloads.sourceforge.net/reactivision/TUIO11_Processing-1.1.5.zip?download)
 
 ### 2D and 3D examples
 
@@ -100,7 +95,7 @@ Documentation
 
 Data protocol is here : https://github.com/Theoriz/Augmenta/wiki
 
-Here is a presentation explaining how to use the API
+Here is a presentation explaining how to use the API with an older version of the library. Some methods/members names have changed but the main concepts remain the same.
 
 http://fr.slideshare.net/DavidAlexandreCHANEL/augmentap5-api-59334230
 
@@ -123,3 +118,4 @@ Thanks to the devs and beta testers whose contribution are vitals to the project
 [Théoriz studio]: http://www.theoriz.com/
 [OpenTSPS]: https://github.com/labatrockwell/openTSPS/
 [Eclipse]: http://www.eclipse.org/
+[Augmenta]: https://augmenta-tech.com

@@ -17,7 +17,7 @@
  *
  */
  
-import augmentaP5.*;
+import augmenta.*;
 import oscP5.*;
 // [Sound] and [Audioreaction]
 import ddf.minim.*;
@@ -50,6 +50,8 @@ void setup() {
   setupSyphonSpout();
   setupAugmenta();
   setupGUI();
+  // enable the resizable window
+  surface.setResizable(true);
   
   // [Sprites]
   // Load an image (.png/.jpg/.tga/.gif)
@@ -92,7 +94,7 @@ void draw() {
   canvas.background(0);
 
   // Get the person data
-  AugmentaPerson[] people = auReceiver.getPeopleArray();
+  AugmentaObject[] people = auReceiver.getObjectsArray();
 
   // [Video]
   // For an unknow reason trying to display the video on first frame outputs a nullpointerexception, this tests fixes it
@@ -192,7 +194,7 @@ void movieEvent(Movie m) {
   m.read();
 }
 
-void personEntered (AugmentaPerson p) {
+void objectEntered (AugmentaObject o) {
   //println("Person entered : "+ p.pid + "at ("+p.centroid.x+","+p.centroid.y+")");
   
   // [Sound]
@@ -202,10 +204,10 @@ void personEntered (AugmentaPerson p) {
   }
 }
 
-void personUpdated (AugmentaPerson p) {
+void objectUpdated (AugmentaObject o) {
   //println("Person updated : "+ p.pid + " at ("+p.centroid.x+","+p.centroid.y+")");
 }
 
-void personWillLeave (AugmentaPerson p) {
+void objectWillLeave (AugmentaObject o) {
   //println("Person will leave : "+ p.pid + " at ("+p.centroid.x+","+p.centroid.y+")");
 }

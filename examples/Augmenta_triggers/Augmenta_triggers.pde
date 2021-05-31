@@ -12,7 +12,7 @@
  *
  */
  
-import augmentaP5.*;
+import augmenta.*;
 import oscP5.*;
 
 boolean mode3D = false;
@@ -28,6 +28,8 @@ void setup() {
   setupSyphonSpout();
   setupAugmenta();
   setupGUI();
+  // enable the resizable window
+  surface.setResizable(true);
   
   // [Triggers]
   ct = new CircleTrigger(width/2, height/2, 50, this);
@@ -50,6 +52,8 @@ void setup() {
 void draw() {
 
   adjustSceneSize();
+  ct.setPosition(width/2,height/2);
+  rt.setRectangle(width/2,height/4,width,0.75f*height);
   background(0);
   
   // All visuals to send must be drawn in this canvas
@@ -58,7 +62,7 @@ void draw() {
   canvas.background(0);
   
   // Draw a blue disk for every persons
-  AugmentaPerson[] people = auReceiver.getPeopleArray();
+  AugmentaObject[] people = auReceiver.getObjectsArray();
 
   for (int i=0; i<people.length; i++) {
     
@@ -101,7 +105,7 @@ void draw() {
 
 // DO NOT REMOVE unless you remove the trigger classes
 void personEnteredTrigger(int id, Trigger t){
-  println("The person with id '"+id+"' entered a trigger"); 
+  println("The object with id '"+id+"' entered a trigger"); 
   // How to test which object has been triggered :
   if (t == ct){
     println("It's the circle trigger");
@@ -115,14 +119,14 @@ void personWillLeaveTrigger(int id, Trigger t){
 
 // You can also use these events functions which are triggered automatically
 
-void personEntered (AugmentaPerson p) {
+void objectEntered (AugmentaObject o) {
   //println("Person entered : "+ p.pid + " at ("+p.centroid.x+","+p.centroid.y+")");
 }
 
-void personUpdated (AugmentaPerson p) {
+void objectUpdated (AugmentaObject o) {
   //println("Person updated : "+ p.pid + " at ("+p.centroid.x+","+p.centroid.y+")");
 }
 
-void personWillLeave (AugmentaPerson p) {
+void objectWillLeave (AugmentaObject o) {
   //println("Person will leave : "+ p.pid + " at ("+p.centroid.x+","+p.centroid.y+")");
 }

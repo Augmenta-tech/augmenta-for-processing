@@ -10,7 +10,7 @@
  *
  */
  
-import augmentaP5.*;
+import augmenta.*;
 import oscP5.*;
 import peasy.*; // Peasycam to move around the area
 
@@ -21,12 +21,17 @@ PMatrix lastCamMatrix;
 boolean updateOriginalMatrix = false;
 boolean mode3D = true;
 
+//zoom
+float scaleValue = 2;
+
 void setup() {
 
   // /!\ Keep this setup order !
   setupSyphonSpout();
   setupAugmenta();
   setupGUI();
+  // enable the resizable window
+  surface.setResizable(true);
   
   // Save the basic matrix of the scene before peasycam
   originalMatrix = getMatrix();
@@ -40,6 +45,11 @@ void setup() {
 }
 
 void draw() {
+  
+  if(scaleValue == 0){
+    System.out.println("Cannot use a scale value of zero"); 
+    return;
+  }
 
   if (cam == null){
     updateOriginalMatrix = true;
@@ -61,53 +71,74 @@ void draw() {
 
   canvas.background(0);
   
-  // Draw the floor surface
+  // Prepare global coordinate system
   canvas.pushMatrix();
   canvas.translate(0, 0, -1);
+  canvas.scale(1/scaleValue,1/scaleValue,1/scaleValue); // this allows to "zoom" in or out, to fit everything in the screen
+  
+  // Draw the floor surface
   canvas.rectMode(CENTER);
   canvas.fill(70);
-  canvas.rect(0, 0, width, height);
-  canvas.popMatrix();
+  float planeWidth = width;
+  float planeHeight = height;  
+  //System.out.println("Size: " + width + "," + height);
   
-  // Draw every persons
-  AugmentaPerson[] people = auReceiver.getPeopleArray();
+  // Draw a simple plane
+  //canvas.rect(0, 0, planeWidth, planeHeight);
 
-  for (int i=0; i<people.length; i++) {
+  //Set the current origin in the topleft corner of the plane, needed to draw objects and checkerboard
+  canvas.translate(-planeWidth/2,-planeHeight/2,0);
+  
+  // Draw a checkerboard with 1m x 1m tiles
+  drawCheckerBoard(canvas);
+  
+  // Draw every objects
+  AugmentaObject[] objects = auReceiver.getObjectsArray();
+
+  for (int i=0; i<objects.length; i++) {
+    // Push a new matrix for each object, to keep the origin in the top left corner of the plane for the next object
+    canvas.pushMatrix();
     
-    PVector pos = people[i].centroid;
+    PVector pos = objects[i].centroid;
     
-    augmentaP5.RectangleF rect = people[i].boundingRect;
-    float rectHeight = 200;
-    if (people[i].highest.z != 0 ) {
-      rectHeight = people[i].highest.z*400;
+    augmenta.RectangleF rect = objects[i].boundingRect;
+    float rectHeight = 2;
+    if (objects[i].highest.z != 0 ) {
+      rectHeight = objects[i].highest.z*auReceiver.getPixelPerMeter().x;
     }
 
+    // Move the origin at the centroid position
+    canvas.translate(planeWidth*(pos.x), planeHeight*(pos.y), 0); 
+    
     // Centroids
-    canvas.pushMatrix();
-    canvas.translate(width*(pos.x-0.5), height*(pos.y-0.5), 3); 
     canvas.fill(255);
     canvas.ellipseMode(CENTER);
     canvas.ellipse(0, 0, 5, 5);
+
+    // Bounding boxes
+    //canvas.pushMatrix();
+    //canvas.translate(-(rect.width * auReceiver.getPixelPerMeter().x)/4, -(rect.height * auReceiver.getPixelPerMeter().y)/4, 0);
+    //canvas.translate(width*(rect.x-0.5+rect.width/2), height*(rect.y-0.5+rect.height/2), rectHeight/2);
+    canvas.pushMatrix();
+    canvas.translate(0,0,rectHeight/2);
+    canvas.rotate(-radians(rect.rotation));
+    canvas.fill(255, 255, 255, 30);
+    canvas.stroke(255);
+    canvas.box(rect.width * auReceiver.getResolution()[0], rect.height*auReceiver.getResolution()[1], rectHeight);
+    canvas.popMatrix();
     
     if (drawDebugData){
       //println("People size : "+rect.x+" "+rect.y+" "+rectHeight);
       canvas.pushMatrix();
-      canvas.translate(15, 0, 0);
-      canvas.text("pid : "+people[i].pid+"\n"+"oid : "+people[i].oid+"\n"+"age : "+people[i].age, 0, 0);
+      canvas.fill(255, 255, 255, 200);
+      canvas.translate(30, 0, 0);
+      canvas.scale(scaleValue,scaleValue,scaleValue);
+      canvas.text("pid : "+objects[i].pid+"\n"+"oid : "+objects[i].oid+"\n"+"age : "+objects[i].age +"\nrot: " +rect.rotation + "\nsize: " + rect.width + "," + rect.height, 0, 0);
       canvas.popMatrix();
     }
-
-    canvas.popMatrix();
-
-    // Bounding boxes
-    canvas.pushMatrix();
-    canvas.translate(width*(rect.x-0.5+rect.width/2), height*(rect.y-0.5+rect.height/2), rectHeight/2); 
-    canvas.fill(255, 255, 255, 30);
-    canvas.stroke(255);
-    canvas.box(rect.width*width, rect.height*height, rectHeight);
     canvas.popMatrix();
   }
-  
+  canvas.popMatrix();
   canvas.endDraw();
   
   updateMatrix();
@@ -121,14 +152,53 @@ void draw() {
 
 // You can also use these events functions which are triggered automatically
 
-void personEntered (AugmentaPerson p) {
+void objectEntered (AugmentaObject o) {
   //println("Person entered : "+ p.pid + " at ("+p.centroid.x+","+p.centroid.y+")");
 }
 
-void personUpdated (AugmentaPerson p) {
+void objectUpdated (AugmentaObject o) {
   //println("Person updated : "+ p.pid + " at ("+p.centroid.x+","+p.centroid.y+")");
 }
 
-void personWillLeave (AugmentaPerson p) {
+void objectWillLeave (AugmentaObject o) {
   //println("Person will leave : "+ p.pid + " at ("+p.centroid.x+","+p.centroid.y+")");
+}
+
+/** Helper functions */
+
+// Draws a checkerboard corresponding to the Augmenta zone. Note that every dimensions are halved.
+void drawCheckerBoard(PGraphics canvas){
+  //System.out.println(auReceiver.getSceneSize()[0] + "," + auReceiver.getSceneSize()[1]);
+  //System.out.println(auReceiver.getResolution()[0] + "," + auReceiver.getResolution()[1]);
+  //System.out.println(auReceiver.getPixelPerMeter().x + "," + auReceiver.getPixelPerMeter().y);
+  
+  canvas.pushMatrix();
+  int fillColor = 200;
+  canvas.rectMode(CORNER);
+  for(int j = 0; j < (height/auReceiver.getPixelPerMeter().y); j++){
+    canvas.pushMatrix();
+    float _height;
+    if(j > (height/auReceiver.getPixelPerMeter().y)-1){
+      //System.out.println("Height: " + height + " - " + j*auReceiver.getPixelPerMeter().y);
+      _height = (height - j*auReceiver.getPixelPerMeter().y);
+    } else {
+      _height = auReceiver.getPixelPerMeter().y;
+    }
+    for(int i = 0; i < (width/auReceiver.getPixelPerMeter().x); i++){
+      //System.out.println("i; " + i + ",j: " + j);
+      canvas.fill(fillColor/((i+j)%2+1));
+      float _width;
+      if(i > (width/auReceiver.getPixelPerMeter().x)-1){
+        //System.out.println("Width: " + width + " - " + i*auReceiver.getPixelPerMeter().x);
+        _width = (width - i*auReceiver.getPixelPerMeter().x);
+      } else {
+        _width = auReceiver.getPixelPerMeter().x;
+      }
+      canvas.rect(0,0,_width,_height);
+      canvas.translate(auReceiver.getPixelPerMeter().x,0,0);
+    }
+    canvas.popMatrix();
+    canvas.translate(0,auReceiver.getPixelPerMeter().y,0);
+  }
+  canvas.popMatrix(); 
 }

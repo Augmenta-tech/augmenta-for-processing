@@ -29,7 +29,7 @@ int manualSceneY = 480; // default
 float originX;
 float originY;
 
-AugmentaP5 auReceiver;
+Augmenta auReceiver;
 int oscPort = 12000;  // OSC default reception port
 boolean drawDebugData = false;
 
@@ -46,7 +46,7 @@ void settings(){
 void setupAugmenta() {
   
   // Create the Augmenta receiver
-  auReceiver= new AugmentaP5(this, oscPort);
+  auReceiver= new Augmenta(this, oscPort);
   auReceiver.setTimeOut(30); // TODO : comment needed here !
   auReceiver.setGraphicsTarget(canvas);
   // You can set the interactive area (can be set with the mouse in this example)
@@ -98,7 +98,7 @@ void showGUI(boolean val) {
 }
 
 boolean changeSize(int a_width, int a_height) {
-  
+    System.out.println("Changing size");
     boolean hasChanged = false;
     int minSize = 200;
     int maxSize = 16000;
@@ -112,24 +112,24 @@ boolean changeSize(int a_width, int a_height) {
         canvas = createGraphics(a_width, a_height, P2D);
       }
     
-      // Change window size if needed
-      float ratio = (float)a_width/(float)a_height;
-      if (a_width >= displayWidth*0.9f || a_height >= displayHeight*0.9f) {
-        // Resize the window to fit in the screen with the correct ratio
-        if ( ratio > displayWidth/displayHeight ) {
-          a_width = (int)(displayWidth*0.8f);
-          a_height = (int)(a_width/ratio);
-        } else {
-          a_height = (int)(displayHeight*0.8f);
-          a_width = (int)(a_height*ratio);
-        }
-      }
+//      // Change window size if needed
+//      float ratio = (float)a_width/(float)a_height;
+//      if (a_width >= displayWidth*0.9f || a_height >= displayHeight*0.9f) {
+//        // Resize the window to fit in the screen with the correct ratio
+//        if ( ratio > displayWidth/displayHeight ) {
+//          a_width = (int)(displayWidth*0.8f);
+//          a_height = (int)(a_width/ratio);
+//        } else {
+//          a_height = (int)(displayHeight*0.8f);
+//          a_width = (int)(a_height*ratio);
+//        }
+//      }
       
       surface.setSize(a_width, a_height);
       auReceiver.setGraphicsTarget(canvas);
       
       hasChanged = true;
-
+      System.out.println("Size changed");
   } else if (a_width < minSize || a_height < minSize || a_width > maxSize || a_height > maxSize) {
      println("ERROR : Cannot set a window size of :" + a_width + "x" + a_height + " : smaller than " +  minSize + " or greater than " + maxSize); 
   }
@@ -147,7 +147,7 @@ boolean adjustSceneSize() {
   // Auto size
   if (autoSceneSize.getBooleanValue()) {
     
-    int[] sceneSize = auReceiver.getSceneSize();
+    int[] sceneSize = auReceiver.getResolution();
     newWidth = sceneSize[0];
     newHeight = sceneSize[1];
     
@@ -186,7 +186,7 @@ boolean adjustSceneSize() {
 // --------------------------------------
 void setUI() {
   
-  //Auto scene size + manual scene sihhze
+  //Auto scene size + manual scene size
   autoSceneSize = cp5.addToggle("changeAutoSceneSize")
      .setPosition(14, 35)
      .setSize(15, 15)
@@ -280,9 +280,7 @@ public void changeInputPort(String s) {
   }
   reconnectReceiver();
 }
-public void changeTuio(boolean b) {
-  reconnectReceiver();
-}
+
 public void reconnectReceiver(){
   if(portInput != null && auReceiver != null){ // Sanity check
     auReceiver.reconnect(oscPort);
@@ -314,15 +312,18 @@ void drawAugmenta() {
     
   // Draw debug data on top with [d] key
   if (drawDebugData) {
-    AugmentaPerson[] people = auReceiver.getPeopleArray();
-    for (int i=0; i<people.length; i++) {
-      people[i].draw();
+    AugmentaObject[] objects = auReceiver.getObjectsArray();
+    for (int i=0; i<objects.length; i++) {
+      System.out.println("Debug draw");
+      objects[i].draw();
     }
   }
 
   // Draw interactive area
   if (drawDebugData) {
-    auReceiver.interactiveArea.draw();
+    //String s = auReceiver.interactiveArea.area.x + "," + auReceiver.interactiveArea.area.y + "," + auReceiver.interactiveArea.area.width + "," + auReceiver.interactiveArea.area.height;
+    //System.out.println(s);
+    //auReceiver.interactiveArea.draw();
   } 
 }
 
