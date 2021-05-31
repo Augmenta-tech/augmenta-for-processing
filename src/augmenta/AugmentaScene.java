@@ -1,4 +1,4 @@
-package augmentaP5;
+package augmenta;
 
 import processing.core.PVector;
 
@@ -8,28 +8,28 @@ import processing.core.PVector;
 public class AugmentaScene {
 	
 	/** Time in frame number */
-	public int age = 0;
+	public int frame = 0; //age = 0;
 	/** Percent covered */ 
 	public float percentCovered = 0; 
 	/** Number of person */
-	public int numPeople = 0; 
+	public int objectCount = 0;//numObjects = 0; 
 	/** Average motion */
 	public PVector averageMotion;
 	/** Width */
-	public int width = 0; 
+	public float width = 0; 
 	/** Height */
-	public int height = 0;
+	public float height = 0;
 	/** Depth */
-	public int depth = 0; 
+//	public int depth = 0; 
 	
 	public AugmentaScene(){
-		age = 0;
+		frame = 0;
 		percentCovered = 0.0f;
-		numPeople = 0;
+		objectCount = 0;
 		averageMotion = new PVector();
-		width = 0;
-		height = 0;
-		depth = 0;
+		width = 0.0f;
+		height = 0.0f;
+//		depth = 0;
 	}
 	
 }

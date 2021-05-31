@@ -19,8 +19,6 @@ Textfield sceneY;
 Textlabel sceneSizeInfo;
 Textfield portInput;
 Textlabel portInputLabel;
-Toggle tuioToggle;
-Textlabel tuioLabel;
 
 // Manual scene size info
 int manualSceneX = 640; // default
@@ -31,9 +29,8 @@ int manualSceneY = 480; // default
 float originX;
 float originY;
 
-AugmentaP5 auReceiver;
+Augmenta auReceiver;
 int oscPort = 12000;  // OSC default reception port
-boolean tuio = false; // TUIO default mode
 boolean drawDebugData = false;
 
 void settings(){
@@ -49,7 +46,7 @@ void settings(){
 void setupAugmenta() {
   
   // Create the Augmenta receiver
-  auReceiver= new AugmentaP5(this, oscPort, tuio);
+  auReceiver= new Augmenta(this, oscPort);
   auReceiver.setTimeOut(30); // TODO : comment needed here !
   auReceiver.setGraphicsTarget(canvas);
   // You can set the interactive area (can be set with the mouse in this example)
@@ -98,9 +95,6 @@ void showGUI(boolean val) {
   
   portInput.setVisible(val);
   portInputLabel.setVisible(val);
-  
-  tuioToggle.setVisible(val);
-  tuioLabel.setVisible(val);
 }
 
 boolean changeSize(int a_width, int a_height) {
@@ -119,17 +113,17 @@ boolean changeSize(int a_width, int a_height) {
       }
     
       // Change window size if needed
-      float ratio = (float)a_width/(float)a_height;
-      if (a_width >= displayWidth*0.9f || a_height >= displayHeight*0.9f) {
-        // Resize the window to fit in the screen with the correct ratio
-        if ( ratio > displayWidth/displayHeight ) {
-          a_width = (int)(displayWidth*0.8f);
-          a_height = (int)(a_width/ratio);
-        } else {
-          a_height = (int)(displayHeight*0.8f);
-          a_width = (int)(a_height*ratio);
-        }
-      }
+//      float ratio = (float)a_width/(float)a_height;
+//      if (a_width >= displayWidth*0.9f || a_height >= displayHeight*0.9f) {
+//        // Resize the window to fit in the screen with the correct ratio
+//        if ( ratio > displayWidth/displayHeight ) {
+//          a_width = (int)(displayWidth*0.8f);
+//          a_height = (int)(a_width/ratio);
+//        } else {
+//          a_height = (int)(displayHeight*0.8f);
+//          a_width = (int)(a_height*ratio);
+//        }
+//      }
       
       surface.setSize(a_width, a_height);
       auReceiver.setGraphicsTarget(canvas);
@@ -153,7 +147,7 @@ boolean adjustSceneSize() {
   // Auto size
   if (autoSceneSize.getBooleanValue()) {
     
-    int[] sceneSize = auReceiver.getSceneSize();
+    int[] sceneSize = auReceiver.getResolution();
     newWidth = sceneSize[0];
     newHeight = sceneSize[1];
     
@@ -162,6 +156,7 @@ boolean adjustSceneSize() {
       // If we were in Auto with default size we need to update
       if(sceneSizeInfo.get().getText() == "0 x 0")
       {
+        System.out.println("Init size: " + newWidth + "," + newHeight);
         sceneSizeInfo.setText(newWidth + " x " + newHeight);
       }
       // Same size than current size, do nothing
@@ -174,6 +169,8 @@ boolean adjustSceneSize() {
       hasChanged = false;
       
     } else if(newWidth != canvas.width || newHeight != canvas.height) {
+      
+      System.out.println("Changing size: " + newWidth + "," + newHeight);
       
       // New size or same size newly received from Augmenta
       hasChanged = changeSize(newWidth,newHeight);
@@ -239,18 +236,6 @@ void setUI() {
       .setText("OSC input port")
       .setPosition(10, 16)
       ;
-      
-  // TUIO toggle
-  tuioToggle = cp5.addToggle("changeTuio")
-     .setPosition(14, 60)
-     .setSize(15, 15)
-     .setLabel("")
-     .setValue(false)
-     ;
-  tuioLabel = cp5.addTextlabel("labelTuioToggle")
-      .setText("TUIO mode")
-      .setPosition(34, 63)
-      ;
 }
 // --------------------------------------
 
@@ -299,12 +284,11 @@ public void changeInputPort(String s) {
   reconnectReceiver();
 }
 public void changeTuio(boolean b) {
-  tuio = b;
   reconnectReceiver();
 }
 public void reconnectReceiver(){
-  if(tuioToggle != null && portInput != null && auReceiver != null){ // Sanity check
-    auReceiver.reconnect(oscPort, tuio);
+  if(portInput != null && auReceiver != null){ // Sanity check
+    auReceiver.reconnect(oscPort);
   }
 }
 // --------------------------------------
@@ -333,9 +317,9 @@ void drawAugmenta() {
     
   // Draw debug data on top with [d] key
   if (drawDebugData) {
-    AugmentaPerson[] people = auReceiver.getPeopleArray();
-    for (int i=0; i<people.length; i++) {
-      people[i].draw();
+    AugmentaObject[] objects = auReceiver.getObjectsArray();
+    for (int i=0; i<objects.length; i++) {
+      objects[i].draw();
     }
   }
 

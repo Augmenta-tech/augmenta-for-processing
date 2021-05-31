@@ -1,46 +1,57 @@
-package augmentaP5;
+package augmenta;
 
 import processing.core.PApplet;
 import processing.core.PVector;
 import processing.core.PGraphics;
 
-//import augmentaP5.Rectangle;
+//import augmenta.Rectangle;
 import java.util.ArrayList;
 import java.util.Collections;
 
 /**
- * Augmenta Person object, containing properties unique to a specific tracked person
+ * Augmenta Object class, containing properties unique to a specific tracked object
  */
-public class AugmentaPerson
+public class AugmentaObject
 {
 	
 	//private final PApplet app;
-
-	/** Unique ID, different for each Person as long as Augmenta is running */
+	
+	/** How long an object has been around in frames */
+	public long frame = 0;
+	/** Unique ID, different for each Object as long as Augmenta is running */
 	public int pid = 0;
-	/** Ordered ID (not usually used), ID ranging from 0-Total Number of people */ 
+	/** Ordered ID (not usually used), ID ranging from 0-Total Number of objects */ 
 	public int oid = 0; 
-	/** How long a person has been around (in seconds) */
-	public int age = 0; 
-	/** Normalized (0.0-1.0) distance from camera. For Kinect camera, highest value (1) is approx. 10 meters*/
-	public float depth;
-	private float lastDepth;
-	/** Center of mass of person */
+	/** How long an object has been around (in seconds) */
+	public double age = 0; 
+//	/** Normalized (0.0-1.0) distance from camera. For Kinect camera, highest value (1) is approx. 10 meters*/
+//	public float depth;
+//	private float lastDepth;
+	/** Center of mass of object */
 	public PVector centroid;
 	private PVector lastCentroid;  
 	/** Speed since last update */
 	public PVector velocity;
-	/** Closest point to the camera (with Kinect). If using non-depth camera, represents brightest point on person. */
+	/** Computed virtual 'forward' direction for the object. Note, it is a COMPUTED value that uses the velocity to set a relative forward direction, and then when not moving this direction is kept to simulate a 'forward' direction */
+	public float orientation = 0; 
+	/** Oriented bounding rectangle */
+	public RectangleF boundingRect;	
+	/** Closest point to the camera (with Kinect). If using non-depth camera, represents brightest point on object. */
 	public PVector highest;
 	private PVector lastHighest;
-	/** Average motion within a Person's area */
+	/** Distance between the sensor and ground plane. */
+	public float depth = 0;
+	private float lastDepth;
+	/** Reflectivity value for lidar sensors */
+	public float reflectivity = 0;
+	
+	/** Average motion within a object's area */
 	public PVector opticalFlow; 
-	/** Bounding rectangle that surrounds Person's shape*/
-	public RectangleF boundingRect;
+	/** Bounding rectangle that surrounds object's shape*/
 	private RectangleF lastBoundingRect;
 	/** Rectangle representing a detected HAAR feature (if there is one) */
 	public RectangleF haarRect;
-	/** Defines the rough outline of a Person*/
+	/** Defines the rough outline of an object*/
 	public ArrayList<PVector> contours;
 	/** (deprecated) */
 	public int lastUpdated;
@@ -51,7 +62,7 @@ public class AugmentaPerson
 	 * Create a Augmenta Person object
 	 * @param PApplet	Pass in app to enable debug drawing of Augmenta Person object
 	 */
-	public AugmentaPerson(){
+	public AugmentaObject(){
 		//app 			= _app;
 		boundingRect 	= new RectangleF();
 		haarRect 		= new RectangleF();
@@ -67,41 +78,48 @@ public class AugmentaPerson
 		lastCentroid 		= new PVector();
 		lastHighest			= new PVector();
 	}
-	public AugmentaPerson(int _pid, int _oid, int _age, float _depth, PVector _centroid, PVector _velocity, RectangleF _boundingRect, float _highestX, float _highestY, float _highestZ){
+	public AugmentaObject(long _frame, int _pid, int _oid, int _age, PVector _centroid, PVector _velocity, float _orientation, RectangleF _boundingRect, float _highestX, float _highestY, float _highestZ, float _depth, float _reflectivity){
+		frame = _frame;
 		pid = _pid;
 		oid = _oid;
 		age = _age;
-		depth = _depth;
 		centroid = _centroid;
 		velocity = _velocity;
+		orientation = _orientation;
 		boundingRect = _boundingRect;
-		highest = new PVector(_highestX, _highestY);
+		highest = new PVector(_highestX, _highestY, _highestZ);
+		depth = _depth;
+		reflectivity = _reflectivity;
+
 		//default :
 		opticalFlow = new PVector();
 		dead = false;
 		contours = new ArrayList<PVector>();
 		lastUpdated	= 0;
 	}
-	public AugmentaPerson(int _pid, PVector _centroid, RectangleF _boundingRect){
-		this(_pid, 0, 0, 0, _centroid, new PVector(0,0), _boundingRect, 0, 0, 0);
+	public AugmentaObject(int _pid, PVector _centroid, RectangleF _boundingRect){
+		this((long)0,_pid, 0, 0, _centroid, new PVector(0,0), 0,_boundingRect, 0, 0, 1, 10, 0);
 	}
-	public AugmentaPerson(PVector _centroid, RectangleF _boundingRect){
+	public AugmentaObject(PVector _centroid, RectangleF _boundingRect){
 		this((int)(Math.random() * 100000), _centroid, _boundingRect);
 	}
-	public AugmentaPerson(PVector _centroid){
-		this(_centroid, new RectangleF(_centroid.x-0.1f, _centroid.y-0.1f, 0.2f, 0.2f));
+	public AugmentaObject(PVector _centroid){
+		this(_centroid, new RectangleF(_centroid.x-0.1f, _centroid.y-0.1f, 0.2f, 0.2f,0.0f));
 	}
 
-	public void copy( AugmentaPerson p){
+	public void copy( AugmentaObject p){
+		frame			= p.frame;
 		pid 			= p.pid;
 		oid 			= p.oid; 
 		age 			= p.age; 
-		depth 			= p.depth;
 		centroid 		= p.centroid;
 		velocity 		= p.velocity;
-		highest  		= p.highest;
-		opticalFlow 	= p.opticalFlow;
+		orientation		= p.orientation;
 		boundingRect	= p.boundingRect;
+		highest  		= p.highest;
+		depth 			= p.depth;
+		reflectivity	= p.reflectivity;
+		opticalFlow 	= p.opticalFlow;
 		haarRect 		= p.haarRect;
 		lastUpdated		= p.lastUpdated;
 
@@ -122,10 +140,10 @@ public class AugmentaPerson
 	 */
 	public void draw(){
 		
-		// draw rect based on person's detected size
+		// draw rect based on object's detected size
     	// dimensions from Augmenta are 0-1, so we multiply by window width and height
-		PApplet app = AugmentaP5.parent;
-      	PGraphics g = AugmentaP5.canvas;
+		PApplet app = Augmenta.parent;
+      	PGraphics g = Augmenta.canvas;
 		
 		if(g != null)
 		{
@@ -159,12 +177,16 @@ public class AugmentaPerson
 			g.noFill();
 			g.stroke(rc,gc,bc,255);
 			g.strokeWeight(2);
-
-			g.rectMode(g.CORNER);
-			g.textAlign(g.CORNER);
-			g.rect(boundingRect.x*g.width, boundingRect.y*g.height, boundingRect.width*g.width, boundingRect.height*g.height);		
 			
-			// draw circle based on person's centroid (also from 0-1)
+			g.pushMatrix();
+			g.rectMode(g.CENTER);
+			g.textAlign(g.CENTER);
+			g.translate(boundingRect.x*g.width, boundingRect.y*g.height);
+			g.rotate(-PApplet.radians(boundingRect.rotation));
+			g.rect(0, 0, boundingRect.width*g.width, boundingRect.height*g.height);	
+			g.popMatrix();
+			
+			// draw circle based on object's centroid (also from 0-1)
 			g.fill(rc,gc,bc);
 			g.stroke(255);
 			g.ellipse(centroid.x*g.width, centroid.y*g.height, 10, 10);
@@ -174,29 +196,29 @@ public class AugmentaPerson
 			g.stroke(rc,gc,bc);
 			int crossSize=10;
 			// Horizontal line
-			g.line(highest.x*g.width-crossSize, highest.y*g.height, highest.x*g.width+crossSize, highest.y*g.height);
+			g.line(centroid.x*g.width + highest.x*g.width-crossSize, centroid.y*g.height + highest.y*g.height, centroid.x*g.width + highest.x*g.width+crossSize, centroid.y*g.height + highest.y*g.height);
 			// Vertical line
-			g.line(highest.x*g.width, highest.y*g.height-crossSize, highest.x*g.width, highest.y*g.height+crossSize);
+			g.line(centroid.x*g.width + highest.x*g.width, centroid.y*g.height + highest.y*g.height-crossSize, centroid.x*g.width + highest.x*g.width, centroid.y*g.height + highest.y*g.height+crossSize);
 			
 			// Draw the velocity vector
 			int factor = 2;
 			g.stroke(255);
 			g.line(centroid.x*g.width, centroid.y*g.height, (centroid.x+velocity.x*factor)*g.width, (centroid.y+velocity.y*factor)*g.height);
 			
-			// draw contours
-			//g.noFill();
-			g.stroke(255,100);
-			g.beginShape();
-			for (int i=0; i<contours.size(); i++){
-				PVector pt = (PVector) contours.get(i);
-				g.vertex(pt.x*g.width, pt.y*g.height);
-			}
-			g.endShape(PApplet.CLOSE);
+//			// draw contours
+//			//g.noFill();
+//			g.stroke(255,100);
+//			g.beginShape();
+//			for (int i=0; i<contours.size(); i++){
+//				PVector pt = (PVector) contours.get(i);
+//				g.vertex(pt.x*g.width, pt.y*g.height);
+//			}
+//			g.endShape(PApplet.CLOSE);
 			
 			// text shows more info available
 			g.textSize(10);
 			g.fill(255);
-			g.text("pid: "+pid+" age: "+age, centroid.x*g.width+12, centroid.y*g.height + 2);
+			g.text("pid: "+pid+" age: "+age, centroid.x*g.width+12, centroid.y*g.height - 10);
 
 			g.popStyle();
 		}

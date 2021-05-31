@@ -1,4 +1,4 @@
-import augmentaP5.*;
+import augmenta.*;
 
 public class CircleTrigger extends Trigger{
   

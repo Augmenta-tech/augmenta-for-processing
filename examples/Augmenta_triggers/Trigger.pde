@@ -1,8 +1,8 @@
-import augmentaP5.*;
+import augmenta.*;
 
 public class Trigger{
 
-  AugmentaPerson[] people;
+  AugmentaObject[] people;
   IntList peopleInside;
   Augmenta_triggers app;
   PGraphics canvas;
@@ -13,7 +13,7 @@ public class Trigger{
     canvas = _app.canvas;
   }
   
-  public void update(AugmentaPerson[] _people){
+  public void update(AugmentaObject[] _people){
     
     // Update the people in the scene
     people = _people;

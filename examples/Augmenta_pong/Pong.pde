@@ -18,7 +18,7 @@ void setupPong(PGraphics canvas) {
 
 void drawPong() {
  
-  AugmentaPerson[] people = auReceiver.getPeopleArray();
+  AugmentaObject[] people = auReceiver.getObjectsArray();
   for (int i=0; i<people.length; i++) {
 
     PVector pos = people[i].centroid;

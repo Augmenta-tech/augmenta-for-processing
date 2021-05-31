@@ -46,3 +46,4 @@ application.macosx
 
 examples/Augmenta_2D/settings.json
 *.json
+/bin/
