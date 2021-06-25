@@ -69,9 +69,8 @@ Documentation
 
 Data protocol is here : https://github.com/Theoriz/Augmenta/wiki#data
 
-### Advanced : Manual installation from git
-
-You can also download it manually:
+Advanced : Manual installation from git for developement or bleeding edge
+-------------
 
 get the library on github at this address: https://github.com/Theoriz/augmenta-for-processing/archive/refs/heads/master.zip and **rename it "Augmenta"**.
 
