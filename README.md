@@ -4,44 +4,18 @@ A [Processing][] helper library and examples maintained by [Théoriz studio][] t
 
 ## Install
 
-Open [Processing][] and install the OscP5 library
-
+Open [Processing][] and install the OscP5 and Augmenta library
 ```
 Sketch -> Import Library... -> Add Library -> OscP5
+Sketch -> Import Library... -> Add Library -> Augmenta for Processing
 ```
-
-### Auto installation
-
-**Coming soon:** You can get the *Augmenta for Processing* library within the Processing editor, in Sketch>import a library...>add a library... search for "Augmenta for Processing" and add it to your Processing editor. This is the prefered way of installing it.
-
-### Manual installation
-
-You can also download it manually:
-
-get the library on github at this address: https://github.com/Theoriz/augmenta-for-processing/archive/refs/heads/master.zip and **rename it "Augmenta"**.
-
-or
-
-```
-git clone https://github.com/Theoriz/augmenta-for-processing.git
-```
-
-Once you have downloaded the library and **renamed it "Augmenta"**, put it in the following directory
-
-- Mac OSX : /Users/Username/Documents/Processing/libraries
-- Windows : C:/My Documents/Processing/libraries
-- Linux   : /home/Username/sketchbook/libraries
-
-You should now have a folder named **Augmenta** in this directory.
-
-Then restart [Processing][]
 
 ## Usage
 
 In [Processing][]
 
 ```
-Sketch -> Import Library... -> OscP5 (needed dependency)
+Sketch -> Import Library... -> OscP5
 Sketch -> Import Library... -> Augmenta for Processing
 ```
 
@@ -67,7 +41,7 @@ Install the available libraries first :
 Sketch -> Import Library... -> Add Library -> Syphon
 Sketch -> Import Library... -> Add Library -> Spout For Processing
 Sketch -> Import Library... -> Add Library -> ControlP5
-Sketch -> Import Library... -> Add Library -> PeasyCam (for the 3D example only)
+Sketch -> Import Library... -> Add Library -> PeasyCam (3D example only)
 ```
 
 ### Assets
@@ -93,11 +67,29 @@ Sketch -> Import Library... -> Add Library -> Video
 Documentation
 -------------
 
-Data protocol is here : https://github.com/Theoriz/Augmenta/wiki
+Data protocol is here : https://github.com/Theoriz/Augmenta/wiki#data
 
-Here is a presentation explaining how to use the API with an older version of the library. Some methods/members names have changed but the main concepts remain the same.
+### Advanced : Manual installation from git
 
-http://fr.slideshare.net/DavidAlexandreCHANEL/augmentap5-api-59334230
+You can also download it manually:
+
+get the library on github at this address: https://github.com/Theoriz/augmenta-for-processing/archive/refs/heads/master.zip and **rename it "Augmenta"**.
+
+or
+
+```
+git clone https://github.com/Theoriz/augmenta-for-processing.git
+```
+
+Once you have downloaded the library and **renamed it "Augmenta"**, put it in the following directory
+
+- Mac OSX : /Users/Username/Documents/Processing/libraries
+- Windows : C:/My Documents/Processing/libraries
+- Linux   : /home/Username/sketchbook/libraries
+
+You should now have a folder named **Augmenta** in this directory.
+
+Then restart [Processing][]
 
 Contribute
 ----------
@@ -109,10 +101,8 @@ Instructions are here : [https://github.com/processing/processing-library-templa
 Thanks
 ------
 
-Thanks to the guys at [OpenTSPS][], this library is heavily inspired from it.
-
 Thanks to the devs and beta testers whose contribution are vitals to the project
- Tom Duchêne / David-Alexandre Chanel / Jonathan Richer / you !
+Tom Duchêne / David-Alexandre Chanel / Jonathan Richer / Thomas Weissgerber / you !
 
 [Processing]: http://www.processing.org/
 [Théoriz studio]: http://www.theoriz.com/
