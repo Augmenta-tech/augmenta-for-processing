@@ -69,10 +69,10 @@ Documentation
 
 Data protocol is here : https://github.com/Theoriz/Augmenta/wiki#data
 
-Advanced : Manual installation from git for developement or bleeding edge
--------------
+Advanced : Manual install (git)
+-------------------------------------
 
-get the library on github at this address: https://github.com/Theoriz/augmenta-for-processing/archive/refs/heads/master.zip and **rename it "Augmenta"**.
+get the library on github at this address: https://github.com/Theoriz/augmenta-for-processing/archive/refs/heads/master.zip and **rename it Augmenta**.
 
 or
 
@@ -80,7 +80,7 @@ or
 git clone https://github.com/Theoriz/augmenta-for-processing.git
 ```
 
-Once you have downloaded the library and **renamed it "Augmenta"**, put it in the following directory
+Once you have downloaded the library and **renamed it Augmenta**, put it in the following directory
 
 - Mac OSX : /Users/Username/Documents/Processing/libraries
 - Windows : C:/My Documents/Processing/libraries
