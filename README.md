@@ -2,6 +2,10 @@
 
 A [Processing][] helper library and examples maintained by [Théoriz studio][] that allows to use the [Augmenta][] tracking system.
 
+![bandicam 2021-10-28 12-07-53-419](https://user-images.githubusercontent.com/64955193/139235423-674135df-cbe4-4f8a-be8f-51eb74a41d0e.gif)
+
+
+
 ## Install
 
 Open [Processing][] and install the OscP5 and Augmenta library
