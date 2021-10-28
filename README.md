@@ -11,7 +11,6 @@ A [Processing][] helper library and examples maintained by [Théoriz studio][] t
 Open [Processing][] and install the OscP5 and Augmenta library
 ```
 Sketch -> Import Library... -> Add Library -> OscP5
-Sketch -> Import Library... -> Add Library -> controlP5
 Sketch -> Import Library... -> Add Library -> Augmenta for Processing
 ```
 
